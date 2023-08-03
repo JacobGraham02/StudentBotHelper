@@ -1,6 +1,6 @@
-require('dotenv').config({path:'../.env'});
-import fs from 'fs';
+require('dotenv').config({path:'./.env'});
 import mysql from 'mysql2';
+import fs from 'fs';
 
 export class DatabaseConnectionManager {
 
@@ -26,10 +26,10 @@ export class DatabaseConnectionManager {
     */
     checkDatabaseConfigurationValues():boolean {
         return !!(this.database_admin_username && this.database_admin_password && this.database_host_uri 
-            && this.database_name && this.database_port && this.database_ssl_certificate && this.database_connection_pool);
+            && this.database_name && this.database_port && this.database_ssl_certificate);
     }
 
-    initializeDatabaseConnectionPool() {
+    async initializeDatabaseConnectionPool() {
         if (this.checkDatabaseConfigurationValues()) {
             this.database_connection_pool = mysql.createPool({
                 connectionLimit: this.database_connection_limit,
@@ -40,9 +40,44 @@ export class DatabaseConnectionManager {
                 database: this.database_name,
                 ssl: this.database_ssl_certificate
             });
+
+            this.database_connection_pool.on('connection', function(connection) {
+                console.log(`Database connection established: ${connection}`);
+            });
+
+            this.database_connection_pool.on('error', function(error) {
+                console.error(`Database connection error: ${error}`);
+            });
         }
     }
+
+    async getConnection(): Promise<mysql.PoolConnection> {
+        if (!this.database_connection_pool) {
+            await this.initializeDatabaseConnectionPool();
+        }
+        return new Promise((resolve, reject) => {
+            this.database_connection_pool.getConnection((error, connection) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(connection);
+                }
+            });
+        });
+    }
+
+
+    async closePool() {
+        if (this.database_connection_pool) {
+            return new Promise((resolve, reject) => {
+                this.database_connection_pool.end(function(error) {
+                    if (error) {
+                        reject(`There was an error when attempting to close the database connection pool ${error}`);
+                        return;
+                    }
+                    resolve(`The database connection pool has successfully closed`);
+                });
+            });
+        };
+    }
 }
-
-
-
