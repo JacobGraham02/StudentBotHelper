@@ -41,13 +41,18 @@ export class DatabaseConnectionManager {
                 ssl: this.database_ssl_certificate
             });
 
-            this.database_connection_pool.on('connection', function(connection) {
+            /*this.database_connection_pool.on('connection', function(connection) {
                 console.log(`Database connection established: ${connection}`);
             });
 
             this.database_connection_pool.on('error', function(error) {
                 console.error(`Database connection error: ${error}`);
             });
+
+            this.database_connection_pool.on('release', function(connection) {
+                console.log(`The database connection ${connection} has been released`);
+            });
+            */
         }
     }
 
@@ -65,7 +70,6 @@ export class DatabaseConnectionManager {
             });
         });
     }
-
 
     async closePool() {
         if (this.database_connection_pool) {
