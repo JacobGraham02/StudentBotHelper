@@ -9,12 +9,6 @@ describe('DatabaseConnectionManager Integration Test', () => {
     let database_ssl_certificate: Object;
     let database_connection_manager: DatabaseConnectionManager;
     let database_connection: PoolConnection;
-    const database_connection_limit = 10;
-    const database_admin_username = process.env.mysql_server_admin_username;
-    const database_admin_password = process.env.mysql_server_admin_password;
-    const database_host_uri = process.env.mysql_server_admin_hostname;
-    const database_name = process.env.mysql_server_admin_database_name;
-    const database_port = process.env.mysql_server_admin_connection_port;
 
     beforeAll(async () => {
         database_connection_manager = new DatabaseConnectionManager();
