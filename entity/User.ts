@@ -41,4 +41,14 @@ export default class User {
             throw new Error('The supplied password is invalid');
         }
     }
+
+    public userInformation() {
+        return {
+            userId: this.id,
+            userUsername: this.username,
+            userPassword: this.password,
+            userHomeLocation: this.home_location,
+            userSchoolLocation: this.school_location
+        };
+    }
 }
