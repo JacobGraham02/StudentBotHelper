@@ -12,6 +12,7 @@
     "@discordjs/builders": "^1.6.4",
     "@discordjs/rest": "^2.0.0",
     "@googlemaps/google-maps-services-js": "^3.3.35",
+    "@types/dotenv": "^8.2.0",
     "connect-mongo": "^5.0.0",
     "cookie-parser": "~1.4.4",
     "crypto": "^1.0.1",

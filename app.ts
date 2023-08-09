@@ -1,4 +1,6 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
+console.log(process.env.discord_bot_token);
 import createError from 'http-errors';
 import express from 'express';
 import path from 'path';
