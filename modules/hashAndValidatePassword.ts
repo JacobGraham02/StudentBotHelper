@@ -1,5 +1,5 @@
 import crypto, { BinaryLike } from 'crypto';
-
+import IUserPasswordObject from '../database/IUserPasswordObject';
 /**
  * This function takes in a variable with the BinaryLike data type and uses the native npm module 'crypto' to hash and salt the password. 
  * @param password BinaryLike is a string-like data type that is the password we are going to hash 

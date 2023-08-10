@@ -17,10 +17,8 @@ const filtered_commands_files = commands_files.filter(file => file !== 'deploy-c
 console.log(path.join(__dirname, '../../.env'));
 
 async function registerCommands() {
-    for (const command_file of filtered_commands_files) {
+    for(const command_file of filtered_commands_files) {
         const command_file_path = path.join(commands_folder_path, command_file);
-        console.log(command_file_path);
-        console.log(__dirname);
         const command = await import(command_file_path);
         const command_object = command.default();
         commands.push(command_object.data);
