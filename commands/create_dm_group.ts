@@ -1,4 +1,4 @@
-import {ChannelType, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
+import {ChannelType, PermissionsBitField, SlashCommandBuilder, User } from 'discord.js';
 import { UUID } from 'crypto';
 
 export default function() {
@@ -6,9 +6,13 @@ export default function() {
         data: new SlashCommandBuilder()
             .setName('create-group')
             .setDescription('Use this command to create a private thread with a maximum of 4 people (including yourself)')
+            .addStringOption(options => 
+                options.setName('group_name')
+                .setDescription('(Required) The group name')
+                .setRequired(true))
             .addUserOption(option => 
                 option.setName('user_1')
-                .setDescription('The first user for the group')
+                .setDescription('(Required) The first user for the group')
                 .setRequired(true))
             .addUserOption(option => 
                 option.setName('user_2')
@@ -35,14 +39,17 @@ export default function() {
                 }
                 
             ]
+            const group_name_option:string = 'group_name';
+            const user_options: string[] = ['user_1', 'user_2', 'user_3', 'user_4'];
+            const users: User[] = [];
 
-            const users = [
-                interaction.options.getUser('user_1'),
-                interaction.options.getUser('user_2'),
-                interaction.options.getUser('user_3'),
-                interaction.options.getUser('user_4'),
-            ];
-            
+            for (const option_name of user_options) {
+                const user = interaction.options.getUser(option_name);
+                if (user) {
+                    users.push(user);
+                }
+            }
+
             for (const user of users) {
                 if (user) {
                     permissionOverwrites.push(
@@ -56,7 +63,7 @@ export default function() {
             }
 
             const newChannel = await interaction.guild.channels.create({
-                name: "hello",
+                name: interaction.options.getString(group_name_option),
                 type: ChannelType.GuildText,
                 permissionOverwrites: permissionOverwrites,
                 parent: category_id
