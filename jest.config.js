@@ -5,6 +5,7 @@ module.exports = {
 
     testMatch: [
         '**/tests/database/integration/*.ts',
-        '**/tests/database/unit/*.ts'
+        '**/tests/database/unit/*.ts',
+        '**/tests/**/**/*.ts'
     ],
 };
