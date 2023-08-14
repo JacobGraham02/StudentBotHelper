@@ -3,16 +3,14 @@ import { Request, Response } from "express";
 import { GooglePlacesApiController } from "../../../api/GooglePlaces/GooglePlacesController";
 
 describe('GooglePlacesApiController Integration Test', () => {
-    let api_key = '';
+    let api_key: string = '';
     
     let controller: GooglePlacesApiController;
     if (process.env.google_cloud_api_key) {
         api_key = process.env.google_cloud_api_key;  
-    } else {
-        api_key = 'AIzaSyDFy-RvNkELoVyYNI7ZB4w_zxH66PBC_NQ';
-    }
+    } 
 
-    const json_mock_data = {
+    const json_places_api_test_data = {
             "candidates":
               [
                 {
@@ -53,10 +51,9 @@ describe('GooglePlacesApiController Integration Test', () => {
             status: jest.fn().mockReturnThis(),
         } as unknown as Response;
     
-        const test = await controller.findPlaceFromGooglePlacesApi(request, response);
+        const google_places_api_result = await controller.findPlaceFromGooglePlacesApi(request, response);
 
         expect(response.json).toHaveBeenCalled();
-        console.log(test);
-        expect(test).toEqual(json_mock_data);
+        expect(google_places_api_result).toEqual(json_places_api_test_data);
     });
 });

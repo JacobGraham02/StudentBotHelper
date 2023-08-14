@@ -8,7 +8,7 @@ jest.mock('../../../api/GooglePlaces/GooglePlacesService');
 
 // Group related tests for the GooglePlacesApiController
 describe('GooglePlacesApiController', () => {
-    let mock_api_key;
+    let mock_api_key: string;
     let controller: GooglePlacesApiController;
     if (process.env.google_cloud_api_key) {
         mock_api_key = process.env.google_cloud_api_key;  
