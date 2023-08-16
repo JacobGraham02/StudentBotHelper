@@ -56,8 +56,7 @@ discord_client_instance.on('interactionCreate', async interaction => {
       try {
         await command.execute(interaction);
       } catch (error) {
-        console.error(error);
-        //await interaction.reply({content: `There was an error when attempting to execute the command ${command}. Please inform the bot developer of this error`});
+        await interaction.reply({content: `There was an error when attempting to execute the command ${command}. Please inform the bot developer of this error`});
       }
   } else {
     await interaction.reply({content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`});
@@ -98,67 +97,3 @@ app.use((err: any, req: any, res: any, next: any) => {
 });
 
 export default app;
-
-// const commands_path = path.join(__dirname, 'commands');
-// const command_files_list = fs.readdirSync(commands_path).filter(file => file.endsWith('.js'));
-
-// /**
-//  * Define 2 properties on the client_instance object, which will both be empty collections. 
-//  */
-// client_instance.commands = new Collection();
-// client_instance.discord_commands = new Collection();
-
-// /**
-//  * Using the command_files_list we populated earlier, we have to dynamically import each of the functions and extract the object returned from those functions.
-//  * After we have retrieved the functions and objects, we put the imported functions into client_instance.commands, and the function objects into client_instance.discord_commands
-//  */
-
-// /**
-//  * The discord API triggers an event called 'ready' when the discord bot is ready to respond to commands and other input. 
-//  */
-// client_instance.on('ready', () => {
-//     console.log(`The bot is logged in as ${client_instance.user.tag}`);
-// });
-
-// /**
-//  * When an interaction (command) to executed on discord - for example: !discord - the discord API triggers an event called 'interactionCreate'. 
-//  */
-// client_instance.on('interactionCreate',
-//     /**
-//      * When the discord API triggers the interactionCreate event, an asynchronous function is executed with the interaction passed in as a parameter value. 
-//      * If the interaction is not a command, the function does not continue executing.
-//      * @param {any} interaction 
-//      * @returns ceases execution of the function if the interaction is not a command, if the user sent the message in the wrong channel, or if the user cannot use this command
-//      */
-//     async (interaction) => {
-//     if (!interaction.isCommand()) {
-//         return;
-//     }
-
-//     /**
-//      * The in-memory collection that stores the discord command is searched. If the collection contains the target interaction, we fetch that command for use later.
-//      */
-    
-//     const command = client_instance.discord_commands.get(interaction.commandName);
-
-//     if (!command) {
-//         return;
-//     }
-
-//     if (!(determineIfUserMessageInCorrectChannel(interaction.channel.id, discord_chat_channel_bot_commands))) {
-//         await interaction.reply({ content: `You are using this command in the wrong channel` });
-//         return;
-//     }
-    
-//     if (determineIfUserCanUseCommand(interaction.member, command.authorization_role_name)) { 
-//         try {
-//             await command.execute(interaction);
-//         } catch (error) {
-//             console.error(error);
-//             await interaction.reply({ content: 'There was an error while executing this command!', ephermal: true });
-//         }
-
-//     } else {
-//         await interaction.reply({ content: `You do not have permission to execute the command ${command.data.name}` });
-//     }
-// });

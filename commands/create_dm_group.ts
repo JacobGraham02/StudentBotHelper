@@ -69,7 +69,7 @@ export default function() {
                 parent: category_id
             });
         
-            await interaction.reply(`Channel ${newChannel.name} has been created!`);
+            await interaction.reply({content: `Channel ${newChannel.name} has been created!`, ephemeral: true});
         }
     }
 

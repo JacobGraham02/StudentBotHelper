@@ -27,7 +27,7 @@ describe('GooglePlacesApiController Integration Test', () => {
                         },
                     },
                   "name": "Museum Of Contemporary Art Chicago",
-                  "opening_hours": { "open_now": false },
+                  "opening_hours": { "open_now": true },
                   "rating": 4.4,
                 },
               ],
