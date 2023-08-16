@@ -5,7 +5,7 @@ export default function() {
     const object: Object = {
         data: new SlashCommandBuilder()
             .setName('create-group')
-            .setDescription('Use this command to create a private thread with a maximum of 4 people (including yourself)')
+            .setDescription('Use this command to create a private text channel with a maximum of 4 people (including yourself)')
             .addStringOption(options => 
                 options.setName('group_name')
                 .setDescription('(Required) The group name')
