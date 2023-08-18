@@ -1,6 +1,10 @@
 CREATE DATABASE discord_student_helper_bot;
 USE discord_student_helper_bot;
 
+SELECT * FROM student;
+DELETE FROM student;
+SET SQL_SAFE_UPDATES = 0;
+
 CREATE TABLE student (
 	id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) DEFAULT NULL,
@@ -9,8 +13,6 @@ CREATE TABLE student (
     home_location VARCHAR(100) DEFAULT NULL,
 	school_location VARCHAR(100) DEFAULT NULL
 ) Engine=InnoDB;
-
-ALTER TABLE student ADD salt VARCHAR(255);
 
 CREATE TABLE student_class (
 	id VARCHAR(36) PRIMARY KEY,

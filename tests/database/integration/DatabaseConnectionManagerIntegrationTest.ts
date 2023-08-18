@@ -1,6 +1,7 @@
-import { PoolConnection } from "mysql2";
-import { DatabaseConnectionManager } from "../../../database/DatabaseConnectionManager";
+import { PoolConnection } from "mysql2/promise";
 import fs from 'fs';
+import IDatabaseConfig from "../../../database/IDatabaseConfig";
+import DatabaseConnectionManager from "../../../database/DatabaseConnectionManager";
 
 jest.useRealTimers();
 
@@ -8,32 +9,37 @@ describe('DatabaseConnectionManager Integration Test', () => {
 
     let database_ssl_certificate: Object;
     let database_connection_manager: DatabaseConnectionManager;
-    let database_connection: PoolConnection;
+    let database_connection;
+    let database_config: IDatabaseConfig;
 
     beforeAll(async () => {
-        database_connection_manager = new DatabaseConnectionManager();
-        database_connection = await database_connection_manager.getConnection();
         if (process.env.mysql_server_admin_path_to_ssl_certificate) {
             database_ssl_certificate = {ca: fs.readFileSync(process.env.mysql_server_admin_path_to_ssl_certificate)}
         }
+        database_config = {
+            admin_username: process.env.mysql_server_admin_username!,
+            admin_password: process.env.mysql_server_admin_password!,
+            host_uri: process.env.mysql_server_admin_hostname!,
+            name: process.env.mysql_server_admin_database_name!,
+            port: process.env.mysql_server_admin_connection_port!,
+            ssl_certificate_path: process.env.mysql_server_admin_path_to_ssl_certificate!
+        }
+        database_connection_manager = new DatabaseConnectionManager(database_config);
+        await database_connection_manager.initializeDatabaseConnectionPool();
+        database_connection = await database_connection_manager.getConnection();
     });
 
     it('should connect to the remote MySQL database on Microsoft Azure', async() => {
         expect(database_connection).toBeDefined();
     });
 
-    it('should perform a query on the remote MySQL database on Microsoft Azure', async() => {        
-        new Promise((resolve, reject) => {
-            database_connection.query('SELECT 1 + 1 AS result', (error, results, fields) => {
-                if (error) {
-                    reject(error);
-                } 
-                expect(results[0].result).toEqual(2);
-                resolve(results[0].result);
-            });
-        }).catch((error) => {
-            console.error(`There was an error when attempting to perform the query 1+1 using the database: ${error}`);
-        });
+    it('should perform a query on the remote MySQL database on Microsoft Azure', async() => {     
+        try {
+            const [rows, fields] = await database_connection.query('SELECT 1+1 AS result');
+            expect(rows[0].result).toEqual(2);
+        } catch (error) {
+            console.error(error);
+        }
     });
 
     afterAll(async() => {

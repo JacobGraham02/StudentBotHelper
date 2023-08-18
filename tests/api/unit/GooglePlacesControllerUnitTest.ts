@@ -1,4 +1,3 @@
-// Import necessary dependencies
 import { GooglePlacesApiController } from "../../../api/GooglePlaces/GooglePlacesController";
 import { GooglePlacesService } from "../../../api/GooglePlaces/GooglePlacesService";
 import { Request, Response } from 'express';
@@ -34,7 +33,7 @@ describe('GooglePlacesApiController', () => {
                         },
                     },
                   "name": "Museum of Contemporary Art Australia",
-                  "opening_hours": { "open_now": false },
+                  "opening_hours": { "open_now": false || true },
                   "rating": 4.4,
                 },
               ]

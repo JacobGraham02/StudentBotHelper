@@ -9,10 +9,11 @@ export default class User {
     private id: UUID;
     private username: string;
     private password: string;
-    private home_location?: string | undefined;
+    private start_location?: string | undefined;
     private school_location?: string | undefined;
+    private salt: string;
 
-    constructor(id: UUID, username: string, password: string, home_location?: string, school_location?: string) {
+    constructor(id: UUID, username: string, password: string, salt: string, start_location?: string, school_location?: string) {
         this.validateId(id);
         this.validateUsername(username);
         this.validatePassword(password);
@@ -20,8 +21,13 @@ export default class User {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.home_location = home_location;
-        this.school_location = school_location;
+        if (start_location) {
+            this.start_location = start_location;
+        }
+        if (school_location) {
+            this.school_location = school_location;
+        }
+        this.salt = salt;
     }
 
     private validateId(id: UUID): void {
@@ -47,7 +53,7 @@ export default class User {
             userId: this.id,
             userUsername: this.username,
             userPassword: this.password,
-            userHomeLocation: this.home_location,
+            userStartLocation: this.start_location,
             userSchoolLocation: this.school_location
         };
     }
