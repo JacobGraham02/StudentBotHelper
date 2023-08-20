@@ -9,7 +9,8 @@ CREATE TABLE student (
 	id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) DEFAULT NULL,
     password VARCHAR(255) DEFAULT NULL,
-    salt VARCHAR(255) DEFAULT NULL,
+    discord_username VARCHAR(40) DEFAULT NULL UNIQUE,
+    salt VARCHAR(255) DEFAULT NULL UNIQUE,
     home_location VARCHAR(100) DEFAULT NULL,
 	school_location VARCHAR(100) DEFAULT NULL
 ) Engine=InnoDB;

@@ -1,11 +1,11 @@
 import crypto, { BinaryLike } from 'crypto';
-import IUserPasswordObject from '../database/IUserPasswordObject';
+import IStudentPasswordObject from '../database/IStudentPasswordObject';
 /**
  * This function takes in a variable with the BinaryLike data type and uses the native npm module 'crypto' to hash and salt the password. 
  * @param password BinaryLike is a string-like data type that is the password we are going to hash 
  * @returns A plain javascript object containing the hash and salt of the supplied password
  */
-export function hashPassword(password: BinaryLike): IUserPasswordObject {
+export function hashPassword(password: BinaryLike): IStudentPasswordObject {
     const hash_creation_iterations: number = 10000;
     const hash_total_length = 60;
     const salt: string = crypto.randomBytes(32).toString('hex');

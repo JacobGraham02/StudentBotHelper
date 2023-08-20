@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 
-export default class User {
+export default class Student {
 
     private uuid_regex_pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     private username_regex_pattern = /[a-zA-Z ]{0,32}/
@@ -9,11 +9,12 @@ export default class User {
     private id: UUID;
     private username: string;
     private password: string;
+    private discord_username: string;
     private start_location?: string | undefined;
     private school_location?: string | undefined;
     private salt: string;
 
-    constructor(id: UUID, username: string, password: string, salt: string, start_location?: string, school_location?: string) {
+    constructor(id: UUID, username: string, password: string, discord_username: string, salt: string, start_location?: string, school_location?: string) {
         this.validateId(id);
         this.validateUsername(username);
         this.validatePassword(password);
@@ -21,6 +22,7 @@ export default class User {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.discord_username = discord_username;
         if (start_location) {
             this.start_location = start_location;
         }
@@ -48,13 +50,15 @@ export default class User {
         }
     }
 
-    public userInformation() {
+    public studentInformation() {
         return {
-            userId: this.id,
-            userUsername: this.username,
-            userPassword: this.password,
-            userStartLocation: this.start_location,
-            userSchoolLocation: this.school_location
+            studentId: this.id,
+            studentUsername: this.username,
+            studentPassword: this.password,
+            studentDiscordUsername: this.discord_username,
+            studentSalt: this.salt,
+            studentStartLocation: this.start_location,
+            studentSchoolLocation: this.school_location
         };
     }
 }

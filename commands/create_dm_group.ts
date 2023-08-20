@@ -1,8 +1,8 @@
 import {ChannelType, PermissionsBitField, SlashCommandBuilder, User } from 'discord.js';
-import { UUID } from 'crypto';
+import StudentRepository from '../database/StudentRepository';
 
 export default function() {
-    const object: Object = {
+    const create_dm_group_object: Object = {
         data: new SlashCommandBuilder()
             .setName('create-group')
             .setDescription('Use this command to create a private text channel with a maximum of 4 people (including yourself)')
@@ -29,7 +29,11 @@ export default function() {
         authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
+            const student_repository = new StudentRepository();
+            const discord_user_username = interaction.user.username;
             const category_id = "1110654950066896957";
+
+            await student_repository.findByDiscordUsername(discord_user_username);
             
             const permissionOverwrites = [
                 {
@@ -73,5 +77,5 @@ export default function() {
         }
     }
 
-    return object;
+    return create_dm_group_object;
 }

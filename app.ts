@@ -36,7 +36,7 @@ async function fetchCommandFiles() {
 fetchCommandFiles();
 
 discord_client_instance.on('ready', () => {
-    console.log(`The bot is logged in as ${discord_client_instance.user!.tag}`)
+  console.log(`The bot is logged in as ${discord_client_instance.user!.tag}`)
 });
 
 discord_client_instance.on('interactionCreate', async interaction => {
@@ -56,7 +56,7 @@ discord_client_instance.on('interactionCreate', async interaction => {
       try {
         await command.execute(interaction);
       } catch (error) {
-        await interaction.reply({content: `There was an error when attempting to execute the command ${command}. Please inform the bot developer of this error`});
+        await interaction.reply({content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`});
       }
   } else {
     await interaction.reply({content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`});

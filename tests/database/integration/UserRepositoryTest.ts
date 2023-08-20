@@ -2,8 +2,8 @@ import { PoolConnection } from "mysql2/promise";
 import fs from 'fs';
 import IDatabaseConfig from "../../../database/IDatabaseConfig";
 import DatabaseConnectionManager from "../../../database/DatabaseConnectionManager";
-import UserRepository from "../../../database/UserRepository";
-import User from "../../../entity/User";
+import UserRepository from "../../../database/StudentRepository";
+import Student from "../../../entity/Student";
 
 describe('DatabaseConnectionManager Integration Test', () => {
 
@@ -11,13 +11,14 @@ describe('DatabaseConnectionManager Integration Test', () => {
     let database_connection_manager: DatabaseConnectionManager;
     let userRepository: UserRepository;
     let database_config: IDatabaseConfig;
-    const user:User = new User(
+    const user:Student = new Student(
         'eb266e83-bdce-4e04-845b-295ebb09b795',
-        'test',
-        'test',
-        'test',
-        'test',
-        'test'
+        'test_username',
+        'test_password',
+        'test_discord_username',
+        'test_salt',
+        'test_start_location',
+        'test_school_location'
     );
 
     beforeAll(async () => {
@@ -43,10 +44,10 @@ describe('DatabaseConnectionManager Integration Test', () => {
     });
 
     it('Should find a student in the database from their username', async() => {
-        const foundUser = await userRepository.findByUsername('test');
+        const foundUser = await userRepository.findByStudentName('test');
         expect(foundUser).toBeDefined();
-        const foundUserInformation = foundUser?.userInformation();
-        expect(foundUserInformation?.userUsername).toBe('test');
+        const foundUserInformation = foundUser?.studentInformation();
+        expect(foundUserInformation?.studentUsername).toBe('test');
     });
 
     it('Should delete a student from the database', async() => {  
@@ -55,7 +56,7 @@ describe('DatabaseConnectionManager Integration Test', () => {
     });
 
     it('Should update a student in the database', async() => {
-        const updated_user:User = new User(
+        const updated_user:Student = new Student(
             'eb266e83-bdce-4e04-845b-295ebb09b795',
             'updated_test',
             'updated_test',
@@ -65,15 +66,15 @@ describe('DatabaseConnectionManager Integration Test', () => {
         );
         await userRepository.update(updated_user);
         const updatedUser = await userRepository.findById('eb266e83-bdce-4e04-845b-295ebb09b795');
-        const updatedUserInformation = updatedUser?.userInformation();
-        expect(updatedUserInformation?.userUsername).toBe('updated_test');
+        const updatedUserInformation = updatedUser?.studentInformation();
+        expect(updatedUserInformation?.studentUsername).toBe('updated_test');
     });
 
     it('Should find a student in the database from their id', async() => {
         const foundUser = await userRepository.findById('eb266e83-bdce-4e04-845b-295ebb09b795');
         expect(foundUser).toBeDefined();
-        const foundUserInformation = foundUser?.userInformation();
-        expect(foundUserInformation?.userId).toBe('eb266e83-bdce-4e04-845b-295ebb09b795');
+        const foundUserInformation = foundUser?.studentInformation();
+        expect(foundUserInformation?.studentId).toBe('eb266e83-bdce-4e04-845b-295ebb09b795');
     });
 
     afterAll(async() => {
