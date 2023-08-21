@@ -23,7 +23,7 @@ export default function() {
 
         async execute(interaction) {
             const student_cache: Cache = Cache.getCacheInstance();
-            const student_repository = new StudentRepository();
+            const student_repository: StudentRepository = new StudentRepository();
             const discord_user_username: string = interaction.user.username;
 
             let existing_student = student_cache.get(discord_user_username);
@@ -52,6 +52,7 @@ export default function() {
                 undefined);
             
             await student_repository.create(student_for_database);
+            student_cache.clear(discord_user_username);
             interaction.reply({content:`An account has been created for you. Remember to save your login credentials somewhere safe`,ephemeral: true});
         }
     }

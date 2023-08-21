@@ -207,7 +207,6 @@ export default class StudentRepository implements IStudentRepository {
         
         const database_connection = await this.database_manager.getConnection();
         try {
-            console.log(student_object_values);
             await database_connection.query(query_string, student_object_values);
         } finally {
             if (database_connection) {
@@ -217,7 +216,7 @@ export default class StudentRepository implements IStudentRepository {
         return undefined;
     }
 
-    async delete(id: UUID): Promise<Student | undefined> {
+    async delete(id: UUID) {
         const query_string = `DELETE FROM student WHERE id = ?`;
         const database_connection = await this.database_manager.getConnection();
 
