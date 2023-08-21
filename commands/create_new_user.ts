@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import StudentRepository from '../database/StudentRepository';
 import Student from '../entity/Student';
 import { hashPassword } from '../modules/hashAndValidatePassword';
+import Cache from '../utils/Cache';
 
 export default function() {
     const create_new_user_object: Object = {
@@ -21,13 +22,21 @@ export default function() {
         authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
+            const student_cache: Cache = Cache.getCacheInstance();
             const student_repository = new StudentRepository();
             const discord_user_username: string = interaction.user.username;
-            console.log(`Discord user username is:${discord_user_username}`);
 
-            const existing_student_result = await student_repository.findByDiscordUsername(discord_user_username);
-            if (existing_student_result !== undefined) {
-                await interaction.reply({content:`You have already created a user for this server. Please attempt to log in or reset your credentials`});
+            let existing_student = student_cache.get(discord_user_username);
+            
+            if (!existing_student) {
+                existing_student = await student_repository.findByDiscordUsername(discord_user_username);
+                
+                if (existing_student) {
+                    student_cache.set(discord_user_username, existing_student);
+                }
+            }
+            if (existing_student !== undefined) {
+                await interaction.reply({content:`You have already created a user for this server. Please attempt to log in or reset your credentials`,ephemeral:true});
                 return;
             } 
             const student_submitted_username = interaction.options.getString('username');
