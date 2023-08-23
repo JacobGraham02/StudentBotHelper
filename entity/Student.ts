@@ -61,4 +61,14 @@ export default class Student {
             studentSchoolLocation: this.school_location
         };
     }
+
+    public toJsonSafe() {
+        return {
+            id: this.id,
+            username: this.username,
+            discord_username: this.discord_username,
+            start_location: this.start_location,
+            school_location: this.school_location   
+        };
+    }
 }

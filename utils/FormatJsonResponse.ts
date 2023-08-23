@@ -1,9 +1,10 @@
-import IEventEmitterResponse from './IEventEmitterResponse';
+import Student from "../entity/Student";
 
-export default function formatValidJsonResponse(response_status: number, response_text: string):IEventEmitterResponse {
+export default function formatValidJsonResponse(response_status: number, response_statusText: string, user_data?: Student):string {
     const formatted_object = {
         status: response_status,
-        statusText: response_text
+        statusText: response_statusText,
+        data: user_data ? user_data.toJsonSafe() : undefined
     }
-    return { response_json: JSON.stringify(formatted_object)};
+    return JSON.stringify(formatted_object);
 }

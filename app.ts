@@ -21,10 +21,10 @@ const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   ],
   discord_commands: Collection<any, any>
 });
-const custom_event_emitter = new CustomEventEmitter();
 const commands_folder_path: string = path.join(__dirname, './commands');
 const filtered_commands_files = fs.readdirSync(commands_folder_path).filter(file => file !== 'deploy-commands.js' && !file.endsWith(".map"));
 discord_client_instance.discord_commands = new Collection();
+const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
 
 async function fetchCommandFiles() {
   for (const command_file of filtered_commands_files) {
@@ -66,7 +66,6 @@ discord_client_instance.on('interactionCreate', async interaction => {
 discord_client_instance.login(discord_bot_token);
 
 custom_event_emitter.on('databaseOperationEvent', async(message) => {
-  console.log('Emitted event to record a database operation');
   const discord_channel_for_operation_results = process.env.discord_bot_http_response_channel_id;
   if (!discord_channel_for_operation_results) {
     throw new Error(`The discord channel id for database operation results could not be fetched.`);
