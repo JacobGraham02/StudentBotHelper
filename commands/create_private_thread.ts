@@ -26,19 +26,19 @@ export default function() {
             const thread_owner_password:string = 'password';
             const thread_owner_user: User = interaction.options.getUser('user');
             
-            if (interaction.channel.type === 'GUILD_TEXT' || interaction.channel.type === 'GUILD_NEWS') {
+            // if (interaction.channel.type === 'GUILD_TEXT' || interaction.channel.type === 'GUILD_NEWS') {
                 const channel_to_create_thread = interaction.channel;
 
                 const private_text_thread = await channel_to_create_thread.threads.create({
                     name: `Private session for ${thread_owner_username}`,
                     autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
                     type: ChannelType.PrivateThread,
-                    reason: `This thread is a user session for something specific`
+                    reason: `This thread is a user session ${thread_owner_username}`
                 });
-            } else {
-                interaction.reply({content:'A private thread can only be created in a text channel.',ephemeral:true});
-                return;
-            }
+            // } else {
+            //     interaction.reply({content:'A private thread can only be created in a text channel.',ephemeral:true});
+            //     return;
+            // }
             interaction.reply({content:'A private thread has been successfully created',emphermal:true});
         }
     }

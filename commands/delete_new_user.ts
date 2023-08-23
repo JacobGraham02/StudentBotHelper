@@ -23,6 +23,7 @@ export default function() {
                 let existing_student = student_cache.get(discord_user_username);
                 if (existing_student) {
                     interaction.reply({content:`The specified user does not exist. Try again if you believe this is an error`,ephemeral:true});
+                    return;
                 }
 
                 let existing_user = await student_repository.findByDiscordUsername(discord_user_username);

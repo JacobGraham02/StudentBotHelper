@@ -9,6 +9,7 @@ import logger from 'morgan';
 import fs from 'fs';
 import { Client, Collection, GatewayIntentBits, GuildMemberRoleManager } from 'discord.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
+import CustomEventEmitter from './utils/CustomEventEmitter.js';
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -20,7 +21,7 @@ const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   ],
   discord_commands: Collection<any, any>
 });
-
+const custom_event_emitter = new CustomEventEmitter();
 const commands_folder_path: string = path.join(__dirname, './commands');
 const filtered_commands_files = fs.readdirSync(commands_folder_path).filter(file => file !== 'deploy-commands.js' && !file.endsWith(".map"));
 discord_client_instance.discord_commands = new Collection();
@@ -40,7 +41,6 @@ discord_client_instance.on('ready', () => {
 });
 
 discord_client_instance.on('interactionCreate', async interaction => {
-  let error_message = '';
   if (!interaction.isCommand()) {
     return;
   }
@@ -56,14 +56,27 @@ discord_client_instance.on('interactionCreate', async interaction => {
       try {
         await command.execute(interaction);
       } catch (error) {
-        await interaction.reply({content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`});
+        await interaction.reply({content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,ephemeral:true});
       }
   } else {
-    await interaction.reply({content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`});
+    await interaction.reply({content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`,ephemeral:true});
   }
 });
 
 discord_client_instance.login(discord_bot_token);
+
+custom_event_emitter.on('databaseOperationEvent', async(message) => {
+  console.log('Emitted event to record a database operation');
+  const discord_channel_for_operation_results = process.env.discord_bot_http_response_channel_id;
+  if (!discord_channel_for_operation_results) {
+    throw new Error(`The discord channel id for database operation results could not be fetched.`);
+  }
+  const discord_channel_for_messages = await discord_client_instance.channels.fetch(discord_channel_for_operation_results);
+  if (discord_channel_for_messages && discord_channel_for_messages.isTextBased()) {
+    discord_channel_for_messages.send(message);
+  }
+});
+
 
 const app = express();
 

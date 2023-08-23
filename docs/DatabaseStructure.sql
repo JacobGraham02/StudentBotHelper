@@ -2,7 +2,7 @@ CREATE DATABASE discord_student_helper_bot;
 USE discord_student_helper_bot;
 
 SELECT * FROM student;
-DELETE FROM student;
+DELETE FROM student WHERE username='Jacob' OR username='Jacob2';
 SET SQL_SAFE_UPDATES = 0;
 
 CREATE TABLE student (
