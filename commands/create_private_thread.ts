@@ -1,4 +1,6 @@
-import { ChannelType, SlashCommandBuilder, TextChannel, ThreadAutoArchiveDuration, User } from 'discord.js';
+import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, User } from 'discord.js';
+import StudentRepository from '../database/StudentRepository';
+import Cache from '../utils/Cache';
 
 export default function() {
     const create_private_thread_object: Object = {
@@ -15,31 +17,39 @@ export default function() {
             .setRequired(true))
         .addUserOption(option => 
             option.setName('user')
-            .setDescription('(Required) The first user for the group')
+            .setDescription('(Required) The first user for the thread')
             .setRequired(true)
         ),
         authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
             const category_id = "1110654950066896957"; 
-            const thread_owner_username:string = 'username';
-            const thread_owner_password:string = 'password';
             const thread_owner_user: User = interaction.options.getUser('user');
-            
-            // if (interaction.channel.type === 'GUILD_TEXT' || interaction.channel.type === 'GUILD_NEWS') {
-                const channel_to_create_thread = interaction.channel;
+            const student_repository: StudentRepository = new StudentRepository();
+            const discord_user_username: string = interaction.user.username;
+            const channel_to_create_thread = interaction.channel;
+            const student_cache: Cache = Cache.getCacheInstance();
 
-                const private_text_thread = await channel_to_create_thread.threads.create({
-                    name: `Private session for ${thread_owner_username}`,
-                    autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
-                    type: ChannelType.PrivateThread,
-                    reason: `This thread is a user session ${thread_owner_username}`
-                });
-            // } else {
-            //     interaction.reply({content:'A private thread can only be created in a text channel.',ephemeral:true});
-            //     return;
-            // }
-            interaction.reply({content:'A private thread has been successfully created',emphermal:true});
+            let existing_student = student_cache.get(discord_user_username);
+
+            if (!existing_student) {
+                existing_student = await student_repository.findByDiscordUsername(discord_user_username);
+
+                if (existing_student) {
+                    student_cache.set(discord_user_username, existing_student);
+                } else {
+                    interaction.reply({content:`Please register a user account using the command /create-user`,ephemeral:true});
+                    return;
+                }
+            }
+
+            const private_text_thread = await channel_to_create_thread.threads.create({
+                name: `Private session for ${discord_user_username}`,
+                autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
+                type: ChannelType.PrivateThread,
+                reason: `This thread is a user session for ${discord_user_username}`
+            });
+            interaction.reply({content:'A private thread has been successfully created',ephemeral:true});
         }
     }
     return create_private_thread_object;

@@ -10,6 +10,7 @@ import fs from 'fs';
 import { Client, Collection, GatewayIntentBits, GuildMemberRoleManager } from 'discord.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
+import { EmbedBuilder } from '@discordjs/builders';
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -66,13 +67,26 @@ discord_client_instance.on('interactionCreate', async interaction => {
 discord_client_instance.login(discord_bot_token);
 
 custom_event_emitter.on('databaseOperationEvent', async(message) => {
+  const database_operation_embedded_message = new EmbedBuilder()
+    .setColor(0x299bcc)
+    .setTitle('Database operation that triggered for Microsoft Azure')
+    .setURL('https://discord.js.org/')
+    .setAuthor({name:`StudentHelperBot`, iconURL:'https://imgur.com/9rn0xvQ'})
+    .setDescription(message.status)
+    .setThumbnail('https://imgur.com/9rn0xvQ')
+    .addFields(
+      { name: 'Response statusText', value: message.statusText}
+    )
+    .setImage('https://imgur.com/9rn0xvQ')
+    .setTimestamp()
+
   const discord_channel_for_operation_results = process.env.discord_bot_http_response_channel_id;
   if (!discord_channel_for_operation_results) {
     throw new Error(`The discord channel id for database operation results could not be fetched.`);
   }
   const discord_channel_for_messages = await discord_client_instance.channels.fetch(discord_channel_for_operation_results);
   if (discord_channel_for_messages && discord_channel_for_messages.isTextBased()) {
-    discord_channel_for_messages.send(message);
+    discord_channel_for_messages.send({embeds: [database_operation_embedded_message]});
   }
 });
 

@@ -26,7 +26,7 @@ export default class StudentRepository implements IStudentRepository {
         this.database_operation_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
         this.database_manager = new DatabaseConnectionManager(this.database_config);
     }
-    
+
     /**
      * Find all Students from the 'student' table. There is a limit of 10 fetched Students so I save costs on fetching data from the database I host on Microsoft Azure.
      * @returns A Promise containing an array of Student objects, or a value of undefined if an array of Student objects cannot be fetched
@@ -52,6 +52,9 @@ export default class StudentRepository implements IStudentRepository {
                 student_array.push(new_student);
             });
             return student_array.length > 0 ? student_array : undefined;
+        } catch(error) {
+            console.error(`There was an error when attempting to fetch all Student objects from the database: ${error}`);
+            return undefined;
         } finally {
             if (database_connection) {
                 database_connection.end();
@@ -83,6 +86,9 @@ export default class StudentRepository implements IStudentRepository {
                     student_data.school_location
                 );
             }
+        } catch(error) {
+            console.error(`There was an error when attempting to find a Student in the database via id: ${error}`);
+            return undefined;  
         } finally {
             if (database_connection) {
                 database_connection.end();
@@ -113,12 +119,12 @@ export default class StudentRepository implements IStudentRepository {
             }
         } catch (error) {
             console.error(`There was an error when attempting to fetch a student by their username: ${error}`);
+            return undefined;
         } finally {
             if (database_connection) {
                 database_connection.end();
             }
         }
-        return undefined; 
     }
 
     async findByDiscordUsername(discord_username: string): Promise<Student | undefined> {
@@ -129,7 +135,7 @@ export default class StudentRepository implements IStudentRepository {
 
         const database_connection = await this.database_manager.getConnection();
 
-       try {
+        try {
            const [rows, fields] = await database_connection.query(query_string, [discord_username]);
 
            if (rows[0].id && rows[0].username && rows[0].password && rows[0].discord_username && rows[0].salt) {
@@ -139,16 +145,17 @@ export default class StudentRepository implements IStudentRepository {
            } else {
                throw new Error(`A user in the database by that discord name could not be found. Please try again or try different inputs`);
            }
-       } catch (error) {
-           console.error(`There was an error when attempting to fetch a student by their discord name: ${error}`);
-       } finally {
+        } catch (error) {
+           console.error(`There was an error when attempting to fetch a Student by their discord name: ${error}`);
+           return undefined;
+        } finally {
            if (database_connection) {
                database_connection.end();
            }
-       }
-   }
+        }
+    }
 
-    async create(Student: Student): Promise<any> {
+    async create(Student: Student): Promise<any | undefined> {
         const query_string: string = `INSERT INTO student (id, username, password, discord_username, salt, home_location, school_location) VALUES (?, ?, ?, ?, ?, ?, ?)`;
         if (!this.database_manager) {
             console.error('The database manager object is undefined or null');
@@ -167,13 +174,13 @@ export default class StudentRepository implements IStudentRepository {
                 student_information.studentSchoolLocation]);
             return rows;
         } catch (error) {
-            console.error(error);
+            console.error(`There was an error when attempting to insert a Student into the database: ${error}`);
+            return undefined;
         } finally {
             if (database_connection) {
                 database_connection.end();
             }
         }
-        return undefined;
     }
 
     async update(Student: Student): Promise<Student | undefined> {
@@ -211,25 +218,31 @@ export default class StudentRepository implements IStudentRepository {
         const database_connection = await this.database_manager.getConnection();
         try {
             await database_connection.query(query_string, student_object_values);
+        } catch (error) {
+            console.error(`An error occurred when attempting to update a Student in the database: ${error}`);
+            return undefined;
         } finally {
             if (database_connection) {
                 database_connection.end();
             }
         }
-        return undefined;
+        
     }
 
-    async delete(id: UUID) {
+    async delete(id: UUID): Promise<any | undefined> {
         const query_string = `DELETE FROM student WHERE id = ?`;
         const database_connection = await this.database_manager.getConnection();
 
         try {
-            await database_connection.query(query_string, [id]);
+            const [rows] = await database_connection.query(query_string, [id]);
+            return rows;
+        } catch (error) {
+            console.error(`There was an error when attempting to delete a Student in the database: ${error}`);
+            return undefined;
         } finally {
             if (database_connection) {
                 database_connection.end();
             }
         }
-        return undefined;
     }
 }

@@ -16,7 +16,7 @@ export interface IStudentRepository {
     findById(id: UUID): Promise<Student | undefined>
     findByStudentName(username: string): Promise<Student | undefined>
     findByDiscordUsername(username: string): Promise<Student | undefined>
-    create(user: Student): Promise<any>
+    create(user: Student): Promise<any | undefined>
     update(user: Student): Promise<Student | undefined>
     delete(id: UUID): Promise<Student | undefined>
 }
