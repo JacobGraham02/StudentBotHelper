@@ -4,14 +4,17 @@ dotenv.config({path: './.env'});
 import IDatabaseConfig from "./IDatabaseConfig";
 import mysql from 'mysql2/promise';
 import fs from 'fs';
+import CustomEventEmitter from '../utils/CustomEventEmitter';
 
 export default class DatabaseConnectionManager {
     private database_connection_limit: number = 10;
     private database_config: IDatabaseConfig;  
     private database_ssl_certificate: { ca: Buffer };
     private database_connection_pool!: mysql.Pool;
+    private custom_event_emitter: CustomEventEmitter;
 
     constructor(config: IDatabaseConfig) {
+        this.custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
         this.database_config = config;
 
         if (this.database_config.ssl_certificate_path) {
@@ -42,10 +45,12 @@ export default class DatabaseConnectionManager {
         });
     
         this.database_connection_pool.on('connection', (connection) => {
+            this.custom_event_emitter.emitDatabaseLoggingMessage(200, 'Database connection established');
             console.log(`Database connection established: ${connection.threadId}`);
         });
 
         this.database_connection_pool.on('release', (connection) => {
+            this.custom_event_emitter.emitDatabaseLoggingMessage(200, 'Database connection released');
             console.log(`Database connection ${connection.threadId} has been released`);
         });
     }

@@ -12,7 +12,6 @@ import CustomEventEmitter from '../utils/CustomEventEmitter';
 export default class StudentRepository implements IStudentRepository {
     database_manager: DatabaseConnectionManager;
     database_config: IDatabaseConfig;
-    database_operation_event_emitter: CustomEventEmitter;
 
     constructor() {
         this.database_config = {
@@ -23,7 +22,6 @@ export default class StudentRepository implements IStudentRepository {
             port: process.env.mysql_server_admin_connection_port!,
             ssl_certificate_path: '../'+process.env.mysql_server_admin_path_to_ssl_certificate!
         }
-        this.database_operation_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
         this.database_manager = new DatabaseConnectionManager(this.database_config);
     }
 

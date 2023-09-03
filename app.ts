@@ -69,15 +69,12 @@ discord_client_instance.login(discord_bot_token);
 custom_event_emitter.on('databaseOperationEvent', async(message) => {
   const database_operation_embedded_message = new EmbedBuilder()
     .setColor(0x299bcc)
-    .setTitle('Database operation that triggered for Microsoft Azure')
+    .setTitle('Database connection operation')
     .setURL('https://discord.js.org/')
-    .setAuthor({name:`StudentHelperBot`, iconURL:'https://imgur.com/9rn0xvQ'})
-    .setDescription(message.status)
-    .setThumbnail('https://imgur.com/9rn0xvQ')
+    .setDescription(`HTTP response status: ${message.status}`)
     .addFields(
-      { name: 'Response statusText', value: message.statusText}
+      { name: 'Database response status:', value: message.statusText}
     )
-    .setImage('https://imgur.com/9rn0xvQ')
     .setTimestamp()
 
   const discord_channel_for_operation_results = process.env.discord_bot_http_response_channel_id;

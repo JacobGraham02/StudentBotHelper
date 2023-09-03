@@ -11,7 +11,7 @@ export default class StudentClass {
     private class_midterm_date?: Date;
     private class_exam_date?: Date
 
-    constructor(id: UUID, student_id: UUID, class_name: string, class_time?: Date, class_location?: string, class_midterm_date?: Date, ) {
+    constructor(id: UUID, student_id: UUID, class_name: string, class_time?: Date, class_location?: string, class_midterm_date?: Date, class_exam_date?: Date) {
         this.id = id;
         this.student_id = student_id;
         this.class_name = class_name;
@@ -25,7 +25,7 @@ export default class StudentClass {
             this.class_midterm_date = class_midterm_date;
         }
         if (this.class_exam_date) {
-            this.class_exam_date = this.class_exam_date;
+            this.class_exam_date = class_exam_date;
         }
     }
 
@@ -33,6 +33,7 @@ export default class StudentClass {
         return {
             id: this.id,
             student_id: this.student_id,
+            class_name: this.class_name,
             class_time: this.class_time,
             class_location: this.class_location,
             class_midterm_date: this.class_midterm_date,
