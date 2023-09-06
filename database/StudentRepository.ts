@@ -7,7 +7,6 @@ import { IStudentRepository } from "./IStudentRepository";
 import { hashPassword } from "../modules/hashAndValidatePassword";
 import DatabaseConnectionManager from "./DatabaseConnectionManager";
 import IDatabaseConfig from "./IDatabaseConfig";
-import CustomEventEmitter from '../utils/CustomEventEmitter';
 
 export default class StudentRepository implements IStudentRepository {
     database_manager: DatabaseConnectionManager;
