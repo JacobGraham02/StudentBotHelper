@@ -1,6 +1,23 @@
 CREATE DATABASE discord_student_helper_bot;
 USE discord_student_helper_bot;
 
+CREATE TABLE common_class (
+    id INT AUTO_INCREMENT,
+    class_name VARCHAR(36),
+    class_time TIME,
+    class_notes TEXT,
+    PRIMARY KEY(id);
+)
+
+CREATE TABLE common_classes_work (
+    id INT AUTO_INCREMENT,
+    class_id INT,
+    homework_name VARCHAR(100),
+    homework_due_date DATE,
+    homework_notes TEXT,
+    FOREIGN KEY(class_id) REFERENCES common_class(id)
+)
+
 CREATE TABLE student (
 	id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
