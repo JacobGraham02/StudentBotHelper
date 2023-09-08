@@ -1,6 +1,24 @@
 CREATE DATABASE discord_student_helper_bot;
 USE discord_student_helper_bot;
 
+CREATE TABLE common_class (
+    id VARCHAR(36) PRIMARY KEY,
+	class_start_time DATETIME,
+    class_end_time DATETIME,
+    class_course_code VARCHAR(20)
+) Engine=InnoDB;
+
+CREATE TABLE common_class_work (
+    id VARCHAR(36) PRIMARY KEY,
+    class_id VARCHAR(36) NOT NULL,
+    class_course_code VARCHAR(20),
+    class_name VARCHAR(100),
+    class_work_start_date DATETIME,
+    class_work_end_date DATETIME,
+    class_work_notes TEXT,
+    FOREIGN KEY(class_id) REFERENCES common_class(id)
+) Engine=InnoDB;
+
 CREATE TABLE student (
 	id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) NOT NULL,

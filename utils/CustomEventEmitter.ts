@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import Student from '../entity/Student';
 import formatValidDatabaseResponseObject from './FormatValidResponse';
 
 export default class CustomEventEmitter extends EventEmitter {

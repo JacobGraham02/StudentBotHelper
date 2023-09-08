@@ -7,11 +7,14 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import fs from 'fs';
-import { Client, Collection, GatewayIntentBits, GuildMemberRoleManager } from 'discord.js';
+import { Client, Collection, GatewayIntentBits, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
+import DiscordEvent from './utils/DiscordEvent.js';
+import IDiscordEventData from './utils/IDiscordEventData.js';
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
+const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -37,8 +40,29 @@ async function fetchCommandFiles() {
 }
 fetchCommandFiles();
 
-discord_client_instance.on('ready', () => {
-  console.log(`The bot is logged in as ${discord_client_instance.user!.tag}`)
+discord_client_instance.on('ready', async () => {
+  if (discord_client_instance.user) {
+    console.log(`The discord bot is logged in as ${discord_client_instance.user.tag}`);
+  } else {
+    console.log(`The discord bot has not logged in`);
+  }
+  console.log(`The bot is logged in as ${discord_client_instance.user!.tag}`);
+  if (discord_guild_id) {
+    const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
+    const event_data: IDiscordEventData = {
+      name: 'Test name',
+      description: 'test description',
+      start_date: '2023-09-08T20:00:00.000Z',
+      end_date: '2023-09-08T23:00:00.000Z',
+      privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
+      entity_type: GuildScheduledEventEntityType.External,
+      entity_meta_data: {
+        location: 'test location'
+      }
+    }
+    const discord_event_manager = new DiscordEvent(event_data, guild);
+    discord_event_manager.createNewDiscordEvent();
+  }
 });
 
 discord_client_instance.on('interactionCreate', async interaction => {
