@@ -1,8 +1,6 @@
 # StudentBotHelper
 <a name="readme-top"></a>
 
-![StudentBotHelper example running image](images/DiscordBotPicture.PNG)
-
 <!-- TABLE OF CONTENTS -->
 <section>
   <article>
@@ -31,21 +29,26 @@
 </section>
 
 
+<section>
+  <!-- ABOUT THE PROJECT -->
+  ## About The Project
+  
+  ![StudentBotHelper example running image](images/DiscordBotPicture.PNG)
+  ![StudentBotHelper example embedded message](images/DiscordBotResponses.PNG)
+  
+  StudentBotHelper is a Discord bot primarily aimed at College and University students to both relieve them of menial and repetitive work (e.g. logging due dates), and to centralize a lot of resources they find useful onto one platform. In 2023, a lot of student, incuding myself, use Discord for purposes ranging from gaming to school. Therefore, a Discord bot that is aimed at assisting specifically students will garner a lot of interest and be appreciated by a large chunk of Discord users. 
+  
+  <p align="right">(<a href="#readme-top">back to top</a>)</p>
+</section>
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+<section>
+  ## Built with
+  * [![Discord API][Discord.js]][(https://discord.js.org/)]
+  * [![JavaScript][JavaScript]][https://developer.mozilla.org/en-US/docs/Web/JavaScript]
+  * [![Microsoft Azure][Microsoft Azure]][https://azure.microsoft.com/en-ca]
+  * [![Google Places API][Google Places API]][https://developers.google.com/maps/documentation/places/web-service/overview]
+  * [![Google Directions API][Google Directions API]][https://developers.google.com/maps/documentation/directions/overview]
+  * [![TypeScript][Typescript]][(https://www.typescriptlang.org/)]
+</section>
 
-[Product Name Screen Shot][product-screenshot]
 
-There are many great README templates available on GitHub; however, I didn't find one that really suited my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
-
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should implement DRY principles to the rest of your life :smile:
-
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have contributed to expanding this template!
-
-Use the `BLANK_README.md` to get started.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
