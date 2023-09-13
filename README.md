@@ -5,9 +5,9 @@
 <section>
   <article>
     <ol>
+     <li><a href="#about-the-project">About The Project</a></li>
       <li>
-        <a href="#purpose-of-project">Project purpose</a>
-        <a href="#about-the-project">About The Project</a>
+        <li><a href="#purpose-of-project">Project purpose</a></li>
         <ul>
           <li><a href="#built-with">Built With</a></li>
         </ul>
@@ -21,7 +21,7 @@
       </li>
       <li><a href="#usage">Usage</a></li>
       <li><a href="#contributing">Contributing</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#contact">Contact me</a></li>
     </ol>
   </article>
 </section>
@@ -30,7 +30,7 @@
 <section>
   <article>
     <!-- ABOUT THE PROJECT -->
-    <h2 id="about-the-project"> About The Project</h2>
+    <h2 id="about-the-project">About The Project</h2>
     
   </article>
   
@@ -39,12 +39,11 @@
   
   StudentBotHelper is a Discord bot primarily aimed at College and University students to both relieve them of menial and repetitive work (e.g. logging due dates), and to centralize a lot of resources they find useful onto one platform. In 2023, a lot of student, incuding myself, use Discord for purposes ranging from gaming to school. Therefore, a Discord bot that is aimed at assisting specifically students will garner a lot of interest and be appreciated by a large chunk of Discord users. 
   
-  <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 <section>
   <!-- PURPOSE OF PROJECT -->
-  ## Purpose of project
+  <h2 id="purpose-of-project">About The Project</h2>
 
   The purpose of StudentHelperBot is to assist students in their studies, whether it be finding information about their educational institution, logging due dates, forming group chats to work collaboratively with their friends on assignments, or just lounge around to get the general vibe of their school. The following features built into StudentBotHelper include the following:
     1. Registering an account to use with the bot
@@ -55,11 +54,10 @@
     6. Deleting your user account (if the account is associated with your discord username)
     7. Typing the '/help' command to get more information about what commands can be used with the bot
     8. Having Discord events created automatically for classes in the present or future
-    <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 <section>
-  ## Built with
+  <h2 id="built-with">Built with</h2>
   <ol>
     <li><a href="https://www.typescriptlang.org/" >TypeScript</a></li>
     <li><a href="https://azure.microsoft.com/en-ca">Microsoft Azure</a></li>
@@ -69,17 +67,15 @@
     <li><a href="https://developers.google.com/maps/documentation/directions/overview">Google Directions API</a></li>
     <li><a href="https://nodejs.org/en">Node.js</a></li>
   </ol>
-
-  <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 
 <section>
   <article>
-  ## Getting started
+  <h2 id="getting-started">Getting started</h2>
   <p>The following section gives you instructions on the prerequisites you need to set up StudentBotHelper locally on your own Discord server</p>
   
-  ### Prerequisites
+  <h3 id="prerequisites">Prerequisites</h3>
   <p>First, you must have Node.js installed on your machine. You can download Node.js from <a href="https://nodejs.org/en">Here</a></p>
 
   #### If on Windows:
@@ -110,24 +106,24 @@
   </article>
   
   <article>
-    ### Installation
+    <h2 id="installation">Installation<h2>
     TODO (Edited on September 13, 2023)
-  </article>
-</section>
-
-<section>
-  <article>
-    <p>
-      ### Usage
-      TODO (Edited on September 13, 2023)
-    </p>
   </article>
   <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 <section>
   <article>
-    ## Contributing
+    <p>
+      <h2 id="usage">Usage</h2>
+      TODO (Edited on September 13, 2023)
+    </p>
+  </article>
+</section>
+
+<section>
+  <article>
+    <h2 id="contributing">Contributing</h2>
   
     Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions that you make are **greatly appreciated**.
   
@@ -145,11 +141,17 @@
 
 <section>
   <article>
-    ## Contact
+    <h2 id="contact">Contact me</h2>
     <p>
       Jacob Graham - jakegraham54@gmail.com
     </p>
   </article>
+</section>
+
+<section>
+  <aside>
+    <p align="right">(<a href="#readme-top">back to top</a>)</p>
+  </aside>
 </section>
 
 
