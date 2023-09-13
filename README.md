@@ -75,20 +75,22 @@
   <article>
     <h2 id="getting-started">Getting started</h2>
     <p>The following section gives you instructions on the prerequisites you need to set up StudentBotHelper locally on your own Discord server</p>
-    
+  </article>
+
+  <article>
     <h3 id="prerequisites">Prerequisites</h3>
     <p>First, you must have Node.js installed on your machine. You can download Node.js from <a href="https://nodejs.org/en">Here</a></p>
   
-    <h4 id="if-on-windows">If on Windows</h4>
-    <p>Click on the download button that says 'Recommended for Most Users' as the bottom text.</p>
-  
-    <h4 id="if-on-macos">If on MacOS</h4>
-    <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, click on the download button which says 'macOS Installer'</p>  
-  
-    <h4 id="if-on-linux">If on Linux</h4>
-    <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, you have one of two options for installers:
-    Linux 64-bit binaries: Click on the '64-bit' button to the right of the text 'Linux Binaries (x64)'
-    Linux ARM binaries: Click on the 'ARMv7' or 'ARMv8' button to the right of the text
+      <h4 id="if-on-windows">If on Windows</h4>
+      <p>Click on the download button that says 'Recommended for Most Users' as the bottom text.</p>
+    
+      <h4 id="if-on-macos">If on MacOS</h4>
+      <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, click on the download button which says 'macOS Installer'</p>  
+    
+      <h4 id="if-on-linux">If on Linux</h4>
+      <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, you have one of two options for installers:
+      Linux 64-bit binaries: Click on the '64-bit' button to the right of the text 'Linux Binaries (x64)'
+      Linux ARM binaries: Click on the 'ARMv7' or 'ARMv8' button to the right of the text
   
     Once you have downloaded an installer, proceed with the installation of Node.js. You can check to see if your Nodejs installation was successful by opening the Windows command prompt, 
     MacOS terminal, or Linux terminal and typing the following command:
