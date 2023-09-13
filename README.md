@@ -30,7 +30,7 @@
 <section>
   <article>
     <!-- ABOUT THE PROJECT -->
-    ## About The Project
+    <h2 id="about-the-project"> About The Project</h2>
     
   </article>
   
@@ -118,7 +118,7 @@
 <section>
   <article>
     <p>
-      ## Usage
+      ### Usage
       TODO (Edited on September 13, 2023)
     </p>
   </article>
