@@ -13,9 +13,9 @@
         <ul>
           <li><a href="#prerequisites">Prerequisites</a></li>
           <ul>
-            <li><a href="#if-on-windows">Prerequisites</a></li>
-            <li><a href="#if-on-macos">Prerequisites</a></li>
-            <li><a href="#if-on-linux">Prerequisites</a></li>
+            <li><a href="#if-on-windows">If on Windows</a></li>
+            <li><a href="#if-on-macos">If on MacOS</a></li>
+            <li><a href="#if-on-linux">If on Linux</a></li>
           </ul>
           <li><a href="#installation">Installation</a></li>
         </ul>
@@ -90,7 +90,8 @@
     Linux 64-bit binaries: Click on the '64-bit' button to the right of the text 'Linux Binaries (x64)'
     Linux ARM binaries: Click on the 'ARMv7' or 'ARMv8' button to the right of the text
   
-    Once you have downloaded an installer, proceed with the installation of Node.js. You can check to see if your Nodejs installation was successful by opening the Windows command prompt, MacOS terminal, or Linux terminal and typing the following command:
+    Once you have downloaded an installer, proceed with the installation of Node.js. You can check to see if your Nodejs installation was successful by opening the Windows command prompt, 
+    MacOS terminal, or Linux terminal and typing the following command:
     ```sh
     node --version
     ```
