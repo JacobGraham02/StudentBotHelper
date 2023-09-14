@@ -47,22 +47,22 @@ discord_client_instance.on('ready', async () => {
     console.log(`The discord bot has not logged in`);
   }
   console.log(`The bot is logged in as ${discord_client_instance.user!.tag}`);
-  if (discord_guild_id) {
-    const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
-    const event_data: IDiscordEventData = {
-      name: 'Test name',
-      description: 'test description',
-      start_date: '2023-09-08T20:00:00.000Z',
-      end_date: '2023-09-08T23:00:00.000Z',
-      privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
-      entity_type: GuildScheduledEventEntityType.External,
-      entity_meta_data: {
-        location: 'test location'
-      }
-    }
-    const discord_event_manager = new DiscordEvent(event_data, guild);
-    discord_event_manager.createNewDiscordEvent();
-  }
+  // if (discord_guild_id) {
+  //   const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
+  //   const event_data: IDiscordEventData = {
+  //     name: 'Test name',
+  //     description: 'test description',
+  //     start_date: '2023-09-08T20:00:00.000Z',
+  //     end_date: '2023-09-08T23:00:00.000Z',
+  //     privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
+  //     entity_type: GuildScheduledEventEntityType.External,
+  //     entity_meta_data: {
+  //       location: 'test location'
+  //     }
+  //   }
+  //   const discord_event_manager = new DiscordEvent(event_data, guild);
+  //   discord_event_manager.createNewDiscordEvent();
+  // }
 });
 
 discord_client_instance.on('interactionCreate', async interaction => {
