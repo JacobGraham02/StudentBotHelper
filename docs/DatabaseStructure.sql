@@ -6,7 +6,7 @@ CREATE TABLE common_class (
 	class_start_time DATETIME,
     class_end_time DATETIME,
     class_course_code VARCHAR(20),
-    class_name VARCHAR(100)
+    class_name VARCHAR(100),
 ) Engine=InnoDB;
 
 CREATE TABLE common_class_work (

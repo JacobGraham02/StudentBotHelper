@@ -13,8 +13,12 @@ import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
 import DiscordEvent from './utils/DiscordEvent.js';
 import IDiscordEventData from './utils/IDiscordEventData.js';
+import CommonClassRepository from './database/CommonClassRepository.js';
+import schedule from 'node-schedule';
+import CommonClass from './entity/CommonClass.js';
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
+const common_class_repository: CommonClassRepository = new CommonClassRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -47,22 +51,29 @@ discord_client_instance.on('ready', async () => {
     console.log(`The discord bot has not logged in`);
   }
   console.log(`The bot is logged in as ${discord_client_instance.user!.tag}`);
-  // if (discord_guild_id) {
-  //   const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
-  //   const event_data: IDiscordEventData = {
-  //     name: 'Test name',
-  //     description: 'test description',
-  //     start_date: '2023-09-08T20:00:00.000Z',
-  //     end_date: '2023-09-08T23:00:00.000Z',
-  //     privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
-  //     entity_type: GuildScheduledEventEntityType.External,
-  //     entity_meta_data: {
-  //       location: 'test location'
-  //     }
-  //   }
-  //   const discord_event_manager = new DiscordEvent(event_data, guild);
-  //   discord_event_manager.createNewDiscordEvent();
-  // }
+
+  if (!discord_guild_id) {
+    return;
+  }
+  const node_schedule_event_creation_job = schedule.scheduleJob('0 0 * * *', async function() {
+    const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
+    const common_class_array: CommonClass[] | undefined = await common_class_repository.findAll();
+   
+    common_class_array?.forEach((common_class) => {
+      const common_class_data = common_class.commonClassInformation();
+      const event_data: IDiscordEventData = {
+        name: common_class_data.class_name,
+        description: `The course ${common_class_data.class_course_code} starts at ${common_class_data.class_start_time} and ends at ${common_class_data.class_end_time}`,
+        start_date: common_class_data.class_start_time.toISOString(),
+        end_date: common_class_data.class_end_time.toISOString(),
+        privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
+        entity_type: GuildScheduledEventEntityType.External,
+        entity_meta_data: {
+          location: ''
+        }
+      }
+    });
+  });
 });
 
 discord_client_instance.on('interactionCreate', async interaction => {
