@@ -11,7 +11,6 @@ import { Client, Collection, GatewayIntentBits, GuildMemberRoleManager, GuildSch
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
-import DiscordEvent from './utils/DiscordEvent.js';
 import IDiscordEventData from './utils/IDiscordEventData.js';
 import CommonClassRepository from './database/CommonClassRepository.js';
 import schedule from 'node-schedule';

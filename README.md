@@ -80,33 +80,36 @@
   <article>
     <h3 id="prerequisites">Prerequisites</h3>
     <p>First, you must have Node.js installed on your machine. You can download Node.js from <a href="https://nodejs.org/en">Here</a></p>
-  
-      <h4 id="if-on-windows">If on Windows</h4>
-      <p>Click on the download button that says 'Recommended for Most Users' as the bottom text.</p>
+  </article>
+
+  <article>
+    <h4 id="if-on-windows">If on Windows</h4>
+    <p>Click on the download button that says 'Recommended for Most Users' as the bottom text.</p>
+  </article>
     
-      <h4 id="if-on-macos">If on MacOS</h4>
-      <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, click on the download button which says 'macOS Installer'</p>  
-    
-      <h4 id="if-on-linux">If on Linux</h4>
-      <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, you have one of two options for installers:
-      Linux 64-bit binaries: Click on the '64-bit' button to the right of the text 'Linux Binaries (x64)'
-      Linux ARM binaries: Click on the 'ARMv7' or 'ARMv8' button to the right of the text
-  
+  <article>
+    <h4 id="if-on-macos">If on MacOS</h4>
+    <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, click on the download button which says 'macOS Installer'</p>  
+  </article>
+
+  <article>
+    <h4 id="if-on-linux">If on Linux</h4>
+    <p>Click on the Nodejs download link <a href="https://nodejs.org/en/download">here</a>. Once you are at the Nodejs downloads page, you have one of two options for installers:
+    Linux 64-bit binaries: Click on the '64-bit' button to the right of the text 'Linux Binaries (x64)'
+    Linux ARM binaries: Click on the 'ARMv7' or 'ARMv8' button to the right of the text
+  </article>
+
+  <article>  
     Once you have downloaded an installer, proceed with the installation of Node.js. You can check to see if your Nodejs installation was successful by opening the Windows command prompt, 
     MacOS terminal, or Linux terminal and typing the following command:
-    ```sh
-    node --version
-    ```
     </p>
   </article>
 
   <article>
-    <p>Once you have successfully installed Node.js on your system, type in the following command into your command prompt or terminal:
-    * npm
-    ```sh
+    <p>Once you have successfully installed Node.js on your system, type in the following command into your command prompt or terminal:</p>
+
     npm install npm@latest -g
-    ```
-    </p>
+    
   </article>
   
   <article>
@@ -128,18 +131,22 @@
 <section>
   <article>
     <h2 id="contributing">Contributing</h2>
-  
     Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions that you make are **greatly appreciated**.
-  
+  </article>
+  <br>
+  <article>
     If you have a suggestion that would make this better, please fork this repository and create a pull request. You can also simply open an issue with the tag "enhancement".
-    Do not forget to give the project a star! Thanks again!
-
+  </article> 
+  <br>
+  <article>
     Below are some example steps on how to create a pull request for this repository:
-      1. Fork the Project
-      2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-      3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-      4. Push to the Branch (`git push origin feature/AmazingFeature`)
-      5. Open a Pull Request
+    <ol>
+      <li>Fork the Project</li>
+      <li>Create your Feature Branch (`git checkout -b feature/AmazingFeature`)</li>
+      <li>Commit your Changes (`git commit -m 'Add some AmazingFeature'`)</li>
+      <li>Push to the Branch (`git push origin feature/AmazingFeature`)</li>
+      <li>Open a Pull Request</li>
+    </ol>
   </article>
 </section>
 
