@@ -49,7 +49,11 @@ export default function() {
                 type: ChannelType.PrivateThread,
                 reason: `This thread is a user session for ${discord_user_username}`
             });
-            interaction.reply({content:'A private thread has been successfully created',ephemeral:true});
+            interaction.reply({content:`The private thread ${private_text_thread} has been created for you`,ephemeral:true});
+
+            if (private_text_thread) {
+                student_cache.set(discord_user_username+`Logged in`, true);
+            }
         }
     }
     return create_private_thread_object;
