@@ -1,17 +1,19 @@
 import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, User } from 'discord.js';
 import CommonClassRepository from '../database/CommonClassRepository';
 import Cache from '../utils/Cache';
+import CommonClass from '../entity/CommonClass';
+import { randomUUID } from 'crypto';
 
 export default function() {
     const create_private_thread_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-session')
+        .setName('create-common-class')
         .setDescription('Use this command to create a private thread for yourself.')
         .addStringOption(options =>
             options.setName('class_name')
             .setDescription('(Required) Class course name')
             .setRequired(true))
-        .addStringOption(options => 
+        .addNumberOption(options => 
             options.setName('class_course_code')    
             .setDescription('(Required) Class course code')
             .setRequired(true))
@@ -29,11 +31,21 @@ export default function() {
         async execute(interaction) {
             const student_cache: Cache = Cache.getCacheInstance();
             const common_class_repository:CommonClassRepository = new CommonClassRepository();
-            
-            const class_name: string = interaction.user.class_name;
-            const class_course_code: string = interaction.user.class_course_code;
-            const class_start_time: string = interaction.user.class_start_time;
-            const class_end_time: string = interaction.user.class_end_time;
+
+            const class_name: string = interaction.options.getString('class_name');
+            const class_course_code: number = interaction.options.getNumber('class_course_code');
+            const class_start_time: string = interaction.options.getString('class_start_time');
+            const class_end_time: string = interaction.options.getString('class_end_time');
+
+            const common_class = new CommonClass(
+                randomUUID(),
+                class_start_time,
+                class_end_time,
+                class_course_code,
+                class_name
+            );
+            await common_class_repository.create(common_class);
+            interaction.reply({content:`A common class that all students have in common was created successfully`,ephemeral: true});
         }
     }
     return create_private_thread_object;

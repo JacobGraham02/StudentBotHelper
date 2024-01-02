@@ -54,25 +54,26 @@ discord_client_instance.on('ready', async () => {
   if (!discord_guild_id) {
     return;
   }
-  const node_schedule_event_creation_job = schedule.scheduleJob('0 0 * * *', async function() {
-    const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
-    const common_class_array: CommonClass[] | undefined = await common_class_repository.findAll();
+//   const node_schedule_event_creation_job = schedule.scheduleJob('0 0 * * *', async function() {
+//     const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
+//     const common_class_array: CommonClass[] | undefined = await common_class_repository.findAll();
    
-    common_class_array?.forEach((common_class) => {
-      const common_class_data = common_class.commonClassInformation();
-      const event_data: IDiscordEventData = {
-        name: common_class_data.class_name,
-        description: `The course ${common_class_data.class_course_code} starts at ${common_class_data.class_start_time} and ends at ${common_class_data.class_end_time}`,
-        start_date: common_class_data.class_start_time.toISOString(),
-        end_date: common_class_data.class_end_time.toISOString(),
-        privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
-        entity_type: GuildScheduledEventEntityType.External,
-        entity_meta_data: {
-          location: ''
-        }
-      }
-    });
-  });
+//     common_class_array?.forEach((common_class) => {
+//       const common_class_data = common_class.commonClassInformation();
+//       const event_data: IDiscordEventData = {
+//         name: common_class_data.class_name,
+//         description: `The course ${common_class_data.class_course_code} starts at ${common_class_data.class_start_time} and ends at ${common_class_data.class_end_time}`,
+//         start_date: common_class_data.class_start_time.toISOString(),
+//         end_date: common_class_data.class_end_time.toISOString(),
+//         privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
+//         entity_type: GuildScheduledEventEntityType.External,
+//         entity_meta_data: {
+//           location: ''
+//         }
+//       }
+//     });
+//   });
+// });
 });
 
 discord_client_instance.on('interactionCreate', async interaction => {
@@ -92,6 +93,7 @@ discord_client_instance.on('interactionCreate', async interaction => {
         await command.execute(interaction);
       } catch (error) {
         await interaction.reply({content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,ephemeral:true});
+        console.error(error);
       }
   } else {
     await interaction.reply({content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`,ephemeral:true});
@@ -103,13 +105,14 @@ discord_client_instance.login(discord_bot_token);
 custom_event_emitter.on('databaseOperationEvent', async(message) => {
   const database_operation_embedded_message = new EmbedBuilder()
     .setColor(0x299bcc)
-    .setTitle('Database connection operation')
-    .setURL('https://discord.js.org/')
-    .setDescription(`HTTP response status: ${message.status}`)
+    .setTitle('Database operation on Azure MySQL database')
+    .setThumbnail('https://i.imgur.com/9rn0xvQ.jpeg')
+    .setDescription(`Database operation response status: ${message.status}`)
     .addFields(
-      { name: 'Database response status:', value: message.statusText}
+      { name: 'Database response status:', value: message.statusText, inline:true}
     )
     .setTimestamp()
+    .setFooter({text:'Azure database operation', iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg'});
 
   const discord_channel_for_operation_results = process.env.discord_bot_http_response_channel_id;
   if (!discord_channel_for_operation_results) {

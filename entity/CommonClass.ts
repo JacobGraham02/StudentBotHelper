@@ -1,19 +1,17 @@
+import { UUID } from "crypto";
+
 export default class CommonClass {
-    private id?: number;
+    private id: UUID;
     private class_name: string;
-    private class_start_time: Date;
-    private class_end_time: Date; 
+    private class_start_time: string;
+    private class_end_time: string; 
     private class_course_code = 0;
 
     private class_name_regex = /[a-zA-Z ]{1,100}/
 
-    constructor(class_name: string, class_start_time: Date, class_end_time: Date, class_course_code: number, id?: number) {
+    constructor(id: UUID, class_start_time: string, class_end_time: string, class_course_code: number,  class_name: string) {
         this.validateClassName(class_name);
-        this.validateClassTime(class_start_time);
-        this.validateClassTime(class_end_time);
-        if (id !== undefined) {
-            this.id = id;
-        }
+        this.id = id;
         this.class_name = class_name;
         this.class_start_time = class_start_time;
         this.class_end_time = class_end_time;
@@ -26,12 +24,6 @@ export default class CommonClass {
         }
     }
 
-    private validateClassTime(class_time: Date): void {
-        if (!isNaN(class_time.getTime())) {
-            throw new Error('The supplied class time is invalid: Must be a valid date');
-        }
-    }
-
     public commonClassInformation() {
         return {
             class_id: this.id,
@@ -40,5 +32,12 @@ export default class CommonClass {
             class_end_time: this.class_end_time,
             class_course_code: this.class_course_code
         };
+    }
+
+    private validateTimeFormat(time: string): void {
+        const timeRegex = /(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d/g;
+        if (!time.match(timeRegex)) {
+            throw new Error('Invalid time format. Class start and end times must be in the format HH:MM:SS');
+        }
     }
 }

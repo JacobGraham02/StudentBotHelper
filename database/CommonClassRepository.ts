@@ -32,10 +32,11 @@ export default class CommonClassRepository implements ICommonClassRepository {
             const [results] = await database_connection.query(query_string);
             results[0].forEach((common_class_data: any) => {
                 const common_class = new CommonClass(
-                    common_class_data.class_name,
-                    new Date(common_class_data.class_start_time),
-                    new Date(common_class_data.class_end_time),
-                    common_class_data.class_course_code
+                    common_class_data.id,
+                    common_class_data.class_start_time,
+                    common_class_data.class_end_time,
+                    common_class_data.class_course_code,
+                    common_class_data.class_name
                 );
                 common_class_array.push(common_class);
             });
@@ -59,10 +60,11 @@ export default class CommonClassRepository implements ICommonClassRepository {
             if (results[0]) {
                 const common_class_data = results[0];
                 return new CommonClass(
-                    common_class_data.class_name,
-                    new Date(common_class_data.class_start_time),
-                    new Date(common_class_data.class_end_time),
-                    common_class_data.class_course_code
+                    common_class_data.id,
+                    common_class_data.class_start_time,
+                    common_class_data.class_end_time,
+                    common_class_data.class_course_code,
+                    common_class_data.class_name
                 );
             }
         } catch (error) {
@@ -85,10 +87,11 @@ export default class CommonClassRepository implements ICommonClassRepository {
             if (results[0]) {
                 const common_class_data = results[0];
                 return new CommonClass(
-                    common_class_data.class_name,
-                    new Date(common_class_data.class_start_time),
-                    new Date(common_class_data.class_end_time),
-                    common_class_data.class_course_code
+                    common_class_data.id,
+                    common_class_data.class_start_time,
+                    common_class_data.class_end_time,
+                    common_class_data.class_course_code,
+                    common_class_data.class_name
                 );
             }
         } catch (error) {
@@ -109,11 +112,11 @@ export default class CommonClassRepository implements ICommonClassRepository {
         try {
             const common_class_info = common_class.commonClassInformation();
             await database_connection.query(query_string, [
-                randomUUID(),
-                common_class_info.class_name,
+                common_class_info.class_id,
                 common_class_info.class_start_time,
                 common_class_info.class_end_time,
-                common_class_info.class_course_code
+                common_class_info.class_course_code,
+                common_class_info.class_name
             ]);
         } catch (error) {
             console.error(`There was an error when attempting to insert a CommonClass into the database: ${error}`);
@@ -132,11 +135,11 @@ export default class CommonClassRepository implements ICommonClassRepository {
 
         try {
             await database_connection.query(query_string, [
-                common_class_info.class_name,
+                common_class_info.class_id,
                 common_class_info.class_start_time,
                 common_class_info.class_end_time,
                 common_class_info.class_course_code,
-                common_class_info.class_id
+                common_class_info.class_name
             ]);
             return common_class;
         } catch (error) {

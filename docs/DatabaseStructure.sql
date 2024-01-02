@@ -1,12 +1,16 @@
 CREATE DATABASE discord_student_helper_bot;
 USE discord_student_helper_bot;
 
+SELECT * FROM common_class;
+DELETE FROM common_class;
+SET SQL_SAFE_UPDATES = 0;
+
 CREATE TABLE common_class (
     id VARCHAR(36) PRIMARY KEY,
-	class_start_time DATETIME,
-    class_end_time DATETIME,
+	class_start_time TIME,
+    class_end_time TIME,
     class_course_code VARCHAR(20),
-    class_name VARCHAR(100),
+    class_name VARCHAR(255)
 ) Engine=InnoDB;
 
 CREATE TABLE common_class_work (
@@ -49,6 +53,8 @@ CREATE TABLE student_class_work (
     FOREIGN KEY(student_class_id) REFERENCES student_class(id)
 ) Engine=InnoDB;
 
+DROP TABLE common_class_work;
+DROP TABLE common_class;
 DROP TABLE IF EXISTS student_class_work;
 DROP TABLE IF EXISTS student_class;
 DROP TABLE IF EXISTS student;
