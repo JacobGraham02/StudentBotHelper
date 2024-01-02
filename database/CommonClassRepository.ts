@@ -27,29 +27,37 @@ export default class CommonClassRepository implements ICommonClassRepository {
         const query_string = `SELECT * FROM common_class LIMIT 10`;
         const database_connection = await this.database_manager.getConnection();
         const common_class_array: CommonClass[] = [];
-
+      
         try {
-            const [results] = await database_connection.query(query_string);
-            results[0].forEach((common_class_data: any) => {
-                const common_class = new CommonClass(
-                    common_class_data.id,
-                    common_class_data.class_start_time,
-                    common_class_data.class_end_time,
-                    common_class_data.class_course_code,
-                    common_class_data.class_name
-                );
-                common_class_array.push(common_class);
+          const [results] = await database_connection.query(query_string);
+      
+          if (Array.isArray(results) && results.length > 0) {
+            results.forEach((common_class_data: any) => {
+              const common_class = new CommonClass(
+                common_class_data.id,
+                common_class_data.class_start_time,
+                common_class_data.class_end_time,
+                common_class_data.class_course_code,
+                common_class_data.class_name
+              );
+              common_class_array.push(common_class);
             });
-            return common_class_array.length > 0 ? common_class_array : undefined;
-        } catch (error) {
-            console.error(`There was an error when attempting to fetch all CommonClass objects from the database: ${error}`);
+      
+            return common_class_array;
+          } else {
+            console.log('No results found');
             return undefined;
+          }
+        } catch (error) {
+          console.error(`There was an error when attempting to fetch all CommonClass objects from the database: ${error}`);
+          return undefined;
         } finally {
-            if (database_connection) {
-                database_connection.end();
-            }
+          if (database_connection) {
+            database_connection.end();
+          }
         }
     }
+      
 
     async findById(id: UUID): Promise<CommonClass | undefined> {
         const query_string: string = `SELECT * FROM common_class WHERE id = ? LIMIT 1`;

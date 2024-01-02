@@ -5,7 +5,7 @@ import CommonClass from '../entity/CommonClass';
 import { randomUUID } from 'crypto';
 
 export default function() {
-    const create_private_thread_object: Object = {
+    const create_common_class_object: Object = {
         data: new SlashCommandBuilder()
         .setName('create-common-class')
         .setDescription('Use this command to create a private thread for yourself.')
@@ -48,5 +48,5 @@ export default function() {
             interaction.reply({content:`A common class that all students have in common was created successfully`,ephemeral: true});
         }
     }
-    return create_private_thread_object;
+    return create_common_class_object;
 }

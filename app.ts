@@ -112,18 +112,49 @@ custom_event_emitter.on('databaseOperationEvent', async(message) => {
       { name: 'Database response status:', value: message.statusText, inline:true}
     )
     .setTimestamp()
-    .setFooter({text:'Azure database operation', iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg'});
+    .setFooter({text:'Azure database operation', iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg'}
+  );
 
   const discord_channel_for_operation_results = process.env.discord_bot_http_response_channel_id;
+  
   if (!discord_channel_for_operation_results) {
     throw new Error(`The discord channel id for database operation results could not be fetched.`);
   }
+
   const discord_channel_for_messages = await discord_client_instance.channels.fetch(discord_channel_for_operation_results);
+
   if (discord_channel_for_messages && discord_channel_for_messages.isTextBased()) {
     discord_channel_for_messages.send({embeds: [database_operation_embedded_message]});
   }
 });
 
+custom_event_emitter.on('showClassesInSchedule', async(classes) => {
+  const discord_channel_for_class_data_results = process.env.discord_bot_command_channel_id;
+
+  if (!discord_channel_for_class_data_results) {
+    throw new Error(`The discord channel id for database operation results could not be fetched.`);
+  }
+
+  const discord_channel_for_messages = await discord_client_instance.channels.fetch(discord_channel_for_class_data_results);
+  for (const common_class of classes) {
+    const class_in_schedule_embedded_message = new EmbedBuilder()
+    .setColor(0x299bcc)
+    .setTitle(`${common_class.class_name}`)
+    .addFields(
+      {name: `Course code:`, value:common_class.class_course_code},
+      {name: `Course start time:`, value:common_class.class_start_time},
+      {name: `Course end time:`, value:common_class.class_end_time}
+    )
+    .setThumbnail('https://i.imgur.com/9rn0xvQ.jpeg')
+    .setTimestamp()
+    .setFooter({text:common_class.class_name, iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg'}
+    );
+
+    if (discord_channel_for_messages && discord_channel_for_messages.isTextBased()) {
+      discord_channel_for_messages.send({embeds: [class_in_schedule_embedded_message]});
+    }
+  }
+});
 
 const app = express();
 
