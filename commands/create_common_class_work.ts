@@ -1,7 +1,10 @@
-import { ActionRowBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, Component, ComponentType, Interaction, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
 import CommonClassRepository from '../database/CommonClassRepository';
 import CommonClass from '../entity/CommonClass';
 import { StringSelectMenuOptionBuilder } from '@discordjs/builders';
+import CommonClassWork from '../entity/CommonClassWork';
+import { randomUUID } from 'crypto';
+import CommonClassWorkRepository from '../database/CommonClassWorkRepository';
 
 export default function() {
     const create_common_class_object: Object = {
@@ -45,37 +48,40 @@ export default function() {
 
             const common_classes_row = new ActionRowBuilder()
                 .addComponents(select_class_menu);
+
+            const sent_message = await interaction.channel.send({content:`Choose a class to assign this work to:`, components: [common_classes_row], ephemeral: true});
             
-            await interaction.reply({content:`Choose a class to assign this work to:`, components: [common_classes_row], ephemeral: true});
-
-            const filter = (select_menu_interaction) => select_menu_interaction.customId === 'select_class' && select_menu_interaction.user.id === interaction.user.id;
-            const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
-
-            collector.on('collect', async (selectMenuInteraction) => {
-                if (selectMenuInteraction.customId === 'select_class') {
-                    const selectedClassId = selectMenuInteraction.values[0];
-                    await selectMenuInteraction.reply(`You selected the class with ID: ${selectedClassId}`);
+            const collector = sent_message.createMessageComponentCollector({ componentType: ComponentType.StringSelect });
+                
+            collector.on('collect', async (class_menu_interaction) => {
+                const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
+                const work_document_name = interaction.options.getString('homework_name');
+                const work_document_due_date = interaction.options.getString('homework_due_date');
+                const work_document_notes = interaction.options.getString('homework_notes');
+                const selected_class_id = class_menu_interaction.values[0];
+                const common_class_work_document: CommonClassWork = new CommonClassWork(
+                    randomUUID(), 
+                    selected_class_id,
+                    work_document_name,
+                    work_document_due_date,
+                    work_document_notes 
+                );
+                try {
+                    await common_class_work_repository.create(common_class_work_document);
+                    await interaction.channel.send({content:`A new work document was created`,ephemeral:true});
+                } catch (error) {
+                    await interaction.channel.send({content:`There was an error when creating a new work document. Please inform the bot developer of this error: ${error}`,ephemeral:true});
+                    return;
                 }
             });
-            
-            collector.on('end', collected => console.log(`Collected ${collected.size} interactions.`));
+                
+            collector.on('end', async (class_menu_interaction) => {
+                if (class_menu_interaction.size === 0) {
+                    await interaction.channel.send({content:`No class was selected for this work document. Please retype the command and try again`});
+                }
+            });
         }
     }
     return create_common_class_object;
 }
 
-/*
-const filter = i => i.customId === 'select_class' && i.user.id === interaction.user.id;
-const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
-
-collector.on('collect', async i => {
-    if (i.customId === 'select_class') {
-        const selectedClassId = i.values[0];
-        await i.reply(`You selected the class with ID: ${selectedClassId}`);
-        // additional handling for the selected option
-    }
-});
-
-collector.on('end', collected => console.log(`Collected ${collected.size} interactions.`));
-
-*/

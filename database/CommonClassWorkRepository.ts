@@ -14,7 +14,7 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
             host_uri: process.env.mysql_server_admin_hostname!,
             name: process.env.mysql_server_admin_database_name!,
             port: process.env.mysql_server_admin_connection_port!,
-            ssl_certificate_path: '../' + process.env.mysql_server_admin_path_to_ssl_certificate!
+            ssl_certificate_path: process.env.mysql_server_admin_path_to_ssl_certificate!
         }
         this.database_manager = new DatabaseConnectionManager(this.database_config);
     }
@@ -84,7 +84,7 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
     async findByClassId(class_id: number): Promise<CommonClassWork[] | undefined> {
         const query_string: string = `SELECT * FROM common_class WHERE class_id = ? LIMIT 1`;
         const database_connection = await this.database_manager.getConnection();
-        const class_work_for_class = [];
+        const class_work_for_class: CommonClassWork[] = [];
 
         try {
             const [results] = await database_connection.query(query_string, [class_id]);
@@ -97,8 +97,10 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
                         common_class_work.class_work_end_date,
                         common_class_work.class_work_notes
                     );
+                    class_work_for_class.push(common_class_work_document);
                 });
             }
+            return class_work_for_class;
         } catch (error) {
             console.error(`There was an error when attempting to find a CommonClassWork in the database via id: ${error}`);
             return undefined;
@@ -113,7 +115,7 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
     async findByHomeworkName(homework_name: string): Promise<CommonClassWork[] | undefined> {
         const query_string: string = `SELECT * FROM common_class WHERE class_work_name = ? LIMIT 1`;
         const database_connection = await this.database_manager.getConnection();
-        const class_work_for_class = [];
+        const class_work_for_class: CommonClassWork[] = [];
 
         try {
             const [results] = await database_connection.query(query_string, [homework_name]);
@@ -126,6 +128,7 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
                         common_class_work.class_work_end_date,
                         common_class_work.class_work_notes
                     );
+                    class_work_for_class.push(common_class_work_document);
                 });
             }
         } catch (error) {
@@ -140,7 +143,7 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
     }
 
     async create(common_class_work: CommonClassWork): Promise<any> {
-        const query_string: string = `INSERT INTO common_class_work (id, class_id, class_work_name, class_work_end_date, class_notes) VALUES (?, ?, ?, ?, ?)`;
+        const query_string: string = `INSERT INTO common_class_work (id, class_id, class_work_name, class_work_end_date, class_work_notes) VALUES (?, ?, ?, ?, ?)`;
         const database_connection = await this.database_manager.getConnection();
 
         try {

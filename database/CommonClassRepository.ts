@@ -18,7 +18,7 @@ export default class CommonClassRepository implements ICommonClassRepository {
             host_uri: process.env.mysql_server_admin_hostname!,
             name: process.env.mysql_server_admin_database_name!,
             port: process.env.mysql_server_admin_connection_port!,
-            ssl_certificate_path: '../' + process.env.mysql_server_admin_path_to_ssl_certificate!
+            ssl_certificate_path: process.env.mysql_server_admin_path_to_ssl_certificate!
         }
         this.database_manager = new DatabaseConnectionManager(this.database_config);
     }

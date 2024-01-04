@@ -12,7 +12,6 @@ export default class CommonClassWork {
 
     constructor(id: UUID, class_id: number, homework_name: string, homework_due_date: Date, homework_notes: string) {
         this.validateHomeworkName(homework_name);
-        this.validateHomeworkDueDate(homework_due_date);
         this.validateHomeworkNotes(homework_notes);
         this.class_id = class_id;
         this.homework_name = homework_name;
@@ -24,12 +23,6 @@ export default class CommonClassWork {
     private validateHomeworkName(homework_name: string): void {
         if (!homework_name.match(this.class_name_regex)) {
             throw new Error('The supplied homework notes is not between 1 and 10000 characters long, only lower and upper case characters');
-        }
-    }
-
-    private validateHomeworkDueDate(homework_due_date: Date): void {
-        if (!isNaN(homework_due_date.getTime())) {
-            throw new Error('The supplied class time is invalid: Must be a valid date');
         }
     }
 

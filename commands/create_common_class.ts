@@ -43,7 +43,7 @@ export default function() {
                 class_name
             );
             await common_class_repository.create(common_class);
-            interaction.reply({content:`A common class that all students have in common was created successfully`,ephemeral: true});
+            await interaction.reply({content:`A common class that all students have in common was created successfully`,ephemeral: true});
         }
     }
     return create_common_class_object;
