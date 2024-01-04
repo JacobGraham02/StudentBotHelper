@@ -2,6 +2,7 @@ CREATE DATABASE discord_student_helper_bot;
 USE discord_student_helper_bot;
 
 SELECT * FROM common_class;
+SELECT * FROM common_class_work;
 DELETE FROM common_class;
 SET SQL_SAFE_UPDATES = 0;
 
@@ -16,7 +17,7 @@ CREATE TABLE common_class (
 CREATE TABLE common_class_work (
     id VARCHAR(36) PRIMARY KEY,
     class_id VARCHAR(36) NOT NULL,
-    class_work_start_date DATETIME,
+    class_work_name VARCHAR(255) NOT NULL,
     class_work_end_date DATETIME,
     class_work_notes TEXT,
     FOREIGN KEY(class_id) REFERENCES common_class(id)

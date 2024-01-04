@@ -1,6 +1,5 @@
-import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, User } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import CommonClassRepository from '../database/CommonClassRepository';
-import Cache from '../utils/Cache';
 import CommonClass from '../entity/CommonClass';
 import { randomUUID } from 'crypto';
 
@@ -29,7 +28,6 @@ export default function() {
         authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
-            const student_cache: Cache = Cache.getCacheInstance();
             const common_class_repository:CommonClassRepository = new CommonClassRepository();
 
             const class_name: string = interaction.options.getString('class_name');

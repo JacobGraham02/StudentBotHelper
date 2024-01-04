@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export default class CommonClassWork {
-    id?: number;
+    id: UUID;
     class_id: number;
     homework_name: string;
     homework_due_date: Date;
@@ -8,7 +10,7 @@ export default class CommonClassWork {
     private class_name_regex = /[a-zA-Z ]{1,100}/
     private class_notes_regex = /[a-zA-Z0-9 ]{1,10000}/
 
-    constructor(class_id: number, homework_name: string, homework_due_date: Date, homework_notes: string, id?: number) {
+    constructor(id: UUID, class_id: number, homework_name: string, homework_due_date: Date, homework_notes: string) {
         this.validateHomeworkName(homework_name);
         this.validateHomeworkDueDate(homework_due_date);
         this.validateHomeworkNotes(homework_notes);
@@ -16,9 +18,7 @@ export default class CommonClassWork {
         this.homework_name = homework_name;
         this.homework_due_date = homework_due_date;
         this.homework_notes = homework_notes;
-        if (id !== undefined) {
-            this.id = id;
-        }
+        this.id = id;
     }
 
     private validateHomeworkName(homework_name: string): void {
@@ -41,7 +41,7 @@ export default class CommonClassWork {
 
     public commonClassWorkInformation() {
         return {
-            work_id: this.id,
+            id: this.id,
             class_id: this.class_id,
             homework_name: this.homework_name,
             homework_due_date: this.homework_due_date,

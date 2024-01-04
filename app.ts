@@ -54,26 +54,6 @@ discord_client_instance.on('ready', async () => {
   if (!discord_guild_id) {
     return;
   }
-//   const node_schedule_event_creation_job = schedule.scheduleJob('0 0 * * *', async function() {
-//     const guild = await discord_client_instance.guilds.fetch(discord_guild_id);
-//     const common_class_array: CommonClass[] | undefined = await common_class_repository.findAll();
-   
-//     common_class_array?.forEach((common_class) => {
-//       const common_class_data = common_class.commonClassInformation();
-//       const event_data: IDiscordEventData = {
-//         name: common_class_data.class_name,
-//         description: `The course ${common_class_data.class_course_code} starts at ${common_class_data.class_start_time} and ends at ${common_class_data.class_end_time}`,
-//         start_date: common_class_data.class_start_time.toISOString(),
-//         end_date: common_class_data.class_end_time.toISOString(),
-//         privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
-//         entity_type: GuildScheduledEventEntityType.External,
-//         entity_meta_data: {
-//           location: ''
-//         }
-//       }
-//     });
-//   });
-// });
 });
 
 discord_client_instance.on('interactionCreate', async interaction => {
