@@ -1,3 +1,4 @@
+import { UUID } from "crypto";
 import CommonClassWork from "../entity/CommonClassWork";
 import DatabaseConnectionManager from "./DatabaseConnectionManager";
 import { ICommonClassWorkRepository } from "./ICommonClassWorkRepository";
@@ -54,7 +55,7 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
         }
     }
 
-    async findById(id: number): Promise<CommonClassWork | undefined> {
+    async findById(id: UUID): Promise<CommonClassWork | undefined> {
         const query_string: string = `SELECT * FROM common_class_work WHERE id = ? LIMIT 1`;
         const database_connection = await this.database_manager.getConnection();
 
@@ -81,8 +82,8 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
         return undefined;
     }
 
-    async findByClassId(class_id: number): Promise<CommonClassWork[] | undefined> {
-        const query_string: string = `SELECT * FROM common_class WHERE class_id = ? LIMIT 1`;
+    async findByClassId(class_id: UUID): Promise<CommonClassWork[] | undefined> {
+        const query_string: string = `SELECT * FROM common_class_work WHERE class_id = ?`;
         const database_connection = await this.database_manager.getConnection();
         const class_work_for_class: CommonClassWork[] = [];
 
@@ -109,11 +110,10 @@ export default class CommonClassWorkRepository implements ICommonClassWorkReposi
                 database_connection.end();
             }
         }
-        return undefined;
     }
 
     async findByHomeworkName(homework_name: string): Promise<CommonClassWork[] | undefined> {
-        const query_string: string = `SELECT * FROM common_class WHERE class_work_name = ? LIMIT 1`;
+        const query_string: string = `SELECT * FROM common_class_work WHERE class_work_name = ? LIMIT 1`;
         const database_connection = await this.database_manager.getConnection();
         const class_work_for_class: CommonClassWork[] = [];
 

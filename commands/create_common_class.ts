@@ -12,7 +12,7 @@ export default function() {
             options.setName('class_name')
             .setDescription('(Required) Class course name')
             .setRequired(true))
-        .addNumberOption(options => 
+        .addStringOption(options => 
             options.setName('class_course_code')    
             .setDescription('(Required) Class course code')
             .setRequired(true))
@@ -31,7 +31,7 @@ export default function() {
             const common_class_repository:CommonClassRepository = new CommonClassRepository();
 
             const class_name: string = interaction.options.getString('class_name');
-            const class_course_code: number = interaction.options.getNumber('class_course_code');
+            const class_course_code: string = interaction.options.getString('class_course_code');
             const class_start_time: string = interaction.options.getString('class_start_time');
             const class_end_time: string = interaction.options.getString('class_end_time');
 

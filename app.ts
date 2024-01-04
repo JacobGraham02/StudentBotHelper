@@ -7,17 +7,16 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import fs from 'fs';
-import { Client, Collection, GatewayIntentBits, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
+import { Collection, GatewayIntentBits, GuildMemberRoleManager } from 'discord.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
-import IDiscordEventData from './utils/IDiscordEventData.js';
-import CommonClassRepository from './database/CommonClassRepository.js';
-import schedule from 'node-schedule';
+import CommonClassWorkRepository from './database/CommonClassWorkRepository.js';
+import CommonClassWork from './entity/CommonClassWork.js';
 import CommonClass from './entity/CommonClass.js';
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
-const common_class_repository: CommonClassRepository = new CommonClassRepository();
+const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -108,33 +107,54 @@ custom_event_emitter.on('databaseOperationEvent', async(message) => {
   }
 });
 
-custom_event_emitter.on('showClassesInSchedule', async(classes) => {
+custom_event_emitter.on('showClassesInSchedule', async(classes: CommonClass[]) => {
   const discord_channel_for_class_data_results = process.env.discord_bot_command_channel_id;
-
   if (!discord_channel_for_class_data_results) {
-    throw new Error(`The discord channel id for database operation results could not be fetched.`);
+      throw new Error(`The discord channel id for database operation results could not be fetched.`);
+  }
+
+  const class_work_hash_map = new Map();
+
+  for (const common_class of classes) {
+    const common_class_info = common_class.commonClassInformation();
+    const class_work_array = await common_class_work_repository.findByClassId(common_class_info.class_id);
+    class_work_hash_map.set(common_class_info.class_id, class_work_array);
   }
 
   const discord_channel_for_messages = await discord_client_instance.channels.fetch(discord_channel_for_class_data_results);
+
   for (const common_class of classes) {
+    const common_class_info = common_class.commonClassInformation();
     const class_in_schedule_embedded_message = new EmbedBuilder()
-    .setColor(0x299bcc)
-    .setTitle(`${common_class.class_name}`)
-    .addFields(
-      {name: `Course code:`, value:common_class.class_course_code},
-      {name: `Course start time:`, value:common_class.class_start_time},
-      {name: `Course end time:`, value:common_class.class_end_time}
-    )
-    .setThumbnail('https://i.imgur.com/9rn0xvQ.jpeg')
-    .setTimestamp()
-    .setFooter({text:common_class.class_name, iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg'}
-    );
+        .setColor(0x299bcc)
+        .setTitle(`${common_class_info.class_name} and course homework (if any)`)
+        .addFields(
+            { name: `Course code:`, value: common_class_info.class_course_code },
+            { name: `Course start time:`, value: common_class_info.class_start_time },
+            { name: `Course end time:`, value: common_class_info.class_end_time },
+            { name: `\u200B`, value: `\u200B`},
+            { name: `Class work (if any) are display below:`, value: ``, inline: true}
+        )
+        .setThumbnail('https://i.imgur.com/9rn0xvQ.jpeg')
+        .setTimestamp()
+        .setFooter({ text: common_class_info.class_name, iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg' });
+
+
+    const class_work_array = class_work_hash_map.get(common_class_info.class_id);
+    if (class_work_array) {
+      class_work_array.forEach(class_work_document => {
+            class_in_schedule_embedded_message.addFields(
+                { name: `${class_work_document.homework_name}`, value: `Due on ${class_work_document.homework_due_date}`, inline: true }
+            );
+        });
+    }
 
     if (discord_channel_for_messages && discord_channel_for_messages.isTextBased()) {
-      discord_channel_for_messages.send({embeds: [class_in_schedule_embedded_message]});
+        discord_channel_for_messages.send({ embeds: [class_in_schedule_embedded_message] });
     }
   }
 });
+
 
 const app = express();
 

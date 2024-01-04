@@ -5,11 +5,11 @@ export default class CommonClass {
     private class_name: string;
     private class_start_time: string;
     private class_end_time: string; 
-    private class_course_code = 0;
+    private class_course_code: string = "0";
 
     private class_name_regex = /[a-zA-Z ]{1,100}/
 
-    constructor(id: UUID, class_start_time: string, class_end_time: string, class_course_code: number,  class_name: string) {
+    constructor(id: UUID, class_start_time: string, class_end_time: string, class_course_code: string,  class_name: string) {
         this.validateClassName(class_name);
         this.id = id;
         this.class_name = class_name;
