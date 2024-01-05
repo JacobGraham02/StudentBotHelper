@@ -1,4 +1,4 @@
-import { ActionRowBuilder, Component, ComponentType, Interaction, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ComponentType, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
 import CommonClassRepository from '../database/CommonClassRepository';
 import CommonClass from '../entity/CommonClass';
 import { StringSelectMenuOptionBuilder } from '@discordjs/builders';
@@ -31,7 +31,7 @@ export default function() {
             const classes: CommonClass[] | undefined = await common_class_repository.findAll();
             
             if (classes === undefined || classes.length === 0) {
-                interaction.reply({content:`There are no classes which you can assign work to!`,ephemeral:true});
+                interaction.reply({content:`There are no classes which you can assign work to`,ephemeral:true});
                 return;
             }
             const select_class_menu = new StringSelectMenuBuilder()
@@ -77,7 +77,7 @@ export default function() {
                 
             collector.on('end', async (class_menu_interaction) => {
                 if (class_menu_interaction.size === 0) {
-                    await interaction.channel.send({content:`No class was selected for this work document. Please retype the command and try again`});
+                    await interaction.channel.send({content:`No class was selected for this work document. Please retype the command and try again`, ephemeral:true});
                 }
             });
         }

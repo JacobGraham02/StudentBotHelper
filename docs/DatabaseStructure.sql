@@ -4,6 +4,7 @@ USE discord_student_helper_bot;
 SELECT * FROM common_class;
 SELECT * FROM common_class_work;
 DELETE FROM common_class;
+DELETE FROM common_class_work;
 SET SQL_SAFE_UPDATES = 0;
 
 CREATE TABLE common_class (

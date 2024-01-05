@@ -23,8 +23,6 @@ export default function() {
         authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
-            const category_id = "1110654950066896957"; 
-            const thread_owner_user: User = interaction.options.getUser('user');
             const student_repository: StudentRepository = new StudentRepository();
             const discord_user_username: string = interaction.user.username;
             const channel_to_create_thread = interaction.channel;

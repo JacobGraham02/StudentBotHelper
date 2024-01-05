@@ -9,7 +9,7 @@ import CustomEventEmitter from '../utils/CustomEventEmitter';
 export default class DatabaseConnectionManager {
     private database_connection_limit: number = 10;
     private database_config: IDatabaseConfig;  
-    private database_ssl_certificate: { ca: Buffer };
+    private database_ssl_certificate: { ca: Buffer; } | undefined;
     private database_connection_pool!: mysql.Pool;
     private custom_event_emitter: CustomEventEmitter;
 
@@ -20,7 +20,7 @@ export default class DatabaseConnectionManager {
         if (this.database_config.ssl_certificate_path) {
             this.database_ssl_certificate = {ca: fs.readFileSync(this.database_config.ssl_certificate_path)};
         } else {
-            throw new Error('The database SSL certificate path is not provided');
+            this.custom_event_emitter.emitDatabaseLoggingMessage(`The database SSL certificate path is either not provided or is invalid. Please inform the bot developer of this error`, 500);
         }
     }
 
@@ -31,7 +31,7 @@ export default class DatabaseConnectionManager {
 
     async initializeDatabaseConnectionPool() {
         if (!this.isValidConfig) {
-            throw new Error('Invalid database configuration');
+            this.custom_event_emitter.emitDatabaseLoggingMessage(`The database configuration is not valid. Please inform the bot developer of this error`);
         }
 
         this.database_connection_pool = mysql.createPool({
@@ -45,13 +45,11 @@ export default class DatabaseConnectionManager {
         });
     
         this.database_connection_pool.on('connection', (connection) => {
-            this.custom_event_emitter.emitDatabaseLoggingMessage(200, 'Database connection established');
-            console.log(`Database connection established: ${connection.threadId}`);
+            this.custom_event_emitter.emitDatabaseLoggingMessage(`Database connection established with id ${connection.threadId}`, 200);
         });
 
         this.database_connection_pool.on('release', (connection) => {
-            this.custom_event_emitter.emitDatabaseLoggingMessage(200, 'Database connection released');
-            console.log(`Database connection ${connection.threadId} has been released`);
+            this.custom_event_emitter.emitDatabaseLoggingMessage(`Database connection released with id ${connection.threadId}`, 200);
         });
     }
     
@@ -62,14 +60,14 @@ export default class DatabaseConnectionManager {
         try {
             return await this.database_connection_pool.getConnection();
         } catch (error) {
-            console.error(`We failed to get a database connection:${error}`);
+            this.custom_event_emitter.emitDatabaseLoggingMessage(`ERROR - A database connection could not be acquired`, 500);
             throw error;
         }
     }
 
     async closePool() {
         if (this.database_connection_pool) {
-            console.log('Close pool function');
+            this.custom_event_emitter.emitDatabaseLoggingMessage(`The database connection pool has been closed`, 200);
             await this.database_connection_pool.end();
         }
     }

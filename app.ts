@@ -12,7 +12,6 @@ import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
 import CommonClassWorkRepository from './database/CommonClassWorkRepository.js';
-import CommonClassWork from './entity/CommonClassWork.js';
 import CommonClass from './entity/CommonClass.js';
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;

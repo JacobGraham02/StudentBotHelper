@@ -1,4 +1,4 @@
 export default interface IDatabaseResponseObject {
-    status: number;
+    status?: number;
     statusText: string;
 }

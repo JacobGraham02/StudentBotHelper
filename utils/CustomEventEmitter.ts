@@ -20,8 +20,8 @@ export default class CustomEventEmitter extends EventEmitter {
         super();
     }
 
-    emitDatabaseLoggingMessage(operation_status_code: number, operation_status_message: string) {
-        const show_database_operation_events = formatValidDatabaseResponseObject(operation_status_code, operation_status_message);
+    emitDatabaseLoggingMessage(operation_status_message: string, operation_status_code?: number) {
+        const show_database_operation_events = formatValidDatabaseResponseObject(operation_status_message, operation_status_code);
         this.emit('databaseOperationEvent', show_database_operation_events);
     }
 
