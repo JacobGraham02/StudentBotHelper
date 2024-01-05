@@ -7,7 +7,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import fs from 'fs';
-import { Collection, GatewayIntentBits, GuildMemberRoleManager } from 'discord.js';
+import { Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
@@ -155,6 +155,27 @@ custom_event_emitter.on('showClassesInSchedule', async(classes: CommonClass[]) =
   }
 });
 
+custom_event_emitter.on('createDiscordGuildEvent', async(classes: CommonClass[]) => {
+  const guild_id: string | undefined = process.env.discord_bot_guild_id;
+  let guild: Guild | undefined;
+
+  if (guild_id !== undefined) {
+    guild = discord_client_instance.guilds.cache.get(guild_id);
+  }
+  if (guild !== undefined) {
+    for (const common_class of classes) {
+      const common_class_info = common_class.commonClassInformation();
+      guild.scheduledEvents.create({
+        name: common_class_info.class_name,
+        scheduledStartTime: formatTimeValue(common_class_info.class_start_time),
+        scheduledEndTime: formatTimeValue(common_class_info.class_end_time),
+        description: common_class_info.class_course_code,
+        entityType: GuildScheduledEventEntityType.External,
+        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly
+      });
+    }
+  }
+});
 
 const app = express();
 
