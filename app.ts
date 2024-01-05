@@ -13,6 +13,7 @@ import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
 import CommonClassWorkRepository from './database/CommonClassWorkRepository.js';
 import CommonClass from './entity/CommonClass.js';
+import { formatDatetimeValue, formatTimeValue } from './utils/NormalizeDatetimeAndTimeValue.js';
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
@@ -126,13 +127,12 @@ custom_event_emitter.on('showClassesInSchedule', async(classes: CommonClass[]) =
     const common_class_info = common_class.commonClassInformation();
     const class_in_schedule_embedded_message = new EmbedBuilder()
         .setColor(0x299bcc)
-        .setTitle(`${common_class_info.class_name} and course homework (if any)`)
-        .addFields(
+        .setTitle(`${common_class_info.class_name}`)
+        .addFields( 
             { name: `Course code:`, value: common_class_info.class_course_code },
-            { name: `Course start time:`, value: common_class_info.class_start_time },
-            { name: `Course end time:`, value: common_class_info.class_end_time },
+            { name: `Course start time:`, value: formatTimeValue(common_class_info.class_start_time) },
+            { name: `Course end time:`, value: formatTimeValue(common_class_info.class_end_time) },
             { name: `\u200B`, value: `\u200B`},
-            { name: `Class work (if any) are display below:`, value: ``, inline: true}
         )
         .setThumbnail('https://i.imgur.com/9rn0xvQ.jpeg')
         .setTimestamp()
@@ -142,8 +142,9 @@ custom_event_emitter.on('showClassesInSchedule', async(classes: CommonClass[]) =
     const class_work_array = class_work_hash_map.get(common_class_info.class_id);
     if (class_work_array) {
       class_work_array.forEach(class_work_document => {
+            const class_work_document_due_date: string = formatDatetimeValue(class_work_document.homework_due_date);
             class_in_schedule_embedded_message.addFields(
-                { name: `${class_work_document.homework_name}`, value: `Due on ${class_work_document.homework_due_date}`, inline: true }
+                { name: `${class_work_document.homework_name}`, value: `Due on ${class_work_document_due_date}`, inline: true }
             );
         });
     }
