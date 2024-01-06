@@ -165,13 +165,17 @@ custom_event_emitter.on('createDiscordGuildEvent', async(classes: CommonClass[])
   if (guild !== undefined) {
     for (const common_class of classes) {
       const common_class_info = common_class.commonClassInformation();
+      console.log(`The common class info start time is: ${common_class_info.class_start_time}`);
       guild.scheduledEvents.create({
         name: common_class_info.class_name,
-        scheduledStartTime: formatTimeValue(common_class_info.class_start_time),
-        scheduledEndTime: formatTimeValue(common_class_info.class_end_time),
+        scheduledStartTime: common_class_info.class_start_time,
+        scheduledEndTime: common_class_info.class_end_time,
         description: common_class_info.class_course_code,
         entityType: GuildScheduledEventEntityType.External,
-        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly
+        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+        entityMetadata: {
+          location: "Zoom"
+        }
       });
     }
   }

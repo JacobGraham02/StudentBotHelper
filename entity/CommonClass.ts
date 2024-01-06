@@ -6,16 +6,27 @@ export default class CommonClass {
     private class_start_time: string;
     private class_end_time: string; 
     private class_course_code: string = "0";
+    private class_runs_monday: number;
+    private class_runs_tuesday: number;
+    private class_runs_wednesday: number;
+    private class_runs_thursday: number;
+    private class_runs_friday: number;
 
     private class_name_regex = /[a-zA-Z ]{1,100}/
 
-    constructor(id: UUID, class_start_time: string, class_end_time: string, class_course_code: string,  class_name: string) {
+    constructor(id: UUID, class_start_time: string, class_end_time: string, class_course_code: string,  class_name: string, class_monday, class_tuesday, class_wednesday, 
+        class_thursday, class_friday) {
         this.validateClassName(class_name);
         this.id = id;
         this.class_name = class_name;
         this.class_start_time = class_start_time;
         this.class_end_time = class_end_time;
         this.class_course_code = class_course_code;
+        this.class_runs_monday = class_monday;
+        this.class_runs_tuesday = class_tuesday;
+        this.class_runs_wednesday = class_wednesday;
+        this.class_runs_thursday = class_thursday;
+        this.class_runs_friday = class_friday;
     }
 
     private validateClassName(class_name: string): void {
@@ -30,7 +41,12 @@ export default class CommonClass {
             class_name: this.class_name,
             class_start_time: this.class_start_time,
             class_end_time: this.class_end_time,
-            class_course_code: this.class_course_code
+            class_course_code: this.class_course_code,
+            class_monday: this.class_runs_monday,
+            class_tuesday: this.class_runs_tuesday,
+            class_wednesday: this.class_runs_wednesday,
+            class_thursday: this.class_runs_thursday,
+            class_friday: this.class_runs_friday
         };
     }
 

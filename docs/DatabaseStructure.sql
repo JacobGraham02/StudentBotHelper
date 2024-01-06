@@ -12,7 +12,12 @@ CREATE TABLE common_class (
 	class_start_time TIME,
     class_end_time TIME,
     class_course_code VARCHAR(20),
-    class_name VARCHAR(255)
+    class_name VARCHAR(255),
+    class_runs_monday BOOLEAN,
+    class_runs_tuesday BOOLEAN,
+    class_runs_wednesday BOOLEAN,
+    class_runs_thursday BOOLEAN,
+    class_runs_friday BOOLEAN
 ) Engine=InnoDB;
 
 CREATE TABLE common_class_work (
@@ -55,8 +60,8 @@ CREATE TABLE student_class_work (
     FOREIGN KEY(student_class_id) REFERENCES student_class(id)
 ) Engine=InnoDB;
 
-DROP TABLE common_class_work;
-DROP TABLE common_class;
+DROP TABLE IF EXISTS common_class_work;
+DROP TABLE IF EXISTS common_class;
 DROP TABLE IF EXISTS student_class_work;
 DROP TABLE IF EXISTS student_class;
 DROP TABLE IF EXISTS student;

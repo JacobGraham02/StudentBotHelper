@@ -38,7 +38,12 @@ export default class CommonClassRepository implements ICommonClassRepository {
                 common_class_data.class_start_time,
                 common_class_data.class_end_time,
                 common_class_data.class_course_code,
-                common_class_data.class_name
+                common_class_data.class_name,
+                common_class_data.class_monday,
+                common_class_data.class_tuesday,
+                common_class_data.class_wednesday,
+                common_class_data.class_thursday,
+                common_class_data.class_friday
               );
               common_class_array.push(common_class);
             });
@@ -72,7 +77,12 @@ export default class CommonClassRepository implements ICommonClassRepository {
                     common_class_data.class_start_time,
                     common_class_data.class_end_time,
                     common_class_data.class_course_code,
-                    common_class_data.class_name
+                    common_class_data.class_name,
+                    common_class_data.class_monday,
+                    common_class_data.class_tuesday,
+                    common_class_data.class_wednesday,
+                    common_class_data.class_thursday,
+                    common_class_data.class_friday
                 );
             }
         } catch (error) {
@@ -99,7 +109,12 @@ export default class CommonClassRepository implements ICommonClassRepository {
                     common_class_data.class_start_time,
                     common_class_data.class_end_time,
                     common_class_data.class_course_code,
-                    common_class_data.class_name
+                    common_class_data.class_name,
+                    common_class_data.class_monday,
+                    common_class_data.class_tuesday,
+                    common_class_data.class_wednesday,
+                    common_class_data.class_thursday,
+                    common_class_data.class_friday
                 );
             }
         } catch (error) {
@@ -114,7 +129,7 @@ export default class CommonClassRepository implements ICommonClassRepository {
     }
 
     async create(common_class: CommonClass): Promise<any> {
-        const query_string: string = `INSERT INTO common_class (id, class_start_time, class_end_time, class_course_code, class_name) VALUES (?, ?, ?, ?, ?)`;
+        const query_string: string = `INSERT INTO common_class (id, class_start_time, class_end_time, class_course_code, class_name, class_runs_monday, class_runs_tuesday, class_runs_wednesday, class_runs_thursday, class_runs_friday) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const database_connection = await this.database_manager.getConnection();
 
         try {
@@ -124,7 +139,12 @@ export default class CommonClassRepository implements ICommonClassRepository {
                 common_class_info.class_start_time,
                 common_class_info.class_end_time,
                 common_class_info.class_course_code,
-                common_class_info.class_name
+                common_class_info.class_name,
+                common_class_info.class_monday,
+                common_class_info.class_tuesday,
+                common_class_info.class_wednesday,
+                common_class_info.class_thursday,
+                common_class_info.class_friday
             ]);
         } catch (error) {
             console.error(`There was an error when attempting to insert a CommonClass into the database: ${error}`);
@@ -138,7 +158,7 @@ export default class CommonClassRepository implements ICommonClassRepository {
 
     async update(common_class: CommonClass): Promise<CommonClass | undefined> {
         const common_class_info = common_class.commonClassInformation();
-        const query_string = `UPDATE common_class SET class_name = ?, class_start_time = ?, class_end_time = ?, class_course_code = ? WHERE id = ?`;
+        const query_string = `UPDATE common_class SET class_name = ?, class_start_time = ?, class_end_time = ?, class_course_code = ? , class_runs_monday = ?, class_runs_tuesday = ?, class_runs_wednesday = ?, class_runs_thursday = ?, class_runs_friday = ? WHERE id = ?`;
         const database_connection = await this.database_manager.getConnection();
 
         try {
@@ -147,7 +167,12 @@ export default class CommonClassRepository implements ICommonClassRepository {
                 common_class_info.class_start_time,
                 common_class_info.class_end_time,
                 common_class_info.class_course_code,
-                common_class_info.class_name
+                common_class_info.class_name,
+                common_class_info.class_monday,
+                common_class_info.class_tuesday,
+                common_class_info.class_wednesday,
+                common_class_info.class_thursday,
+                common_class_info.class_friday
             ]);
             return common_class;
         } catch (error) {
