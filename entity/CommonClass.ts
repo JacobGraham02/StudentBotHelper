@@ -29,6 +29,28 @@ export default class CommonClass {
         this.class_runs_friday = class_friday;
     }
 
+    public does_class_run_on_day(day_of_week: string): boolean {
+        switch (day_of_week.toLowerCase()) {
+            case 'monday':
+                return this.class_runs_monday === 1;
+                break;
+            case 'tuesday':
+                return this.class_runs_tuesday === 1;
+                break;
+            case "wednesday":
+                return this.class_runs_wednesday === 1;
+                break;
+            case 'thursday':
+                return this.class_runs_thursday === 1;
+                break;
+            case "friday":
+                return this.class_runs_friday === 1;
+                break;
+            default:
+                return false;
+        }
+    }
+
     private validateClassName(class_name: string): void {
         if (!class_name.match(this.class_name_regex)) {
             throw new Error('The supplied class name is invalid: Must contain between 1 and 100 lowercase and uppercase letters');

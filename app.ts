@@ -155,7 +155,7 @@ custom_event_emitter.on('showClassesInSchedule', async(classes: CommonClass[]) =
   }
 });
 
-custom_event_emitter.on('createDiscordGuildEvent', async(classes: CommonClass[]) => {
+custom_event_emitter.on('createDiscordGuildEvent', async(classes: CommonClass[], day_of_the_week: string) => {
   const guild_id: string | undefined = process.env.discord_bot_guild_id;
   let guild: Guild | undefined;
 
@@ -165,18 +165,20 @@ custom_event_emitter.on('createDiscordGuildEvent', async(classes: CommonClass[])
   if (guild !== undefined) {
     for (const common_class of classes) {
       const common_class_info = common_class.commonClassInformation();
-      console.log(`The common class info start time is: ${common_class_info.class_start_time}`);
-      guild.scheduledEvents.create({
-        name: common_class_info.class_name,
-        scheduledStartTime: common_class_info.class_start_time,
-        scheduledEndTime: common_class_info.class_end_time,
-        description: common_class_info.class_course_code,
-        entityType: GuildScheduledEventEntityType.External,
-        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
-        entityMetadata: {
-          location: "Zoom"
-        }
-      });
+      if (common_class.does_class_run_on_day(day_of_the_week)) {
+        console.log(`The common class info start time is: ${common_class_info.class_start_time}`);
+        guild.scheduledEvents.create({
+          name: common_class_info.class_name,
+          scheduledStartTime: new Date().toISOString(),
+          scheduledEndTime: new Date().toISOString(),
+          description: common_class_info.class_course_code,
+          entityType: GuildScheduledEventEntityType.External,
+          privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+          entityMetadata: {
+            location: "Zoom"
+          }
+        });
+      }
     }
   }
 });

@@ -35,10 +35,10 @@ export default class CustomEventEmitter extends EventEmitter {
     }
 
 
-    emitGuildEventCreationMessage(common_classes: CommonClass[] | undefined) {
+    emitGuildEventCreationMessage(common_classes: CommonClass[] | undefined, day_of_week: string) {
         if (common_classes === undefined) {
             return;
         }
-        this.emit('createDiscordGuildEvent', common_classes);
+        this.emit('createDiscordGuildEvent', common_classes, day_of_week);
     }
 }
