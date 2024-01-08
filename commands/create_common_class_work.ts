@@ -28,7 +28,14 @@ export default function() {
 
         async execute(interaction) {
             const common_class_repository:CommonClassRepository = new CommonClassRepository();
-            const classes: CommonClass[] | undefined = await common_class_repository.findAll();
+            let classes: CommonClass[] | undefined;
+
+            try {
+                classes = await common_class_repository.findAll();
+            } catch (error) {
+                await interaction.reply(`There was an error when attempting to get class work for classes. Please try the command again or inform the bot developer of this error: ${error}`);
+                return;
+            }
             
             if (classes === undefined || classes.length === 0) {
                 interaction.reply({content:`There are no classes which you can assign work to`,ephemeral:true});
