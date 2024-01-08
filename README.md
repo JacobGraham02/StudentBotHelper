@@ -35,15 +35,22 @@
     
   </article>
   
-  ![StudentBotHelper example running image](images/DiscordBotPicture.PNG)
-  ![StudentBotHelper example embedded message](images/DiscordBotResponses.PNG)
+  ![StudentBotHelper running help command image demonstration](images/DiscordBotPicture.PNG)
+  ![StudentBotHelper creating study group command image demonstration](images/DiscordBotCreatingGroupImage.PNG)
+  ![StudentBotHelper creating study group image demonstration](images/DiscordBotCreateTestGroup.PNG)
+  ![StudentBotHelper creating a message will all classes currently existing demonstration](images/DiscordBotShowClasses.PNG)
+  ![StudentBotHelper creating official class user with the bot demonstration](images/DiscordBotCreatingUser.PNG)
+  ![StudentBotHelper creating class that all students have in common demonstration](images/DiscordBotCreatingCommonClass.PNG)
+  ![StudentBotHelper webhook showing github repository activity demonstration](images/DiscordBotCommitMessages.PNG)
+  ![StudentBotHelper github commits image demonstration](images/DiscordBotSqlOperations.PNG)
+  ![StudentBotHelper database structure demonstration](images/StudentBotHelperDatabaseStructure.PNG)
   
   StudentBotHelper is a Discord bot primarily aimed at College and University students to both relieve them of menial and repetitive work (e.g. logging due dates), and to centralize a lot of resources they find useful onto one platform. In 2023, a lot of student, incuding myself, use Discord for purposes ranging from gaming to school. Therefore, a Discord bot that is aimed at assisting specifically students will garner a lot of interest and be appreciated by a large chunk of Discord users. 
   
 </section>
 
 <section>
-  <!-- PURPOSE OF PROJECT -->
+  <!-- The purpose of the project -->
   <h2 id="purpose-of-project">About The Project</h2>
 
   The purpose of StudentHelperBot is to assist students in their studies, whether it be finding information about their educational institution, logging due dates, forming group chats to work collaboratively with their friends on assignments, or just lounge around to get the general vibe of their school. The following features built into StudentBotHelper include the following:
@@ -122,7 +129,7 @@
 <section>
   <article>
     <p>
-      <h2 id="usage">Usage</h2>
+      <h2 id="usage">How to run the tests</h2>
       TODO (Edited on September 13, 2023)
     </p>
   </article>
@@ -131,7 +138,7 @@
 <section>
   <article>
     <h2 id="contributing">Contributing</h2>
-    Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions that you make are **greatly appreciated**.
+    Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions that you make are greatly appreciated.
   </article>
   <br>
   <article>
