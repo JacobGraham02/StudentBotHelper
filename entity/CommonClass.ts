@@ -71,11 +71,4 @@ export default class CommonClass {
             class_friday: this.class_runs_friday
         };
     }
-
-    private validateTimeFormat(time: string): void {
-        const timeRegex = /(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d/g;
-        if (!time.match(timeRegex)) {
-            throw new Error('Invalid time format. Class start and end times must be in the format HH:MM:SS');
-        }
-    }
 }

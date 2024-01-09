@@ -162,15 +162,24 @@ custom_event_emitter.on('createDiscordGuildEvent', async(classes: CommonClass[],
   if (guild_id !== undefined) {
     guild = discord_client_instance.guilds.cache.get(guild_id);
   }
+  const today: Date = new Date();
+  const year: number = today.getFullYear();
+  const month: number = today.getMonth();
+  const date: number = today.getDate();
+
   if (guild !== undefined) {
     for (const common_class of classes) {
       const common_class_info = common_class.commonClassInformation();
+      const [start_hours, start_minutes] = common_class_info.class_start_time.split(':').map(Number);
+      const [end_hours, end_minutes] = common_class_info.class_end_time.split(':').map(Number);
+      const scheduled_start_date = new Date(year, month, date, start_hours, start_minutes);
+      const scheduled_end_date = new Date(year, month, date, end_hours, end_minutes);
+
       if (common_class.does_class_run_on_day(day_of_the_week)) {
-        console.log(`The common class info start time is: ${common_class_info.class_start_time}`);
         guild.scheduledEvents.create({
           name: common_class_info.class_name,
-          scheduledStartTime: new Date().toISOString(),
-          scheduledEndTime: new Date().toISOString(),
+          scheduledStartTime: scheduled_start_date,
+          scheduledEndTime: scheduled_end_date,
           description: common_class_info.class_course_code,
           entityType: GuildScheduledEventEntityType.External,
           privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
