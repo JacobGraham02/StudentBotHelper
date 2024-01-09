@@ -29,52 +29,100 @@
 
 
 <section>
+  <!-- ABOUT THE PROJECT -->
+  <h2 id="about-the-project">About The Project</h2>
+  <p>
+    StudentBotHelper is a Discord bot primarily aimed at College and University students to act as both a tickler system and document repository, and to centralize onto one platform a lot of resources that students would find useful. In 2023 and 2024, a lot of students, incuding myself, use Discord for purposes ranging from gaming to school. Therefore, a Discord bot that is aimed at assisting specifically students will garner a lot of interest and be appreciated by the population of Discord users that are currently students. 
+  </p>
+  <p>
+    Below you will find a large number of screenshots showcasing the bot and how various operations with the bot work:
+  </p>
+
   <article>
-    <!-- ABOUT THE PROJECT -->
-    <h2 id="about-the-project">About The Project</h2>
-    
-  </article>
+  <strong> Using the 'help' command with the Discord bot </strong> 
   
   ![StudentBotHelper running help command image demonstration](images/DiscordBotPicture.PNG)
+
+  <strong> The bot command used to create a study group within Discord </strong>
+
   ![StudentBotHelper creating study group command image demonstration](images/DiscordBotCreatingGroupImage.PNG)
+
+  <strong> The result of the create group bot command </strong>
+
   ![StudentBotHelper creating study group image demonstration](images/DiscordBotCreateTestGroup.PNG)
-  ![StudentBotHelper creating a message will all classes currently existing demonstration](images/DiscordBotShowClasses.PNG)
+
+  <strong> Generating a server-wide message with all currently-existing classes displayed for students to see the classes for the day </strong>
+
+  ![StudentBotHelper creating a message with all classes currently existing demonstration](images/DiscordBotShowClasses.PNG)
+
+  <strong> A student is allowed to create a user that is registered with the bot </strong>
+  
   ![StudentBotHelper creating official class user with the bot demonstration](images/DiscordBotCreatingUser.PNG)
+
+  <strong> The result in the MySQL database of a user being created </strong>
+
+  ![StudentBotHelper class user result in the mysql database](images/DiscordBotCreatingStudentDatabaseResult.PNG)
+
+  <strong> A command that allows the creation fo a common class: a class that all students have in common </strong>
+
   ![StudentBotHelper creating class that all students have in common demonstration](images/DiscordBotCreatingCommonClass.PNG)
+
+  <strong> The result in the MySQL database of the user common class being created </strong>
+
+  ![StudentBotHelper common class result in the mysql database](images/DiscordBotCommonClassDatabaseResult.PNG)
+
+  <strong> An image showing the Discord channel which holds all of the activity on the bot GitHub repository </strong>
+
   ![StudentBotHelper webhook showing github repository activity demonstration](images/DiscordBotCommitMessages.PNG)
-  ![StudentBotHelper github commits image demonstration](images/DiscordBotSqlOperations.PNG)
+
+  <strong> An image showing all of the database operations performed by using the Discord bot </strong>
+
+  ![StudentBotHelper database operation messages image demonstration](images/DiscordBotSqlOperations.PNG)
+
+  <strong> An image showing the MySQL database structure that was created for the bot </strong>
+
   ![StudentBotHelper database structure demonstration](images/StudentBotHelperDatabaseStructure.PNG)
-  
-  StudentBotHelper is a Discord bot primarily aimed at College and University students to both relieve them of menial and repetitive work (e.g. logging due dates), and to centralize a lot of resources they find useful onto one platform. In 2023, a lot of student, incuding myself, use Discord for purposes ranging from gaming to school. Therefore, a Discord bot that is aimed at assisting specifically students will garner a lot of interest and be appreciated by a large chunk of Discord users. 
-  
+  </article>
+  <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 <section>
   <!-- The purpose of the project -->
   <h2 id="purpose-of-project">About The Project</h2>
+  <p>
+  StudentBotHelper is a Discord bot primarily aimed at College and University students to act as both a tickler system and document repository, and to centralize onto one platform a lot of resources that students would find useful. In 2023 and 2024, a lot of students, incuding myself, use Discord for purposes ranging from gaming to school. Therefore, a Discord bot that is aimed at assisting specifically students will garner a lot of interest and be appreciated by the population of Discord users that are currently students. 
+  </p>
 
-  The purpose of StudentHelperBot is to assist students in their studies, whether it be finding information about their educational institution, logging due dates, forming group chats to work collaboratively with their friends on assignments, or just lounge around to get the general vibe of their school. The following features built into StudentBotHelper include the following:
-    1. Registering an account to use with the bot
-    2. Creating a private 'thread' session with the bot. This simulates a real session that you would typically establish if you were using a web application
-    3. Creating a private group dm with bot and up to 4 other users.
-    4. Generating a google maps uri for information of a specific place (utilizes the google places api)
-    5. Generating a google maps uri for directions from one place to another place (utilizes the google directions api)
-    6. Deleting your user account (if the account is associated with your discord username)
-    7. Typing the '/help' command to get more information about what commands can be used with the bot
-    8. Having Discord events created automatically for classes in the present or future
+  <p>
+    The bot is continuously being developed and improved so as to keep on top of current trends in the software development industry, and to ensure compatiblity with the current version of MySQL, the Discord API, and with Microsoft Azure. Below is a summarized list of all the functions that the Student Bot Helper currently can do: 
+    <ol>
+      <li>Registering an account to use with the bot</li>
+      <li>Creating a private 'thread' session with the bot. This simulates a real session that you would typically establish if you were using a web application</li>
+      <li>Creating a private group dm with bot and up to 4 other users.</li>
+      <li>Generating a google maps uri for information of a specific place (utilizes the google places api)</li>
+      <li>Generating a google maps uri for directions from one place to another place (utilizes the google directions api)</li>
+      <li>Deleting your user account (if the account is associated with your discord username)</li>
+      <li>Typing the <strong>'/help'</strong> command to get more information about what commands can be used with the bot</li>
+      <li>Having Discord events created automatically for classes in the present or future</li>
+    </ol>
+  </p>
+    <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 <section>
   <h2 id="built-with">Built with</h2>
-  <ol>
-    <li><a href="https://www.typescriptlang.org/" >TypeScript</a></li>
-    <li><a href="https://azure.microsoft.com/en-ca">Microsoft Azure</a></li>
-    <li><a href="https://www.mysql.com/">MySQL</a></li>
-    <li><a href="https://discord.js.org/">Discord.js</a></li>
-    <li><a href="https://developers.google.com/maps/documentation/places/web-service/overview">Google Places API</a></li>
-    <li><a href="https://developers.google.com/maps/documentation/directions/overview">Google Directions API</a></li>
-    <li><a href="https://nodejs.org/en">Node.js</a></li>
-  </ol>
+  <p>
+    <ol>
+      <li><a href="https://www.typescriptlang.org/" >TypeScript</a></li>
+      <li><a href="https://azure.microsoft.com/en-ca">Microsoft Azure</a></li>
+      <li><a href="https://www.mysql.com/">MySQL</a></li>
+      <li><a href="https://discord.js.org/">Discord.js</a></li>
+      <li><a href="https://developers.google.com/maps/documentation/places/web-service/overview">Google Places API</a></li>
+      <li><a href="https://developers.google.com/maps/documentation/directions/overview">Google Directions API</a></li>
+      <li><a href="https://nodejs.org/en">Node.js</a></li>
+    </ol>
+  </p>
+  <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 
@@ -133,6 +181,7 @@
       TODO (Edited on September 13, 2023)
     </p>
   </article>
+  <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 <section>
@@ -155,6 +204,7 @@
       <li>Open a Pull Request</li>
     </ol>
   </article>
+  <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
 <section>
