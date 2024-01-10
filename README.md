@@ -8,6 +8,8 @@
      <li><a href="#about-the-project">About The Project</a></li>
      <li><a href="#purpose-of-project">Project purpose</a></li>
      <li><a href="#built-with">Built With</a></li>
+     <li><a href="#things-i-learned">Things I learned</li>
+     <li><a href="#challenges-i-faced">Challenges I faced</li>
      <li>
         <a href="#getting-started">Getting Started</a>
         <ul>
@@ -125,6 +127,20 @@
   <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
 
+
+<section>
+  <article>
+    <h2 id="things-i-learned">Things I learned while building this project</h2>
+    <p>While building this Discord bot, I learned how to write complex applications in TypeScript, further my skill in developing web applications using Node.js, while following proper SOLID and DRY software development principles. I built this entire application with a keen eye given towards creating loosely-coupled code that is easy to modify, easy to test, and can integrate well with third-party platforms such as Microsoft Azure. So far, I have created a loosely-coupled database repository class that uses SSH to securely connect with a MySQL database on Microsoft Azure. I learned how to write both unit tests so that I could verify my application functions perform properly, and integration tests with the Azure MySQL database so that I know my application can interact with the database correctly.</p>
+    <p>Additionally, I used optimal software development architecture to build this application, using the repository design pattern for the database, and utilizing entity classes to construct objects to use. I used Docker to make a Dockerfile that will allow any user to download the project and just build the constructed Docker image to quickly build their version of the project and get started immediately, without having any problems or potential roadblocks with their project.</p>
+  </article>
+</section>
+
+<section>
+  <article>
+  <h2 id="">Challenges that I faced while building this project</h2>
+  </article>
+</section>
 
 <section>
   <article>
