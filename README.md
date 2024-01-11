@@ -133,12 +133,20 @@
     <h2 id="things-i-learned">Things I learned while building this project</h2>
     <p>While building this Discord bot, I learned how to write complex applications in TypeScript, further my skill in developing web applications using Node.js, while following proper SOLID and DRY software development principles. I built this entire application with a keen eye given towards creating loosely-coupled code that is easy to modify, easy to test, and can integrate well with third-party platforms such as Microsoft Azure. So far, I have created a loosely-coupled database repository class that uses SSH to securely connect with a MySQL database on Microsoft Azure. I learned how to write both unit tests so that I could verify my application functions perform properly, and integration tests with the Azure MySQL database so that I know my application can interact with the database correctly.</p>
     <p>Additionally, I used optimal software development architecture to build this application, using the repository design pattern for the database, and utilizing entity classes to construct objects to use. I used Docker to make a Dockerfile that will allow any user to download the project and just build the constructed Docker image to quickly build their version of the project and get started immediately, without having any problems or potential roadblocks with their project.</p>
+    <p>I added many features to this project to make the bot as compatible as possible with similar real-life implementations of other Discord bots. Below are some of the things I considered when building this Discord bot project:
+      <ol>
+        <li>Used UUID data types instead of integer ID's for the database to allow for integration with other databases</li>
+        <li>Used the repository design pattern to create loose coupling between the application layer and the data layer, allowing for flexibility in dealing with changes</li>
+        <li>Wrote several utility classes containing functions that take input data and normalize the data to create objects which can be used with the Discord API</li>
+      </ol>
   </article>
 </section>
 
 <section>
   <article>
-  <h2 id="">Challenges that I faced while building this project</h2>
+    <h2 id="">Challenges that I faced while building this project</h2>
+    <p>While building this Discord bot, the most prominant challenge that I faced was when debugging errors or thrown by the Discord API, as the Discord API throws very abstract and general error messages, which required me to sequentially go through the stack trace and thoroughly investigate every file which appeared in the stack trace in order to find which file was causing the problems. Any Discord API error which was thrown included an error code which I could search for on Google to assist me in finding which file could be causing the problems.</p>
+    <p>Another significant challenge that I faced while building this project was building the project to be as appliable to the real world as possible (using proper design patterns, following SOLID and DRY principles, and designing the application to be able to merge seamlessly with other similar applications). In my project, I had to create a custom Discord client in the folder <strong>utils/CustomDiscordClient</strong> that interacts with the Discord API because of the custom additions I added to my bot. 
   </article>
 </section>
 
@@ -185,7 +193,7 @@
   
   <article>
     <h2 id="installation">Installation<h2>
-    TODO (Edited on September 13, 2023)
+    TODO
   </article>
   <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
@@ -194,7 +202,7 @@
   <article>
     <p>
       <h2 id="usage">How to run the tests</h2>
-      TODO (Edited on September 13, 2023)
+      TODO 
     </p>
   </article>
   <p align="right">(<a href="#readme-top">back to top</a>)</p>
