@@ -1,24 +1,27 @@
 import { Guild } from 'discord.js';
-import IDiscordEvent from './IDiscordEventData';
+import IDiscordEventData from './IDiscordEventData';
 
 export default class DiscordEvent  {
     target_discord_guild: Guild;
-    target_discord_event_data: IDiscordEvent;
 
-    constructor(discord_event_data: IDiscordEvent, discord_guild: Guild ) {
+    constructor(discord_guild: Guild ) {
         this.target_discord_guild = discord_guild;
-        this.target_discord_event_data = discord_event_data;
     }
 
-    async createNewDiscordEvent() {
+    /**
+     * Create a scheduled event given a Discord guild (server) information. We must create the scheduled event asychronously because 
+     * the Discord API will throw an 'Unknown interaction' exception, because we did not await completion of the interaction (creating the scheduled event). 
+     * @param discord_event_data IDiscordEventData containing all of the data required to create a scheduled event
+     */
+    async createNewDiscordEvent(discord_event_data: IDiscordEventData) {
         await this.target_discord_guild.scheduledEvents.create({
-            description: this.target_discord_event_data.description,
-            name: this.target_discord_event_data.name,
-            privacyLevel: this.target_discord_event_data.privacy_level,
-            scheduledStartTime: this.target_discord_event_data.start_date,
-            scheduledEndTime: this.target_discord_event_data.end_date,
-            entityType: this.target_discord_event_data.entity_type,
-            entityMetadata: this.target_discord_event_data.entity_meta_data
+            name: discord_event_data.discord_event_data_class_name,
+            scheduledStartTime: discord_event_data.scheduled_start_date,
+            scheduledEndTime: discord_event_data.scheduled_end_date,
+            description: discord_event_data.discord_event_data_class_code,
+            entityType: discord_event_data.entityType,
+            privacyLevel: discord_event_data.privacyLevel,
+            entityMetadata: discord_event_data.entityMetadata
         });
     }
 }

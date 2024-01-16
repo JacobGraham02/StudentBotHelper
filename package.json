@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc && node dist\\commands\\deploy-commands.js",
-    "start": "node dist\\app.js",
+    "build": "tsc",
+    "deploy-commands": "node dist/commands/deploy-commands.js",
+    "start": "node dist/app.js",
     "test": "jest",
     "dev": "nodemon ./bin/www",
     "debug": "nodemon --inspect app.ts"

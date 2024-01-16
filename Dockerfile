@@ -1,3 +1,6 @@
+# The following Dockerfile is used a placeholder for an actual Dockerfile, and the Dockerfile does not do anything as of January 15, 2024.
+# The plan is to make this Dockerfile be deployed online somewhere for Comp4431 Advanced Project at Lakehead University. 
+
 # Use an official Node.js runtime as a parent image
 FROM node:18
 

@@ -1,13 +1,16 @@
 import { GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";
 
+/**
+ * An interface defining the data that is used for creating Discord scheduled event data. 
+ */
 export default interface DiscordEventData {
-    start_date: string;
-    end_date: string;
-    name: string;
-    description: string;
-    privacy_level: GuildScheduledEventPrivacyLevel.GuildOnly,
-    entity_type: GuildScheduledEventEntityType.External,
-    entity_meta_data: {
+    discord_event_data_class_name: string;
+    scheduled_start_date: Date;
+    scheduled_end_date: Date;
+    discord_event_data_class_code: string;
+    entityType: GuildScheduledEventEntityType,
+    privacyLevel: GuildScheduledEventPrivacyLevel,
+    entityMetadata: {
         location: string;
     }
 }
