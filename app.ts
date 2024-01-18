@@ -8,7 +8,6 @@ import createError from 'http-errors';
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import logger from 'morgan';
 import fs from 'fs';
 import { Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
 /*
@@ -21,9 +20,10 @@ import CommonClassWorkRepository from './database/CommonClassWorkRepository.js';
 import CommonClass from './entity/CommonClass.js';
 import { formatDatetimeValue, formatTimeValue } from './utils/NormalizeDatetimeAndTimeValue.js';
 import IDatabaseResponseObject from './utils/IDiscordDatabaseResponse.js';
-import CommonClassWork from './entity/CommonClassWork.js';
 import IDiscordEventData from './utils/IDiscordEventData.js';
 import DiscordEvent from './utils/DiscordEvent.js';
+import Logger from './utils/Logger.js';
+const logger: Logger = new Logger(process.env.discord_bot_messages_logs_file_path, process.env.discord_bot_error_logs_file_path);
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -311,7 +311,6 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
