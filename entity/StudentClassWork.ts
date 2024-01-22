@@ -25,6 +25,10 @@ export default class StudentClassWork {
         }
     }
 
+    /**
+     * A function which will return all of the relevant StudentClassWork information 
+     * @returns Object containing all of the relevant student class work information
+     */
     public studentWorkInformation() {
         return {
             id: this.id,

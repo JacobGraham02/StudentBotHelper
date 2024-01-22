@@ -29,6 +29,10 @@ export default class StudentClass {
         }
     }
 
+    /**
+     * A function which will return all of the relevant StudentClasss information 
+     * @returns Object containing all of the relevant student class information
+     */
     public classInformation() {
         return {
             id: this.id,
