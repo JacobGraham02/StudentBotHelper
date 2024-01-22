@@ -125,8 +125,10 @@ discord_client_instance.on('interactionCreate', async interaction => {
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
       try {
+        logger.logMessage(`The bot command ${interaction.commandName} was used`);
         await command.execute(interaction);
       } catch (error) {
+        logger.logError(`An error occured while attempting to execute the bot command ${interaction.commandName}: ${error}`)
         await interaction.reply({content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,ephemeral:true});
         console.error(error);
       }

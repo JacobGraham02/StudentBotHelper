@@ -35,7 +35,7 @@ export default class Logger {
      * @returns nothing 
      */
     public async logError(error: string) {
-        if (this.validateStringIsDefinedAndConformsToRegex(error)) {
+        if (!this.validateStringIsDefinedAndConformsToRegex(error)) {
             console.error(`The error message to write to the error log file is undefined`);
             return;
         }
@@ -60,18 +60,20 @@ export default class Logger {
      * @returns nothing 
      */
     public async logMessage(message: string) {
-        if (this.validateStringIsDefinedAndConformsToRegex(message)) {
+        if (!this.validateStringIsDefinedAndConformsToRegex(message)) {
+            console.error(`The information message to write to the message log file is undefined`);
+            return;
+        }
 
-            const formatted_message_string_date: Date = new Date();
-            const formatted_message_string = `${formatted_message_string_date.toISOString()}: ${message}`;
+        const formatted_message_string_date: Date = new Date();
+        const formatted_message_string = `${formatted_message_string_date.toISOString()}: ${message}`;
 
-            try {
-                if (this.log_file_messages_path !== undefined) {
-                    await fs.appendFile(this.log_file_messages_path, formatted_message_string);
-                } 
-            } catch (error) {
-                console.error(`There was an error when attempting to write to the messages log file: ${message}`);
-            }
+        try {
+            if (this.log_file_messages_path !== undefined) {
+                await fs.appendFile(this.log_file_messages_path, formatted_message_string);
+            } 
+        } catch (error) {
+            console.error(`There was an error when attempting to write to the messages log file: ${message}`);
         }
     }
 }
