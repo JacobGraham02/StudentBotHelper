@@ -17,7 +17,7 @@ export default function() {
                 "**6. /hello-world - Generates a nice hello world message with instructions on how to get started (generating this 'help' list)**",
                 "**7. /help - Generates this same list again!**"
             ];
-            await interaction.reply(`**Available Commands:**\n${commands_list_strings.join('\n')}`);
+            await interaction.reply({content:`**Available Commands:**\n${commands_list_strings.join('\n')}`,ephemeral:true});
         }
     }
     return generate_help_message;
