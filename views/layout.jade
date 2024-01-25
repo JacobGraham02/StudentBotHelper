@@ -1,7 +1,21 @@
+block variables
 doctype html
 html
   head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    // page_title is a variable value
+    title= page_title
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', href='/stylesheets/styles.css')
   body
+    block header
+      header#header 
+
     block content
+      main#main 
+
+    block footer 
+      footer#footer 
+        p.bot_repository_link See the Student Bot Helper GitHub repository 
+          a.github_repository(href='https://github.com/JacobGraham02/StudentBotHelper' alt='A URL to the GitHub repository that contains the Student Bot Helper code') here (privated)
+        p.bot_wiki_link See the official Student Bot Helper
+          a.wiki_link(href='https://github.com/JacobGraham02/StudentBotHelper/wiki' alt='A URL to the GitHub repository wiki page that contains information about Student Bot Helper')

@@ -1,0 +1,24 @@
+mixin menu(data)
+    section#menu_container 
+        #website_menu_username_container 
+            input#menu-btn(type='checkbox')
+            label.menu-icon(for='menu-btn')
+                span.navicon 
+            ul.menu 
+                a#index_page_home_button(href='/' title='A link for Student Bot Helper home page')
+                li.menu_list_item 
+                    #navbar_welcome_message 
+                    -if (user === undefined) {
+                        h1#user_name_header Welcome, user
+                    -} else {
+                        a#index_commands_page(href='user/' title='A link that goes to the index page for logged-in users') Home 
+                        h1#user_name_header Welcome, #{user.username}
+                    -}
+                li.menu_list_item
+                    #logout_button_container 
+                    -if (user !== undefined) {
+                        form#global_site_navigation_logout_form(action='/logout' method='POST')
+                            button#global_site_navigation_logout_form_button(type="submit") Log out
+                    -} else {
+                        a#index_page_login_page_button(href='login' title='A link that goes to the login page') Log in to your account
+                    -}
