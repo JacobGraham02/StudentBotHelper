@@ -13,6 +13,8 @@ import { Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildSche
 /*
 Imports from Custom classes
 */
+import indexRouter from './routes/index.js';
+import userRouter from './routes/user.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
@@ -318,13 +320,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
+app.use('/', indexRouter);
+app.use('/users', userRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
   next(createError(404));
 });
+
+app.listen(process.env.port, function () {
+  console.log(`Server is running on port ${process.env.port}`);
+})
 
 // error handler
 app.use((err: any, req: any, res: any, next: any) => {
