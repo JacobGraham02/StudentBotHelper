@@ -5,8 +5,6 @@
   "scripts": {
     "build": "tsc",
     "deploy-commands": "node dist/commands/deploy-commands.js",
-    "compile-scss": "sass --no-source-map scss/styles.scss:public/stylesheets/styles.css",
-    "watch-for-scss-changes": "sass --no-source-map --watch scss/styles.scss:public/stylesheets/styles.css",
     "start": "node dist/app.js",
     "test": "jest",
     "dev": "nodemon ./bin/www",
@@ -39,7 +37,6 @@
     "nodemon": "^3.0.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
-    "sass": "^1.70.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
