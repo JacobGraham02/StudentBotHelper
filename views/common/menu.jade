@@ -5,7 +5,8 @@ mixin menu(data)
             label.menu-icon(for='menu-btn')
                 span.navicon 
             ul.menu 
-                a#index_page_home_button(href='/' title='A link for Student Bot Helper home page')
+                a#header_menu_bot_link(href='/' title='A link for Student Bot Helper home page')
+                    img#header_menu_bot_icon(src='../images/StudentBotHelperStarterIconSmaller.png', alt='An image of Student Bot Helper global site icon')
                 li.menu_list_item 
                     #navbar_welcome_message 
                     -if (user === undefined) {
