@@ -1,0 +1,25 @@
+extends common/layout
+
+include common/menu 
+
+block header 
+    header#header 
+        +menu 
+
+block content 
+    main#main 
+        section#login_form_section 
+            article#account_login_form_information  
+                p#account_login_form_fields_information To log in to the account that is associated with your Discord bot, must type in your email address and password into the 
+                | corresponding fields in the form below. Optionally, you can also use one of the easy single-click sign on methods listed below.
+            article#login_information_messages_article
+            form#account_login_form(action='/login' method='post') 
+                label#account_login_form_username_label(for='username') Email address: 
+                input#account_login_form_username_input(type='text' name='username')
+
+                label#account_login_form_password_label(for='password') Password:
+                input#account_login_form_password_input(type='text' name='password')
+
+                article#account_login_form_button_container 
+                    button#account_login_form_submit_login(action='submit') Log in 
+                    button#account_login_form_submit_login(type='reset') Cancel
