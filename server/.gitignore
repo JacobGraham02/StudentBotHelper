@@ -1,6 +1,0 @@
-node_modules
-.env
-azure_database_login_student_helper_bot
-DigiCertGlobalRootCA.crt.pem
-dist
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
