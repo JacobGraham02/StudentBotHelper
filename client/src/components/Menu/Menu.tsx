@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import studentBotHelperStarterIconSmaller from '../../assets/images/StudentBotHelperStarterIconSmaller.png';
 
 const Menu = ({ user }: {user: any}) => {
@@ -10,13 +11,13 @@ const Menu = ({ user }: {user: any}) => {
         </label>
         <ul className="menu">
           <li className="menu_list_item">
-            <a id="header_menu_bot_link" href="/" title="A link for Student Bot Helper home page">
+              <a id="header_menu_bot_link" href="/" title="A link for Student Bot Helper home page">
               <img 
                 id="header_menu_bot_icon" 
                 src={studentBotHelperStarterIconSmaller}
                 alt="An image of Student Bot Helper global site icon" 
               />
-            </a>
+            </a> 
           </li>
           <li className="menu_list_item">
             <div id="navbar_welcome_message">
@@ -41,10 +42,9 @@ const Menu = ({ user }: {user: any}) => {
                   </button>
                 </form>
               ) : (
-                <h2>Log in to your account</h2>
-                // <Link id="index_page_login_page_button" to="/login" title="A link that goes to the login page">
-                //   Log in to your account
-                // </Link>
+                <Link id="index_page_login_page_button" to="/login" title="A link that goes to the login page">
+                  Log in to your account
+                </Link>
               )}
             </div>
           </li>
