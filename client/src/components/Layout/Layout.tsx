@@ -1,9 +1,8 @@
 import Header from '../Header/Header'
 import Footer from '../Footer/Footer';
-import LandingPageContent from '../LandingPageContent/LandingPageContent';
 import { Helmet } from 'react-helmet';
 
-const Layout = ({ pageTitle } : {pageTitle: string}) => {
+const Layout = ({ pageTitle, pageLayoutContent } : {pageTitle: string, pageLayoutContent: JSX.Element }) => {
   return (
     <>
       <Helmet>
@@ -12,7 +11,7 @@ const Layout = ({ pageTitle } : {pageTitle: string}) => {
         <link rel="icon" type="image/x-icon" href="/images/StudentBotHelperStarterIconSmaller.ico" /> 
       </Helmet>
       <Header pageTitle={pageTitle} />
-      <LandingPageContent/>
+      {pageLayoutContent}
       <Footer />
     </>
   );
