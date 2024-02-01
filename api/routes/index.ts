@@ -2,11 +2,8 @@ import express, { Request, Response, NextFunction, Router } from 'express';
 
 const indexRouter: Router = express.Router();
 
-/* GET home page. */
 indexRouter.get('/', function(request: Request, response: Response, next: NextFunction) {
-  response.render('index', 
-  { page_title: "Student Bot Helper portal" 
-  });
+  response.send('The API routing is working');
 });
 
 indexRouter.get('/login', function(request: Request, response: Response, next: NextFunction) {
