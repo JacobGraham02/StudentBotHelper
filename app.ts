@@ -13,8 +13,8 @@ import { Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildSche
 /*
 Imports from Custom classes
 */
-import indexRouter from './routes/index.js';
-import userRouter from './routes/user.js';
+import indexRouter from './api/routes/index.js';
+import userRouter from './api/routes/user.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
@@ -311,17 +311,12 @@ custom_event_emitter.on('createDiscordGuildEvent',
 
 const app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, '../views'));
-app.set('view engine', 'jade');
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
-
-app.use('/', indexRouter);
-app.use('/users', userRouter);
+app.use("/", indexRouter);
+app.use("/user", userRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
