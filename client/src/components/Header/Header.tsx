@@ -1,9 +1,9 @@
 import Menu from '../Menu/Menu';
 
-const Header = () => {
+const Header = ({ isUserLoggedIn }: { isUserLoggedIn: boolean}) => {
   return (
     <header id="header">
-      <Menu user={undefined} />
+      <Menu isUserLoggedIn={isUserLoggedIn} />
     </header>
   );
 };

@@ -164,17 +164,26 @@ header * {
   }
   #menu_container {
     border: 2px solid green;
-    height: 50%;
+    height: 95%;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
   }
-  #website_menu_username_container {
+  #website_menu_username_container, #website_menu_username_container_anonymous_user {
     display: flex;
+    flex-direction: column;
     width: 100%;
     height: 70%;
     border: 2px dotted yellow;
+  }
+  #website_menu_username_container_anonymous_user {
+    background: purple;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
   }
   #bot_interface_welcome_container {
     display: flex;
