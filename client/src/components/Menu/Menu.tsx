@@ -51,12 +51,18 @@ const Menu = ({ isUserLoggedIn }: {isUserLoggedIn: boolean}) => {
         </ul>
         {isUserLoggedIn ? (
         <div id="website_menu_username_container_anonymous_user">
-            
+            <Link id="index_page_go_to_commands_page_button" to="/commands" title="A link that goes to the bot commands page when clicked">
+              Commands
+            </Link>
+            <Link id="index_page_go_to_log_files_page_button" to="/logfiles" title="A link that goes to the bot log files page when clicked">
+              Log files
+            </Link>
+            <Link id="index_page_go_to_configuration_options_page_button" to="/configurations" title="A link that goes to the bot configuration options page when clicked">
+              Configuration options
+            </Link>
         </div>
       ) : (
-        <div id="website_menu_username_container_anonymous_user">
-
-        </div>
+        <div id="website_menu_username_container_anonymous_user"></div>
       )}
       </div>
     </section>

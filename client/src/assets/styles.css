@@ -157,18 +157,16 @@ header * {
     grid-area: main;
   }
   #header {
-    border: 2px solid red;
     background: #efeff5;
     border-right: 1px solid #dcdcdc;
     grid-area: header;
   }
   #menu_container {
-    border: 2px solid green;
     height: 95%;
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     flex-direction: column;
   }
   #website_menu_username_container, #website_menu_username_container_anonymous_user {
@@ -176,13 +174,13 @@ header * {
     flex-direction: column;
     width: 100%;
     height: 70%;
-    border: 2px dotted yellow;
+    border: 2px solid yellow;
   }
   #website_menu_username_container_anonymous_user {
-    background: purple;
+    border: 2px dashed orangered;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     flex-direction: column;
   }
   #bot_interface_welcome_container {
