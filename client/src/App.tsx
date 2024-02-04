@@ -1,24 +1,31 @@
-import "./assets/styles.css";
-import Layout from "./components/Layout/Layout";
-
-// Layouts
-import DefaultLayout from "./screens/layout/DefaultLayout";
-// Pages
-import LoginPage from "./pages/LoginPage";
-import LandingPage from "./pages/LandingPage";
-
 import {
   Route,
   Routes,
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import "./assets/styles.css";
+
+// Context
+import AuthProvider from "./contexts/AuthContext";
+
+// Layouts
+import Layout from "./components/Layout/Layout";
+import DefaultLayout from "./screens/layout/DefaultLayout";
+// Pages
+import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
+import Register from "./pages/Auth/Register";
 
 // Create router.
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <DefaultLayout />,
+    element: (
+      <AuthProvider>
+        <DefaultLayout />
+      </AuthProvider>
+    ),
     children: [
       {
         path: "/",
@@ -28,10 +35,11 @@ const router = createBrowserRouter([
         path: "dashboard/",
         element: <LandingPage />,
       },
+      { path: "/register", element: <Register /> },
+      { path: "/login", element: <LoginPage /> },
     ],
   },
-  { path: "/register", element: <LoginPage /> },
-  { path: "/login", element: <LoginPage /> },
+
   {
     path: "*",
     element: <LandingPage />,
