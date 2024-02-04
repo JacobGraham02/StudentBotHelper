@@ -1,5 +1,13 @@
 @import "https://fonts.googleapis.com/css2?family=Merriweather:ital@0;1&display=swap";
 @import "https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap";
+
+/* Default */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
 /* menu */
 /* menu icon */
 .menu {
@@ -123,8 +131,20 @@ header * {
   margin: 0;
 }
 
+/*  */
+.full-height-sidebar {
+  height: 100vh; /* Full viewport height */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+/* Ensure the main content also fills the screen and allows for scrolling */
+.main-content {
+  min-height: 100vh; /* Minimum height to fill the viewport */
+}
+
 @media screen and (min-width: 1199px) {
-  body {
+  /* Editing will revert shortly. */
+  /* body {
     margin: 0;
     padding: 0;
     display: grid;
@@ -141,7 +161,7 @@ header * {
     "header main main main main main" 
     "header main main main main main" 
     "header footer footer footer footer footer";
-  }
+  } */
   #root {
     display: inherit;
     margin: inherit;
