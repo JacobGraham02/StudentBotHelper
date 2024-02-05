@@ -11,7 +11,7 @@ const DefaultLayout = (): ReactElement => {
     <div className="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar full-height-sidebar">
       <ul className="nav flex-column">
         <li className="nav-item">
-          <NavLink to="/" className="nav-link" activeClassName="active" exact>
+          <NavLink to="/" className="nav-link">
             Home
           </NavLink>
         </li>
@@ -19,18 +19,18 @@ const DefaultLayout = (): ReactElement => {
           <NavLink
             to="/dashboard"
             className="nav-link"
-            activeClassName="active"
+            
           >
             Dashboard
           </NavLink>
         </li>
         <li className="nav-item">
-          <NavLink to="/profile" className="nav-link" activeClassName="active">
+          <NavLink to="/profile" className="nav-link">
             Profile
           </NavLink>
         </li>
         <li className="nav-item">
-          <NavLink to="/settings" className="nav-link" activeClassName="active">
+          <NavLink to="/settings" className="nav-link">
             Settings
           </NavLink>
         </li>

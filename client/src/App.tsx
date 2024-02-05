@@ -13,7 +13,7 @@ import { OAuthCreds } from "../config.js";
 import AuthProvider from "./contexts/AuthContext";
 
 // Layouts
-import Layout from "./components/Layout/Layout";
+// import Layout from "./components/Layout/Layout";
 import DefaultLayout from "./screens/layout/DefaultLayout";
 
 // Pages
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
       },
       {
         path: "dashboard/",
-        element: <LandingPage />,
+        element: <LandingPage isUserLoggedIn={false} />,
       },
       { path: "register", element: <Register /> },
       { path: "login", element: <LoginPage /> },
@@ -53,11 +53,11 @@ const router = createBrowserRouter([
 
   {
     path: "*",
-    element: <LandingPage />,
+    element: <LandingPage isUserLoggedIn={false} />,
     children: [
       {
         path: "*",
-        element: <LandingPage />,
+        element: <LandingPage isUserLoggedIn={false} />,
       },
     ],
   },
