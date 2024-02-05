@@ -2,6 +2,8 @@ import React from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { GoogleLogin } from "@react-oauth/google";
 import GitHubLoginButton from "../Buttons/OAuth/GitHubLoginButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 type RegisterDetails = {
   fullName: {
@@ -113,12 +115,22 @@ const RegisterForm = ({
               </Form.Control.Feedback>
             </Form.Group>
 
-            <Button className="w-100 mt-3" variant="primary" type="submit">
-              Register
-            </Button>
+            <Container
+              className="d-flex justify-content-center align-items-center"
+              style={{ height: "40px", width: "240px" }}
+            >
+              <Button
+                className="d-flex align-items-center justify-content-center w-100"
+                variant="primary"
+                type="submit"
+              >
+                <FontAwesomeIcon icon={faUserPlus} className="me-2" />
+                Register
+              </Button>
+            </Container>
           </Form>
 
-          <Container className="text-center mt-3 d-flex flex-column align-items-center">
+          <Container className="text-center my-2 d-flex flex-column align-items-center">
             <div className="my-2 d-flex justify-content-center w-100">
               <GoogleLogin
                 onSuccess={googleOnSuccessHandler}
@@ -126,7 +138,10 @@ const RegisterForm = ({
               />
             </div>
             <div className="my-2 d-flex justify-content-center w-100">
-              <GitHubLoginButton githubLoginHandler={githubLoginHandler} />
+              <GitHubLoginButton
+                githubLoginHandler={githubLoginHandler}
+                text={"Register with GitHub"}
+              />
             </div>
           </Container>
         </Col>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { config } from "../../../config";
+import { config } from "../../config";
 
 const API_KEY = config.server.API_KEY;
 const BASE_URL = config.server.BASE_URL;

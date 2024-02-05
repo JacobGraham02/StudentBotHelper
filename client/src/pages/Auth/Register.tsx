@@ -1,8 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
+
 import RegisterForm from "../../components/Forms/RegisterForm";
 import { AuthContext } from "../../contexts/AuthContext";
+
+import { OAuthCreds } from "../../../config";
+import { registerUser } from "../../services/users/index";
 
 const Register = () => {
   const authCtx = useContext(AuthContext);
@@ -74,7 +78,56 @@ const Register = () => {
     }));
   };
 
-  const onSubmitHandler = () => {};
+  const googleOnSuccessHandler = (credentialResponse) => {
+    console.log(credentialResponse);
+  };
+
+  const googleOnErrorHandler = () => {
+    console.log("Login Failed");
+  };
+
+  const githubLoginHandler = () => {
+    const clientID = OAuthCreds.github.clientID;
+    const redirectURI = encodeURIComponent(OAuthCreds.github.redirectURL);
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&scope=user&state=tokenAuthorizationStudentHelperBot`;
+  };
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    let formIsValid = true;
+    const updatedFormState = {};
+
+    for (const field in registerForm) {
+      if (!registerForm[field].valid) {
+        formIsValid = false;
+      }
+
+      updatedFormState[field] = {
+        ...registerForm[field],
+        touched: true,
+      };
+    }
+
+    setRegisterForm(updatedFormState);
+
+    if (formIsValid) {
+      console.log("Form is valid. Submitting data...", registerForm);
+      // Handle form submission, e.g., sending data to a server
+
+      const response = await registerUser(registerForm);
+
+      const userData = {
+        id: response.data.body.id,
+        email: response.data.body.email,
+        username: response.data.body.username,
+        refreshToken: response.data.body.refreshToken,
+      };
+
+      authCtx?.login(userData);
+    } else {
+      console.log("Form is invalid. Please correct the errors.");
+    }
+  };
 
   return (
     <>
@@ -90,6 +143,9 @@ const Register = () => {
           onSubmitHandler={onSubmitHandler}
           onChangeHandler={onChangeHandler}
           registerDetails={registerForm}
+          googleOnSuccessHandler={googleOnSuccessHandler}
+          googleOnErrorHandler={googleOnErrorHandler}
+          githubLoginHandler={githubLoginHandler}
         />
       </Container>
     </>
