@@ -1,5 +1,7 @@
 import React from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { GoogleLogin } from "@react-oauth/google";
+import GitHubLoginButton from "../Buttons/OAuth/GitHubLoginButton";
 
 type RegisterDetails = {
   fullName: {
@@ -28,6 +30,9 @@ const RegisterForm = ({
   onSubmitHandler,
   onChangeHandler,
   registerDetails,
+  googleOnSuccessHandler,
+  googleOnErrorHandler,
+  githubLoginHandler,
 }) => {
   const handleChange = (field: string, value: string) => {
     // Assuming onChangeHandler is designed to update the state based on field and value
@@ -112,6 +117,18 @@ const RegisterForm = ({
               Register
             </Button>
           </Form>
+
+          <Container className="text-center mt-3 d-flex flex-column align-items-center">
+            <div className="my-2 d-flex justify-content-center w-100">
+              <GoogleLogin
+                onSuccess={googleOnSuccessHandler}
+                onError={googleOnErrorHandler}
+              />
+            </div>
+            <div className="my-2 d-flex justify-content-center w-100">
+              <GitHubLoginButton githubLoginHandler={githubLoginHandler} />
+            </div>
+          </Container>
         </Col>
       </Row>
     </Container>
