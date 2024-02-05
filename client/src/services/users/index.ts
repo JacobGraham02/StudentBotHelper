@@ -23,3 +23,14 @@ export const registerUser = async (userData) => {
     throw error;
   }
 };
+
+export const loginUser = async (userData) => {
+  try {
+    const response = await instance.post("user/login", userData);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error registering user: ", error);
+    throw error;
+  }
+};

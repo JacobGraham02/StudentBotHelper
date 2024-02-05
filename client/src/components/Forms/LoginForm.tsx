@@ -3,14 +3,9 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { GoogleLogin } from "@react-oauth/google";
 import GitHubLoginButton from "../Buttons/OAuth/GitHubLoginButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
-type RegisterDetails = {
-  fullName: {
-    touched: boolean;
-    valid: boolean;
-    value: string;
-  };
+type LoginDetails = {
   email: {
     touched: boolean;
     valid: boolean;
@@ -21,17 +16,12 @@ type RegisterDetails = {
     valid: boolean;
     value: string;
   };
-  confirmPassword: {
-    touched: boolean;
-    valid: boolean;
-    value: string;
-  };
 };
 
-const RegisterForm = ({
+const LoginForm = ({
   onSubmitHandler,
   onChangeHandler,
-  registerDetails,
+  loginDetails,
   googleOnSuccessHandler,
   googleOnErrorHandler,
   githubLoginHandler,
@@ -61,38 +51,21 @@ const RegisterForm = ({
           <div className="my-2 d-flex justify-content-center w-100">
             <GitHubLoginButton
               githubLoginHandler={githubLoginHandler}
-              text={"Register with GitHub"}
+              text={"Login with GitHub"}
             />
           </div>
         </Container>
         <Col md={6}>
           <Form onSubmit={onSubmitHandler}>
-            <Form.Group className="mb-3" controlId="formFullName">
-              <Form.Label>Full Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter full name"
-                value={registerDetails.fullName.value}
-                onChange={(e) => handleChange("fullName", e.target.value)}
-                isInvalid={
-                  !registerDetails.fullName.valid &&
-                  registerDetails.fullName.touched
-                }
-              />
-              <Form.Control.Feedback type="invalid">
-                Please provide a valid full name.
-              </Form.Control.Feedback>
-            </Form.Group>
-
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="Enter email"
-                value={registerDetails.email.value}
+                value={loginDetails.email.value}
                 onChange={(e) => handleChange("email", e.target.value)}
                 isInvalid={
-                  !registerDetails.email.valid && registerDetails.email.touched
+                  !loginDetails.email.valid && loginDetails.email.touched
                 }
               />
               <Form.Control.Feedback type="invalid">
@@ -105,34 +78,14 @@ const RegisterForm = ({
               <Form.Control
                 type="password"
                 placeholder="Password"
-                value={registerDetails.password.value}
+                value={loginDetails.password.value}
                 onChange={(e) => handleChange("password", e.target.value)}
                 isInvalid={
-                  !registerDetails.password.valid &&
-                  registerDetails.password.touched
+                  !loginDetails.password.valid && loginDetails.password.touched
                 }
               />
               <Form.Control.Feedback type="invalid">
                 Please provide a valid password (longer than 8 characters).
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formConfirmPassword">
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Confirm Password"
-                value={registerDetails.confirmPassword.value}
-                onChange={(e) =>
-                  handleChange("confirmPassword", e.target.value)
-                }
-                isInvalid={
-                  !registerDetails.confirmPassword.valid &&
-                  registerDetails.confirmPassword.touched
-                }
-              />
-              <Form.Control.Feedback type="invalid">
-                Passwords must match.
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -145,8 +98,8 @@ const RegisterForm = ({
                 variant="primary"
                 type="submit"
               >
-                <FontAwesomeIcon icon={faUserPlus} className="me-2" />
-                Register
+                <FontAwesomeIcon icon={faRightToBracket} className="me-2" />
+                Login
               </Button>
             </Container>
           </Form>
@@ -156,4 +109,4 @@ const RegisterForm = ({
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
