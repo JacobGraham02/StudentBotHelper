@@ -85,7 +85,7 @@ const LoginForm = ({
                 }
               />
               <Form.Control.Feedback type="invalid">
-                Please provide a valid password.
+                Please provide a valid password (longer than 8 characters).
               </Form.Control.Feedback>
             </Form.Group>
 
