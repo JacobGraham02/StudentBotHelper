@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useReducer } from "react";
 
 type UserAuthDetails = {
   // Have to continue building this.
@@ -14,22 +14,49 @@ type AuthProviderProps = {
 
 type AuthContextType = {
   userAuthDetails: UserAuthDetails;
+  login: (userDetails: UserAuthDetails) => void;
+  logout: () => void;
+};
+
+const initialState: UserAuthDetails = {
+  id: "",
+  username: "",
+  email: "",
+  refreshToken: "",
+};
+
+type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" };
+
+// Create reducer for CRUD actions
+const authReducer = (
+  state: UserAuthDetails,
+  action: Action
+): UserAuthDetails => {
+  switch (action.type) {
+    case "LOGIN":
+      return { ...action.payload };
+    case "LOGOUT":
+      return { id: "", username: "", email: "", refreshToken: "" };
+    default:
+      return state;
+  }
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [userAuthDetails, setUserAuthDetails] = useState<UserAuthDetails>({
-    id: "",
-    username: "",
-    email: "",
-    refreshToken: "",
-  });
+  const [userAuthDetails, dispatch] = useReducer(authReducer, initialState);
 
-  // Create reducer for CRUD actions
+  const login = (userDetails: UserAuthDetails) => {
+    dispatch({ type: "LOGIN", payload: userDetails });
+  };
+
+  const logout = () => {
+    dispatch({ type: "LOGOUT" });
+  };
 
   return (
-    <AuthContext.Provider value={{ userAuthDetails }}>
+    <AuthContext.Provider value={{ userAuthDetails, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
