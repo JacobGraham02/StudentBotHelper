@@ -2,9 +2,9 @@ import * as dotenv from 'dotenv';
 import 'dotenv/config';
 dotenv.config({path: '../../.env'});
 import { SlashCommandBuilder } from 'discord.js';
-import { GooglePlacesService } from '../api/GooglePlaces/GooglePlacesService';
-import IGooglePlacesResponse from '../api/GooglePlaces/IGooglePlacesResponse';
-import ILocation from '../api/GooglePlaces/ILocation';
+import { GooglePlacesService } from '../../api/GooglePlaces/GooglePlacesService';
+import IGooglePlacesResponse from '../../api/GooglePlaces/IGooglePlacesResponse';
+import ILocation from '../../api/GooglePlaces/ILocation';
 
 export default function() {
     const google_place_info_object: Object = {
