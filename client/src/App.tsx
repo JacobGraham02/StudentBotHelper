@@ -20,6 +20,7 @@ import DefaultLayout from "./screens/layout/DefaultLayout";
 import LoginPage from "./pages/LoginPage";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Auth/Register";
+import Login from "./pages/Auth/Login";
 
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
@@ -47,7 +48,7 @@ const router = createBrowserRouter([
         element: <LandingPage />,
       },
       { path: "register", element: <Register /> },
-      { path: "login", element: <LoginPage /> },
+      { path: "login", element: <Login /> },
     ],
   },
 

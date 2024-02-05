@@ -7,6 +7,25 @@ body {
   padding: 0;
 }
 
+.separator {
+  width: 40%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.separator .line {
+  height: 1px;
+  background: #989292; /* Line color */
+  flex-grow: 1;
+}
+
+.separator span {
+  background: #fff; /* Background color of your container for the "or" text to appear "cutting through" the line */
+  padding: 0 10px;
+}
+
 
 /* menu */
 /* menu icon */
