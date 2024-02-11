@@ -1,9 +1,9 @@
 import { PoolConnection } from "mysql2/promise";
 import fs from 'fs';
-import IDatabaseConfig from "../../../../database/IDatabaseConfig";
-import DatabaseConnectionManager from "../../../../database/DatabaseConnectionManager";
-import UserRepository from "../../../../database/StudentRepository";
-import Student from "../../../../entity/Student";
+import IDatabaseConfig from "../../../database/IDatabaseConfig";
+import DatabaseConnectionManager from "../../../database/DatabaseConnectionManager";
+import UserRepository from "../../../database/StudentRepository";
+import Student from "../../../entity/Student";
 
 describe('DatabaseConnectionManager Integration Test', () => {
 
