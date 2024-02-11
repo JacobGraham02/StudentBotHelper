@@ -1,5 +1,5 @@
-import { GooglePlacesApiController } from "../../../api/GooglePlaces/GooglePlacesController";
-import { GooglePlacesService } from "../../../api/GooglePlaces/GooglePlacesService";
+import { GooglePlacesApiController } from "../../../../api/GooglePlaces/GooglePlacesController";
+import { GooglePlacesService } from "../../../../api/GooglePlaces/GooglePlacesService";
 import { Request, Response } from 'express';
 
 // Mock the GooglePlacesService module to avoid real interactions
