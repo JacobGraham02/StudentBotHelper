@@ -1,7 +1,7 @@
 import { PoolConnection } from "mysql2/promise";
 import fs from 'fs';
-import IDatabaseConfig from "../../../database/IDatabaseConfig";
-import DatabaseConnectionManager from "../../../database/DatabaseConnectionManager";
+import IDatabaseConfig from "../../../../database/IDatabaseConfig";
+import DatabaseConnectionManager from "../../../../database/DatabaseConnectionManager";
 
 jest.useRealTimers();
 

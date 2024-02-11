@@ -8,6 +8,7 @@
     "start": "node dist/app.js",
     "test": "jest",
     "dev": "nodemon ./bin/www",
+    "dev:ts": "nodemon --exec ts-node ./src/app.ts",
     "debug": "nodemon --inspect app.ts"
   },
   "dependencies": {
@@ -18,7 +19,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/node-schedule": "^2.1.0",
     "@types/nodemon": "^1.19.3",
-    "axios": "^1.4.0",
+    "axios": "^1.6.7",
     "connect-mongo": "^5.0.0",
     "cookie-parser": "~1.4.4",
     "crypto": "^1.0.1",
@@ -33,9 +34,9 @@
     "morgan": "~1.9.1",
     "mysql2": "^3.5.2",
     "nodemailer": "^6.9.4",
-    "nodemon": "^3.0.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "ts-node": "^10.9.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -51,6 +52,7 @@
     "jest-mock": "^29.6.2",
     "jest-mysql": "^2.0.0",
     "mock-fs": "^5.2.0",
+    "nodemon": "^3.0.3",
     "pkg": "^5.8.1",
     "ts-jest": "^29.1.1",
     "typescript": "^5.1.6"
