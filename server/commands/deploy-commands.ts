@@ -7,14 +7,12 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 
 const discord_token = process.env.discord_bot_token;
-const discord_client_id = process.env.discord_bot_client_id;
+const discord_client_id = process.env.discord_bot_application_id;
 const discord_guild_id = process.env.discord_bot_guild_id;
 const commands: any = [];
 const commands_folder_path: string = __dirname;
 const commands_files: string[] = fs.readdirSync(commands_folder_path);
 const filtered_commands_files = commands_files.filter(file => file !== 'deploy-commands.js');
-
-console.log(path.join(__dirname, '../../.env'));
 
 async function registerCommands() {
     for(const command_file of filtered_commands_files) {
