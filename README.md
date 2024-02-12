@@ -43,47 +43,47 @@
   <article>
   <strong> Using the 'help' command with the Discord bot </strong> 
   
-  ![StudentBotHelper running help command image demonstration](images/DiscordBotPicture.PNG)
+  ![StudentBotHelper running help command image demonstration](server/images/DiscordBotPicture.PNG.PNG)
 
   <strong> The bot command used to create a study group within Discord </strong>
 
-  ![StudentBotHelper creating study group command image demonstration](images/DiscordBotCreatingGroupImage.PNG)
+  ![StudentBotHelper creating study group command image demonstration](server/images/DiscordBotCreatingGroupImage.PNG)
 
   <strong> The result of the create group bot command </strong>
 
-  ![StudentBotHelper creating study group image demonstration](images/DiscordBotCreateTestGroup.PNG)
+  ![StudentBotHelper creating study group image demonstration](server/images/DiscordBotCreateTestGroup.PNG)
 
   <strong> Generating a server-wide message with all currently-existing classes displayed for students to see the classes for the day </strong>
 
-  ![StudentBotHelper creating a message with all classes currently existing demonstration](images/DiscordBotShowClasses.PNG)
+  ![StudentBotHelper creating a message with all classes currently existing demonstration](server/images/DiscordBotShowClasses.PNG)
 
   <strong> A student is allowed to create a user that is registered with the bot </strong>
   
-  ![StudentBotHelper creating official class user with the bot demonstration](images/DiscordBotCreatingUser.PNG)
+  ![StudentBotHelper creating official class user with the bot demonstration](server/images/DiscordBotCreatingUser.PNG)
 
   <strong> The result in the MySQL database of a user being created </strong>
 
-  ![StudentBotHelper class user result in the mysql database](images/DiscordBotCreatingStudentDatabaseResult.PNG)
+  ![StudentBotHelper class user result in the mysql database](server/images/DiscordBotCreatingStudentDatabaseResult.PNG)
 
   <strong> A command that allows the creation fo a common class: a class that all students have in common </strong>
 
-  ![StudentBotHelper creating class that all students have in common demonstration](images/DiscordBotCreatingCommonClass.PNG)
+  ![StudentBotHelper creating class that all students have in common demonstration](server/images/DiscordBotCreatingCommonClass.PNG)
 
   <strong> The result in the MySQL database of the user common class being created </strong>
 
-  ![StudentBotHelper common class result in the mysql database](images/DiscordBotCommonClassDatabaseResult.PNG)
+  ![StudentBotHelper common class result in the mysql database](server/images/DiscordBotCommonClassDatabaseResult.PNG)
 
   <strong> An image showing the Discord channel which holds all of the activity on the bot GitHub repository </strong>
 
-  ![StudentBotHelper webhook showing github repository activity demonstration](images/DiscordBotCommitMessages.PNG)
+  ![StudentBotHelper webhook showing github repository activity demonstration](server/images/DiscordBotCommitMessages.PNG)
 
   <strong> An image showing all of the database operations performed by using the Discord bot </strong>
 
-  ![StudentBotHelper database operation messages image demonstration](images/DiscordBotSqlOperations.PNG)
+  ![StudentBotHelper database operation messages image demonstration](server/images/DiscordBotSqlOperations.PNG)
 
   <strong> An image showing the MySQL database structure that was created for the bot </strong>
 
-  ![StudentBotHelper database structure demonstration](images/StudentBotHelperDatabaseStructure.PNG)
+  ![StudentBotHelper database structure demonstration](server/images/StudentBotHelperDatabaseStructure.PNG)
   </article>
   <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>
