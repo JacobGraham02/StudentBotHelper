@@ -153,13 +153,13 @@ custom_event_emitter.on('databaseOperationEvent',
     const database_operation_embedded_message = new EmbedBuilder()
       .setColor(0x299bcc)
       .setTitle('Database operation on Azure MySQL database')
-      .setThumbnail('https://i.imgur.com/9rn0xvQ.jpeg')
+      .setThumbnail('https://i.imgur.com/WL7Bt6g.png')
       .setDescription(`Database operation response status: ${message.status}`)
       .addFields(
         { name: 'Database response status:', value: message.statusText, inline:true}
       )
       .setTimestamp()
-      .setFooter({text:'Azure database operation', iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg'}
+      .setFooter({text:'Azure database operation', iconURL: 'https://i.imgur.com/WL7Bt6g.png'}
     );
 
     const discord_channel_for_operation_results = process.env.discord_bot_http_response_channel_id;
@@ -229,9 +229,9 @@ custom_event_emitter.on('showClassesInSchedule',
               { name: `Course end time:`, value: formatTimeValue(common_class_info.class_end_time) },
               { name: `\u200B`, value: `\u200B`},
           )
-          .setThumbnail('https://i.imgur.com/9rn0xvQ.jpeg')
+          .setThumbnail('https://i.imgur.com/WL7Bt6g.png')
           .setTimestamp()
-          .setFooter({ text: common_class_info.class_name, iconURL: 'https://i.imgur.com/9rn0xvQ.jpeg' });
+          .setFooter({ text: common_class_info.class_name, iconURL: 'https://i.imgur.com/WL7Bt6g.png' });
 
       /*
       forEach iterator is used to add additional fields to the EmbedBuilder before passing the embedded message to the Discord API for use there. 
@@ -301,7 +301,7 @@ custom_event_emitter.on('createDiscordGuildEvent',
           entityType: GuildScheduledEventEntityType.External,
           privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
           entityMetadata: {
-            location: "In person"
+            location: "Lakehead University, Orillia"
           }
         }
 
@@ -330,7 +330,7 @@ app.use((request: any, response: any, next: NextFunction) => {
  * server_port is a variable defined in the .env file, so the type is: string | undefined 
  */
 app.listen(server_port, function () {
-  console.log(`The Node server is running on port ${server_port}}`);
+  console.log(`The Node server is running on port ${server_port}`);
 })
 
 export default app;
