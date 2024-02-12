@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import 'dotenv/config';
 dotenv.config({path: '../.env'});
 import createError from 'http-errors';
-import express from 'express';
+import express, { NextFunction } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import fs from 'fs';
@@ -26,6 +26,7 @@ import IDiscordEventData from './utils/IDiscordEventData.js';
 import DiscordEvent from './utils/DiscordEvent.js';
 import Logger from './utils/Logger.js';
 const logger: Logger = new Logger(process.env.discord_bot_messages_logs_file_path, process.env.discord_bot_error_logs_file_path);
+const server_port: string | undefined = process.env.port;
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -127,10 +128,10 @@ discord_client_instance.on('interactionCreate', async interaction => {
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
       try {
-        logger.logMessage(`The bot command ${interaction.commandName} was used`);
+        logger.logMessage(`The bot command ${interaction.commandName} was used\n`);
         await command.execute(interaction);
       } catch (error) {
-        logger.logError(`An error occured while attempting to execute the bot command ${interaction.commandName}: ${error}`)
+        logger.logError(`An error occured while attempting to execute the bot command ${interaction.commandName}: ${error}\n`)
         await interaction.reply({content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,ephemeral:true});
         console.error(error);
       }
@@ -318,24 +319,18 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use("/", indexRouter);
 app.use("/user", userRouter);
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
+/**
+ * Catch any 404 errors and forward them to the error handler 
+ */
+app.use((request: any, response: any, next: NextFunction) => {
   next(createError(404));
 });
 
-app.listen(process.env.port, function () {
-  console.log(`Server is running on port ${process.env.port}`);
+/**
+ * server_port is a variable defined in the .env file, so the type is: string | undefined 
+ */
+app.listen(server_port, function () {
+  console.log(`The Node server is running on port ${server_port}}`);
 })
-
-// error handler
-app.use((err: any, req: any, res: any, next: any) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
 
 export default app;
