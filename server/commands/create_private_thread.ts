@@ -5,7 +5,7 @@ import Cache from '../utils/Cache';
 export default function() {
     const create_private_thread_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-session')
+        .setName('create-private-thread')
         .setDescription('Use this command to create a private thread for yourself.')
         .addStringOption(options =>
             options.setName('username')
@@ -42,10 +42,10 @@ export default function() {
             }
 
             const private_text_thread = await channel_to_create_thread.threads.create({
-                name: `Private session for ${discord_user_username}`,
+                name: `Private thread for ${discord_user_username}`,
                 autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
                 type: ChannelType.PrivateThread,
-                reason: `This thread is a user session for ${discord_user_username}`
+                reason: `This thread is a private thread for ${discord_user_username}`
             });
             interaction.reply({content:`The private thread ${private_text_thread} has been created for you`,ephemeral:true});
 
