@@ -47,8 +47,18 @@ const router = createBrowserRouter([
         path: "dashboard/",
         element: <LandingPage isUserLoggedIn={false} />,
       },
-      { path: "register", element: <Register /> },
-      { path: "login", element: <Login /> },
+      { 
+        path: "register", 
+        element: <Register /> 
+      },
+      { 
+        path: "login", 
+        element: <Login /> 
+      },
+      {
+        path: "home",
+        element: <LandingPage isUserLoggedIn={false}/>
+      }
     ],
   },
 
