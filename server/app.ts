@@ -15,6 +15,7 @@ Imports from Custom classes
 */
 import indexRouter from './api/routes/index.js';
 import userRouter from './api/routes/user.js';
+import apiRouter from './api/routes/botapi.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
@@ -318,6 +319,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use("/", indexRouter);
 app.use("/user", userRouter);
+app.use("/api", apiRouter);
 
 /**
  * Catch any 404 errors and forward them to the error handler 
