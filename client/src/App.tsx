@@ -21,6 +21,7 @@ import LoginPage from "./pages/LoginPage";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
+import CommandsPage from "./pages/CommandsPage.js";
 
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
@@ -44,11 +45,25 @@ const router = createBrowserRouter([
         element: <GitHubOAuthRedirect />,
       },
       {
-        path: "dashboard/",
+        path: "dashboard",
         element: <LandingPage isUserLoggedIn={false} />,
       },
-      { path: "register", element: <Register /> },
-      { path: "login", element: <Login /> },
+      { 
+        path: "register", 
+        element: <Register /> 
+      },
+      { 
+        path: "login", 
+        element: <Login /> 
+      },
+      {
+        path: 'commands',
+        element: <CommandsPage />
+      },
+      {
+        path: "home",
+        element: <LandingPage isUserLoggedIn={false}/>
+      }
     ],
   },
 
