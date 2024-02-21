@@ -21,7 +21,7 @@ const DefaultLayout = (): ReactElement => {
             />
           </li>
           <li className="nav-item">
-            <NavLink to="/" className="nav-link">
+            <NavLink to="/home" className="nav-link">
               Home
             </NavLink>
           </li>
@@ -40,7 +40,6 @@ const DefaultLayout = (): ReactElement => {
               Configurations
             </NavLink>
           </li>
-          {/* Add more nav items here */}
         </ul>
       </div>
     );

@@ -6,6 +6,7 @@ SELECT * FROM common_class_work;
 SELECT * FROM student;
 DELETE FROM common_class;
 DELETE FROM common_class_work;
+DELETE FROM student;
 SET SQL_SAFE_UPDATES = 0;
 
 CREATE TABLE common_class (
