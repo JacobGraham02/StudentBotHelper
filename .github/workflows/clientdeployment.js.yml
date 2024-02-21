@@ -33,5 +33,5 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - name: Reload Nginx
-    - run: sudo nginx -s reload
+      run: sudo systemctl reload nginx
 
