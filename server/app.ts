@@ -9,7 +9,7 @@ import express, { NextFunction } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import fs from 'fs';
-import { ButtonInteraction, Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
+import { Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
 /*
 Imports from Custom classes
 */
@@ -45,6 +45,7 @@ Variables defined in the application .env file
 */
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
+const discord_voice_channel_category_id: string | undefined = process.env.discord_bot_voice_category_id;
 
 /*
 The string 'commands_folder_path' holds the directory path to the 'dist/commands' directory, which contains all of the '.js' command files, excluding the script used
