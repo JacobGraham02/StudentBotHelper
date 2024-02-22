@@ -13,7 +13,11 @@ export default function() {
             authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
-            const channel_to_add_button = interaction.options.channel;
+            let channel_to_add_button = interaction.options.channel;
+
+            if (channel_to_add_button === undefined) {
+                channel_to_add_button = interaction.channel;
+            }
 
             if (channel_to_add_button !== null) {
                 await channel_to_add_button.send({ 
