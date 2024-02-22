@@ -9,7 +9,7 @@ import express, { NextFunction } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import fs from 'fs';
-import { Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
+import { ButtonInteraction, Collection, GatewayIntentBits, Guild, GuildMemberRoleManager, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from 'discord.js';
 /*
 Imports from Custom classes
 */
@@ -28,6 +28,7 @@ import DiscordEvent from './utils/DiscordEvent.js';
 import Logger from './utils/Logger.js';
 const logger: Logger = new Logger(process.env.discord_bot_messages_logs_file_path, process.env.discord_bot_error_logs_file_path);
 const server_port: string | undefined = process.env.port;
+import handleButtonInteraction from './modules/handleButtonInteraction.js';
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -101,6 +102,9 @@ discord_client_instance.on('ready', async () => {
  * 
  */
 discord_client_instance.on('interactionCreate', async interaction => {
+  if (interaction.isButton()) {
+    await handleButtonInteraction(interaction);
+  }
   if (!interaction.isCommand()) {
     return;
   }
