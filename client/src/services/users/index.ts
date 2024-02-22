@@ -2,14 +2,14 @@ import { instance } from "../index";
 
 export const requestUserGithub = async (code: string) => {
   try {
+    console.log(instance);
     const response = await instance.post("user/oauth/github", {
       code,
     });
 
     return response.data;
   } catch (error) {
-    console.error("Error sending GitHub code to backend:", error);
-    throw error;
+    throw new Error("Error sending GitHub code to backend");
   }
 };
 

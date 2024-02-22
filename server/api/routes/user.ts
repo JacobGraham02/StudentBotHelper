@@ -1,5 +1,6 @@
 import express, { Router, Request, Response, NextFunction } from "express";
-const UserController = require("../controllers/UserController");
+import UserController from "../controllers/UserController";
+
 const userRouter: Router = express.Router();
 
 /* GET users listing. */
@@ -76,19 +77,23 @@ userRouter.post(
 
 // OAuth Routes
 userRouter.post("/oauth/github", async (req, res, next) => {
-  const { code } = req.query;
+  const { code } = req.body;
+
   if (!code) {
     return res.status(400).send("Authorization code is required");
   }
 
-  const userProfile = await UserController.handleGithubLogin(code);
-  if (userProfile) {
-    // Handle successful authentication, e.g., creating a user session
-    res.json(userProfile);
-  } else {
+  const userController = new UserController();
+  const userProfile = await userController.handleGithubLogin(code);
+
+  if (!userProfile) {
     // Handle failed authentication
     res.status(500).send("Authentication with GitHub failed");
   }
+
+  res.status(201).json({
+    ...userProfile,
+  });
 });
 
 export default userRouter;
