@@ -36,8 +36,8 @@ import DiscordEvent from './utils/DiscordEvent.js';
 import Logger from './utils/Logger.js';
 const logger: Logger = new Logger(process.env.discord_bot_messages_logs_file_path, process.env.discord_bot_error_logs_file_path);
 const server_port: string | undefined = process.env.port;
-const common_class_work_repository: CommonClassWorkRepository =
-  new CommonClassWorkRepository();
+import handleButtonInteraction from './modules/handleButtonInteraction.js';
+const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -53,6 +53,7 @@ Variables defined in the application .env file
 */
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
+const discord_voice_channel_category_id: string | undefined = process.env.discord_bot_voice_category_id;
 
 /*
 The string 'commands_folder_path' holds the directory path to the 'dist/commands' directory, which contains all of the '.js' command files, excluding the script used
@@ -118,6 +119,10 @@ discord_client_instance.on("ready", async () => {
  *  3. The channel that the interaction occurred on
  *
  */
+discord_client_instance.on('interactionCreate', async interaction => {
+  if (interaction.isButton()) {
+    await handleButtonInteraction(interaction);
+  }
 discord_client_instance.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) {
     return;
