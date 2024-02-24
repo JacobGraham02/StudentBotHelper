@@ -21,25 +21,20 @@ import {
 /*
 Imports from Custom classes
 */
-import indexRouter from "./api/routes/index";
-import userRouter from "./api/routes/user";
-import CustomDiscordClient from "./utils/CustomDiscordClient";
-import CustomEventEmitter from "./utils/CustomEventEmitter";
-import { EmbedBuilder } from "@discordjs/builders";
-import CommonClassWorkRepository from "./database/CommonClassWorkRepository";
-import CommonClass from "./entity/CommonClass";
-import {
-  formatDatetimeValue,
-  formatTimeValue,
-} from "./utils/NormalizeDatetimeAndTimeValue";
-import IDatabaseResponseObject from "./utils/IDiscordDatabaseResponse";
-import IDiscordEventData from "./utils/IDiscordEventData";
-import DiscordEvent from "./utils/DiscordEvent";
-import Logger from "./utils/Logger";
-const logger: Logger = new Logger(
-  process.env.discord_bot_messages_logs_file_path,
-  process.env.discord_bot_error_logs_file_path
-);
+import indexRouter from './api/routes/index.js';
+import userRouter from './api/routes/user.js';
+import apiRouter from './api/routes/botapi.js';
+import CustomDiscordClient from './utils/CustomDiscordClient.js';
+import CustomEventEmitter from './utils/CustomEventEmitter.js';
+import { EmbedBuilder } from '@discordjs/builders';
+import CommonClassWorkRepository from './database/CommonClassWorkRepository.js';
+import CommonClass from './entity/CommonClass.js';
+import { formatDatetimeValue, formatTimeValue } from './utils/NormalizeDatetimeAndTimeValue.js';
+import IDatabaseResponseObject from './utils/IDiscordDatabaseResponse.js';
+import IDiscordEventData from './utils/IDiscordEventData.js';
+import DiscordEvent from './utils/DiscordEvent.js';
+import Logger from './utils/Logger.js';
+const logger: Logger = new Logger(process.env.discord_bot_messages_logs_file_path, process.env.discord_bot_error_logs_file_path);
 const server_port: string | undefined = process.env.port;
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
@@ -437,6 +432,7 @@ app.use(cors());
 
 app.use("/", indexRouter);
 app.use("/user", userRouter);
+app.use("/api", apiRouter);
 
 /**
  * Catch any 404 errors and forward them to the error handler
