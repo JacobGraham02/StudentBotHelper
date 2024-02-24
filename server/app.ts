@@ -81,7 +81,7 @@ async function fetchCommandFiles() {
     const command_file_path = path.join(commands_folder_path, command_file);
     const command = await import(command_file_path);
     if (Object.keys(command).length >= 1 && command.constructor === Object) {
-      const command_object = command.default();
+      const command_object = command.default(logger);
       discord_client_instance.discord_commands.set(
         command_object.data.name,
         command_object
@@ -165,24 +165,24 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       */
     try {
       logger.logMessage(
-        `The bot command ${interaction.commandName} was used\n`
+        `The bot command ${interaction.commandName} was used by the user ${interaction.user.displayName} with id ${interaction.user.id}\n`
       );
       await command.execute(interaction);
     } catch (error) {
       logger.logError(
-        `An error occured while attempting to execute the bot command ${interaction.commandName}: ${error}\n`
+        `An error occured while the user ${interaction.user.displayName} with id ${interaction.user.id} attempted to execute the bot command ${interaction.commandName}: ${error}\n`
       );
       await interaction.reply({
         content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,
         ephemeral: true,
       });
-      console.error(error);
-    }
+    } 
   } else {
     await interaction.reply({
       content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`,
       ephemeral: true,
     });
+    logger.logMessage(`The user ${interaction.user.displayName} with id ${interaction.user.id} did not have permission to execute the command ${command.data.name}`);
   }
 });
 
@@ -217,8 +217,9 @@ custom_event_emitter.on(
       process.env.discord_bot_http_response_channel_id;
 
     if (!discord_channel_for_operation_results) {
+      logger.logError(`The discord channel id for database operation results to be stored could not be resolved`);
       throw new Error(
-        `The discord channel id for database operation results could not be fetched.`
+        `The discord channel id for database operation results to be stored could not be resolved`
       );
     }
 
@@ -240,6 +241,7 @@ custom_event_emitter.on(
       discord_channel_for_messages.send({
         embeds: [database_operation_embedded_message],
       });
+      logger.logMessage(`The database operation has been successfully written to the channel that stores database operation results`)
     }
   }
 );
@@ -260,8 +262,9 @@ custom_event_emitter.on(
     const discord_channel_for_class_data_results =
       process.env.discord_bot_command_channel_id;
     if (!discord_channel_for_class_data_results) {
+      logger.logError(`The discord channel id for showing classes this semester could not be resolved`)
       throw new Error(
-        `The discord channel id for database operation results could not be fetched.`
+        `The discord channel id for showing classes this semester could not be resolved.`
       );
     }
 
@@ -362,7 +365,8 @@ custom_event_emitter.on(
    *
    * @param message CommonClass[] an array of CommonClass objects
    */
-  async (classes: CommonClass[], day_of_the_week: string) => {
+  async (classes: CommonClass[]) => {
+    let number_of_events_created = 0;
     const guild_id: string | undefined = process.env.discord_bot_guild_id;
     let guild: Guild | undefined;
 
@@ -420,9 +424,10 @@ custom_event_emitter.on(
             location: "Lakehead University, Orillia",
           },
         };
-
+        ++number_of_events_created;
         discordEventClassInstance.createNewDiscordEvent(discord_event_data);
       }
+      logger.logMessage(`A total of ${number_of_events_created} class events have been created`);
     }
   }
 );
