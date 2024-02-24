@@ -119,11 +119,12 @@ discord_client_instance.on("ready", async () => {
  *  3. The channel that the interaction occurred on
  *
  */
-discord_client_instance.on('interactionCreate', async interaction => {
+discord_client_instance.on("interactionCreate", async (interaction) => {
+  
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
   }
-discord_client_instance.on("interactionCreate", async (interaction) => {
+
   if (!interaction.isCommand()) {
     return;
   }
