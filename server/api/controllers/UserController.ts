@@ -54,11 +54,25 @@ class UserController {
           "User-Agent": "Student Bot Helper",
         },
       });
+      const userProfile = response.data;
 
-      return response.data;
+      // Save the user data in database
+      const userData = {
+        id: userProfile.id,
+        name: userProfile.name,
+        username: userProfile.login,
+        email: userProfile.email,
+        access_token: "",
+        refresh_token: "",
+        avatar_url: userProfile.avatar_url,
+      };
+
+      return userData;
     } catch (error) {
       console.error("Error fetching GitHub user profile:", error);
       return;
     }
   }
 }
+
+export default UserController;
