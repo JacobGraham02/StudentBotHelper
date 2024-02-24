@@ -15,7 +15,7 @@ export default function() {
                 .setDescription(`(Required) Category where the new voice channel will be created`)
                 .setRequired(true)
             ),
-            authorization_role_name: ["Discord admin"],
+            authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const voice_channel_name = interaction.options.getString("voice_channel_name");

@@ -6,9 +6,9 @@ import CommonClassRepository from '../database/CommonClassRepository';
 export default function() {
     const create_common_class_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-discord-guild-event')
-        .setDescription('Use this command to auto-populate Discord server with class guild events'),
-        authorization_role_name: ["Discord admin"],
+        .setName('create-scheduled-event')
+        .setDescription('Use this command to create one scheduled event per class.'),
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const custom_event_emitter: CustomEventEmitter = CustomEventEmitter.getCustomEventEmitterInstance();

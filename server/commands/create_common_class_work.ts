@@ -9,22 +9,22 @@ import CommonClassWorkRepository from '../database/CommonClassWorkRepository';
 export default function() {
     const create_common_class_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-common-class-work')
-        .setDescription('Use this command to create a private thread for yourself.')
+        .setName('create-class-work')
+        .setDescription('Use this command to create work and associate that work with a class.')
         .addStringOption(option =>
             option.setName('homework_name')
-            .setDescription('Set the name of the homework document')
+            .setDescription('(Required) Set the name of the homework document')
             .setRequired(true))
         .addStringOption(option => 
             option.setName('homework_due_date')
-            .setDescription('Set the homework due date and time')
+            .setDescription('(Required) Set the homework due date and time')
             .setRequired(true))
         .addStringOption(option =>
             option.setName('homework_notes')
-            .setDescription('Set any notes for the homework')
+            .setDescription('(Required) Set any notes for the homework')
             .setRequired(false)
         ),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const common_class_repository:CommonClassRepository = new CommonClassRepository();
@@ -56,7 +56,7 @@ export default function() {
             const common_classes_row = new ActionRowBuilder()
                 .addComponents(select_class_menu);
 
-            const sent_message = await interaction.channel.send({content:`Choose a class to assign this work to:`, components: [common_classes_row], ephemeral: true});
+            const sent_message = await interaction.channel.send({content:`Choose the class which has this work:`, components: [common_classes_row], ephemeral: true});
             
             const collector = sent_message.createMessageComponentCollector({ componentType: ComponentType.StringSelect });
                 
@@ -75,9 +75,9 @@ export default function() {
                 );
                 try {
                     await common_class_work_repository.create(common_class_work_document);
-                    await interaction.channel.send({content:`A new work document was created`,ephemeral:true});
+                    await interaction.channel.send({content:`New work has been created for the class ${class_menu_interaction.values[0]}`,ephemeral:true});
                 } catch (error) {
-                    await interaction.channel.send({content:`There was an error when creating a new work document. Please inform the bot developer of this error: ${error}`,ephemeral:true});
+                    await interaction.channel.send({content:`There was an error when creating work for the class ${class_menu_interaction.values[0]}. Please inform the bot developer of this error: ${error}`,ephemeral:true});
                     return;
                 }
             });

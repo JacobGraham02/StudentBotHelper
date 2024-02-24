@@ -1,11 +1,11 @@
-import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, User } from 'discord.js';
+import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration } from 'discord.js';
 import StudentRepository from '../database/StudentRepository';
 import Cache from '../utils/Cache';
 
 export default function() {
     const create_private_thread_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-private-thread')
+        .setName('create-thread')
         .setDescription('Use this command to create a private thread for yourself.')
         .addStringOption(options =>
             options.setName('username')
@@ -20,7 +20,7 @@ export default function() {
             .setDescription('(Required) The first user for the thread')
             .setRequired(true)
         ),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const student_repository: StudentRepository = new StudentRepository();
@@ -36,7 +36,7 @@ export default function() {
                 if (existing_student) {
                     student_cache.set(discord_user_username, existing_student);
                 } else {
-                    interaction.reply({content:`Please register a user account using the command /create-user`,ephemeral:true});
+                    interaction.reply({content:`Please contact the server administrator and ask to have an account created for you`,ephemeral:true});
                     return;
                 }
             }
@@ -45,7 +45,7 @@ export default function() {
                 name: `Private thread for ${discord_user_username}`,
                 autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
                 type: ChannelType.PrivateThread,
-                reason: `This thread is a private thread for ${discord_user_username}`
+                reason: `Private thread for ${discord_user_username}`
             });
             interaction.reply({content:`The private thread ${private_text_thread} has been created for you`,ephemeral:true});
 

@@ -6,7 +6,7 @@ import { UUID } from 'crypto';
 export default function() {
     const delete_new_user_object: Object = {
         data: new SlashCommandBuilder()
-            .setName('delete-user')
+            .setName('delete-website-user')
             .setDescription('Use this command to delete the user associated with your discord name')
             .addStringOption(options =>
                 options.setName('username')
@@ -22,14 +22,14 @@ export default function() {
 
                 let existing_student = student_cache.get(discord_user_username);
                 if (existing_student) {
-                    interaction.reply({content:`The specified user does not exist. Try again if you believe this is an error`,ephemeral:true});
+                    interaction.reply({content:`The username that you have entered is not associated with any known user. Please contact the server administrator and have them create an account for you`,ephemeral:true});
                     return;
                 }
 
                 let existing_user = await student_repository.findByDiscordUsername(discord_user_username);
                 if (!existing_user) {
-                    interaction.reply({content:'The specified user does not exist. Try again if you believe this is an error',ephemeral:true});
-                    student_cache.set(discord_user_username, 'The specified user does not exist. Try again if you believe this is an error');
+                    interaction.reply({content:'The username that you have entered is not associated with any known user. Please contact the server administrator and have them create an account for you',ephemeral:true});
+                    student_cache.set(discord_user_username, 'The username that you have entered is not associated with any known user. Please contact the server administrator and have them create an account for you');
                     return;
                 }
                 const existing_user_uuid: UUID = existing_user.studentInformation().studentId;

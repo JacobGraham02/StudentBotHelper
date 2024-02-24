@@ -9,14 +9,14 @@ import ILocation from '../api/GooglePlaces/ILocation';
 export default function() {
     const google_place_info_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('placeinfo')
-        .setDescription('Retrieve a Google Maps link for a specific location')
+        .setName('place-info')
+        .setDescription('Use this command to get a Google Maps link that informs you of information about a place.')
         .addStringOption(option => 
             option.setName('google_maps_location')
             .setDescription('(Required) Name of the location to get info from')
             .setRequired(true)
         ),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             if (!process.env.google_cloud_api_key) {

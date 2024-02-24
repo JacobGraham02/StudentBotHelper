@@ -6,8 +6,8 @@ import { randomUUID } from 'crypto';
 export default function() {
     const create_common_class_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-common-class')
-        .setDescription('Use this command to create a private thread for yourself.')
+        .setName('create-class')
+        .setDescription('Use this command to create a class.')
         .addStringOption(options =>
             options.setName('class_name')
             .setDescription('(Required) Class course name')
@@ -45,7 +45,7 @@ export default function() {
             .setDescription('(Required) true or false')
             .setRequired(true)
         ),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const common_class_repository:CommonClassRepository = new CommonClassRepository();

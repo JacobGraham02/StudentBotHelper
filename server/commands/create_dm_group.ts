@@ -4,8 +4,8 @@ import StudentRepository from '../database/StudentRepository';
 export default function() {
     const create_dm_group_object: Object = {
         data: new SlashCommandBuilder()
-            .setName('create-group')
-            .setDescription('Use this command to create a private text channel with a maximum of 4 people (including yourself)')
+            .setName('create-dm-group')
+            .setDescription('Use this command to create a private DM group between yourself and up to three others.')
             .addStringOption(options => 
                 options.setName('group_name')
                 .setDescription('(Required) The group name')
@@ -26,12 +26,11 @@ export default function() {
                 option.setName('user_4')
                 .setDescription('(Optional) The fourth user for the group')
                 .setRequired(false)),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin","Bot user"],
 
         async execute(interaction) {
             const student_repository = new StudentRepository();
             const discord_user_username = interaction.user.username;
-            const category_id = "1110654950066896957";
 
             await student_repository.findByDiscordUsername(discord_user_username);
             
@@ -70,7 +69,7 @@ export default function() {
                 name: interaction.options.getString(group_name_option),
                 type: ChannelType.GuildText,
                 permissionOverwrites: permissionOverwrites,
-                parent: category_id
+                parent: interaction.channel.id
             });
         
             await interaction.reply({content: `Channel ${newChannel.name} has been created!`, ephemeral: true});

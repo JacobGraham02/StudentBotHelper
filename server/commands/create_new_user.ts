@@ -8,8 +8,8 @@ import Cache from '../utils/Cache';
 export default function() {
     const create_new_user_object: Object = {
         data: new SlashCommandBuilder()
-            .setName('create-user')
-            .setDescription('Use this command to create a new user for yourself')
+            .setName('create-website-user')
+            .setDescription('Use this command to create a new user that will allow a user to log in to the website')
             .addStringOption(options =>
                 options.setName('username')
                 .setDescription('(Required) your username')
