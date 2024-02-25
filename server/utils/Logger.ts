@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { Channel, Client, TextChannel } from 'discord.js';
 
 /**
  * This Logger class provides a basic implementation of asynchronous file write operation, where the bot can write errors or information messages to log files
@@ -6,13 +6,33 @@ import fs from 'fs/promises';
  * write some data to a file. 
  */
 export default class Logger {
-    log_file_messages_path: string | undefined;
-    log_file_errors_path: string | undefined;
+    log_information_messages_channel_id: string | undefined;
+    log_error_messages_channel_id: string | undefined;
     error_and_info_regex_pattern: RegExp = /[a-zA-Z0-9()\[\]'":/.,{} ]{1,1000}/g
+    discord_client: Client;
 
-    constructor(bot_helper_message_log_path: string | undefined, bot_helper_error_log_path: string | undefined) {
-        this.log_file_messages_path = bot_helper_message_log_path;
-        this.log_file_errors_path = bot_helper_error_log_path;
+
+    constructor(bot_information_messages_channel_id: string | undefined, bot_error_messages_channel_id: string | undefined, discord_bot_client: Client) {
+        this.log_information_messages_channel_id = bot_information_messages_channel_id;
+        this.log_error_messages_channel_id = bot_error_messages_channel_id;
+        this.discord_client = discord_bot_client;
+    }
+
+    private async sendMessageToDiscordChannel(channel_id: string, log_message: string) {
+        if (!channel_id) {
+            return;
+        }
+        const channel_for_message: Channel | null = await this.discord_client.channels.fetch(channel_id);
+
+        if (!channel_for_message || !(channel_for_message instanceof TextChannel)) {
+            return;
+        }
+
+        try {
+            await channel_for_message.send({content:`${log_message}`});
+        } catch (error) {
+            console.error(`There was an error when attempting to send a log message to the proper Discord channel. Please contact the site administrator about this error: ${error}`);
+        }
     }
 
     /**
@@ -36,17 +56,20 @@ export default class Logger {
      */
     public async logError(error: string) {
         if (!this.validateStringIsDefinedAndConformsToRegex(error)) {
-            console.error(`The error message to write to the error log file is undefined`);
+            console.error(`The error message that we want to write to the Discord error messages text channel is undefined or null`);
             return;
         }
 
         const formatted_error_string_date: Date = new Date();
         const formatted_error_string = `${formatted_error_string_date.toISOString()}: ${error}\n`;
 
+        if (typeof this.log_error_messages_channel_id === 'undefined') {
+            console.error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
+            return;
+        }
+
         try {
-            if (this.log_file_errors_path !== undefined) {
-                await fs.appendFile(this.log_file_errors_path, formatted_error_string);
-            }
+            await this.sendMessageToDiscordChannel(this.log_error_messages_channel_id, formatted_error_string);
         } catch (error) {
             console.error(`There was an error when attempting to write to the errors log file: ${error}`);
         }
@@ -68,10 +91,13 @@ export default class Logger {
         const formatted_message_string_date: Date = new Date();
         const formatted_message_string = `${formatted_message_string_date.toISOString()}: ${message}`;
 
+        if (typeof this.log_information_messages_channel_id === 'undefined') {
+            console.error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
+            return;
+        }
+
         try {
-            if (this.log_file_messages_path !== undefined) {
-                await fs.appendFile(this.log_file_messages_path, formatted_message_string);
-            } 
+            await this.sendMessageToDiscordChannel(this.log_information_messages_channel_id, formatted_message_string);
         } catch (error) {
             console.error(`There was an error when attempting to write to the messages log file: ${message}`);
         }

@@ -34,7 +34,6 @@ import IDatabaseResponseObject from './utils/IDiscordDatabaseResponse.js';
 import IDiscordEventData from './utils/IDiscordEventData.js';
 import DiscordEvent from './utils/DiscordEvent.js';
 import Logger from './utils/Logger.js';
-const logger: Logger = new Logger(process.env.discord_bot_messages_logs_file_path, process.env.discord_bot_error_logs_file_path);
 const server_port: string | undefined = process.env.port;
 import handleButtonInteraction from './modules/handleButtonInteraction.js';
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
@@ -48,12 +47,12 @@ const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   ],
   discord_commands: Collection<any, any>,
 });
+const logger: Logger = new Logger(process.env.discord_bot_information_messages_channel_id, process.env.discord_bot_error_messages_channel_id, discord_client_instance);
 /*
 Variables defined in the application .env file
 */
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
-const discord_voice_channel_category_id: string | undefined = process.env.discord_bot_voice_category_id;
 
 /*
 The string 'commands_folder_path' holds the directory path to the 'dist/commands' directory, which contains all of the '.js' command files, excluding the script used
@@ -165,12 +164,12 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       */
     try {
       logger.logMessage(
-        `The bot command ${interaction.commandName} was used by the user ${interaction.user.displayName} with id ${interaction.user.id}\n`
+        `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
       );
       await command.execute(interaction);
     } catch (error) {
       logger.logError(
-        `An error occured while the user ${interaction.user.displayName} with id ${interaction.user.id} attempted to execute the bot command ${interaction.commandName}: ${error}\n`
+        `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
       );
       await interaction.reply({
         content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,
@@ -182,7 +181,7 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`,
       ephemeral: true,
     });
-    logger.logMessage(`The user ${interaction.user.displayName} with id ${interaction.user.id} did not have permission to execute the command ${command.data.name}`);
+    logger.logError(`The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`);
   }
 });
 
