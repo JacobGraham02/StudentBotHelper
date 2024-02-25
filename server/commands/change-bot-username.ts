@@ -25,7 +25,7 @@ export default function() {
                 await interaction.reply({content:`The Discord bot username has been changed to ${new_bot_username}`, ephemeral: true});
             } catch (error) {
                 console.error(`There was an error when attempting to change the Discord bot username: ${error}`);
-                await interaction.reply({content:`There was an error when attempting to change the Discord bot username. Please contact the server administrator and inform them of this error`});
+                await interaction.reply({content:`There was an error when attempting to change the Discord bot username. Please contact the server administrator and inform them of this error: ${error}`});
                 throw error;
             }
         }

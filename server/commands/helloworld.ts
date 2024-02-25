@@ -5,11 +5,18 @@ export default function() {
         data: new SlashCommandBuilder()
             .setName('hello-world')
             .setDescription('Use this command to get a hello world message!'),
+
         authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const discord_user_username: string = interaction.user.username;
-            await interaction.reply({content:`Hello, ${discord_user_username}. Welcome to the bot command channel! What can I help you with? Use the command '/help' to view a list of available commands`,ephemeral:true});
+
+            try {
+                await interaction.reply({content:`Hello, ${discord_user_username}. Welcome to the bot command channel! What can I help you with? Use the command '/help' to view a list of available commands`,ephemeral:true});
+            } catch (error) {
+                await interaction.reply({content:`There was an error when writing the 'hello world' command to Discord`,ephemeral:true});
+                throw error;
+            }
         }
     }
     return create_new_user_object

@@ -81,9 +81,10 @@ export default function() {
             
             try {
                 await common_class_repository.create(common_class);
-                await interaction.reply({content:`A common class that all students have in common was created successfully`,ephemeral: true});
+                await interaction.reply({content:`A class was created successfully`,ephemeral: true});
             } catch (error) {
-                await interaction.reply({content:`The bot was unable to create a student class. Please try the command again or inform the bot developer of this error: ${error}`});
+                await interaction.reply({content:`The bot was unable to create a student class. Please try the command again or inform the server administrator of this error: ${error}`});
+                throw error;
             }            
         }
     }

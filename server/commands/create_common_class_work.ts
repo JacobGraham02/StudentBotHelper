@@ -77,14 +77,15 @@ export default function() {
                     await common_class_work_repository.create(common_class_work_document);
                     await interaction.channel.send({content:`New work has been created for the class ${class_menu_interaction.values[0]}`,ephemeral:true});
                 } catch (error) {
-                    await interaction.channel.send({content:`There was an error when creating work for the class ${class_menu_interaction.values[0]}. Please inform the bot developer of this error: ${error}`,ephemeral:true});
-                    return;
+                    await interaction.channel.send({content:`There was an error when creating work for the class ${class_menu_interaction.values[0]}. Please inform the server adminstrator of this error: ${error}`,ephemeral:true});
+                    throw error;
                 }
             });
                 
             collector.on('end', async (class_menu_interaction) => {
                 if (class_menu_interaction.size === 0) {
-                    await interaction.channel.send({content:`No class was selected for this work document. Please retype the command and try again`, ephemeral:true});
+                    await interaction.channel.send({content:`No class was selected to assign this work to. Please retry the command or inform the server administrator`, ephemeral:true});
+                    return;
                 }
             });
         }

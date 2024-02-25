@@ -25,12 +25,15 @@ export default function() {
             .addUserOption(option => 
                 option.setName('user_4')
                 .setDescription('(Optional) The fourth user for the group')
-                .setRequired(false)),
+                .setRequired(false)
+            ),
+            
         authorization_role_name: ["Discord admin","Bot user"],
 
         async execute(interaction) {
             const student_repository = new StudentRepository();
             const discord_user_username = interaction.user.username;
+            let new_dm_group;
 
             await student_repository.findByDiscordUsername(discord_user_username);
             
@@ -65,14 +68,18 @@ export default function() {
                 }
             }
 
-            const newChannel = await interaction.guild.channels.create({
-                name: interaction.options.getString(group_name_option),
-                type: ChannelType.GuildText,
-                permissionOverwrites: permissionOverwrites,
-                parent: interaction.channel.id
-            });
-        
-            await interaction.reply({content: `Channel ${newChannel.name} has been created!`, ephemeral: true});
+            try {
+                new_dm_group = await interaction.guild.channels.create({
+                    name: interaction.options.getString(group_name_option),
+                    type: ChannelType.GuildText,
+                    permissionOverwrites: permissionOverwrites,
+                    parent: interaction.channel.id
+                });
+                await interaction.reply({content: `The dm group ${new_dm_group.name} has been created`, ephemeral: true});
+            } catch (error) {
+                await interaction.reply({content: `There was an error when attempting to create the dm group ${new_dm_group.name}. Please inform the server administrator of this error: ${error}`, ephemeral: true});
+                throw error;
+            }
         }
     }
 

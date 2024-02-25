@@ -12,12 +12,17 @@ export default function() {
 
         async execute(interaction) {
             const common_class_repository:CommonClassRepository = new CommonClassRepository();
-            const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
+            const custom_event_emitter: CustomEventEmitter = CustomEventEmitter.getCustomEventEmitterInstance();
 
-            const classes: CommonClass[] | undefined = await common_class_repository.findAll();
-            custom_event_emitter.emitCommonClassDataMessage(classes);
+            try {
+                const classes: CommonClass[] | undefined = await common_class_repository.findAll();
+                custom_event_emitter.emitCommonClassDataMessage(classes);
 
-            interaction.reply({content:`The classes that are registered in the Discord bot for this semester will be displayed shortly`,ephemeral: true});
+                await interaction.reply({content:`The classes that are registered in the Discord bot will be displayed shortly`,ephemeral: true});
+            } catch (error) {
+                await interaction.reply({content:`There was an error when attempting to show all of the classes registered in the Discord bot: ${error}`});
+                throw error;
+            }
         }
     }
     return show_classes_object;

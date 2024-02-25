@@ -15,6 +15,7 @@ export default function() {
                 .setDescription(`(Required) Category where the new voice channel will be created`)
                 .setRequired(true)
             ),
+            
             authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
@@ -39,11 +40,11 @@ export default function() {
                 await interaction.reply({content:`The voice channel ${voice_channel} was created successfully in the category ${category_channel}`,ephemeral:true});
             } catch (error) {
                 console.error(`There was an error creating your specified voice channel: ${error}`);
-                await interaction.reply({content:`There was an error while creating the specified voice channel`, ephemeral: true});
+                await interaction.reply({content:`There was an error while creating the specified voice channel: ${error}`, ephemeral: true});
+                throw error;
             }
         }
     }
-
     return create_voice_channel_object;
 }
 

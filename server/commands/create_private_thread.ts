@@ -1,4 +1,4 @@
-import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration } from 'discord.js';
+import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, ThreadChannel } from 'discord.js';
 import StudentRepository from '../database/StudentRepository';
 import Cache from '../utils/Cache';
 
@@ -27,6 +27,7 @@ export default function() {
             const discord_user_username: string = interaction.user.username;
             const channel_to_create_thread = interaction.channel;
             const student_cache: Cache = Cache.getCacheInstance();
+            let private_text_thread: any;
 
             let existing_student = student_cache.get(discord_user_username);
 
@@ -41,13 +42,19 @@ export default function() {
                 }
             }
 
-            const private_text_thread = await channel_to_create_thread.threads.create({
-                name: `Private thread for ${discord_user_username}`,
-                autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
-                type: ChannelType.PrivateThread,
-                reason: `Private thread for ${discord_user_username}`
-            });
-            interaction.reply({content:`The private thread ${private_text_thread} has been created for you`,ephemeral:true});
+            try {
+                private_text_thread = await channel_to_create_thread.threads.create({
+                    name: `Private thread for ${discord_user_username}`,
+                    autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
+                    type: ChannelType.PrivateThread,
+                    reason: `Private thread for ${discord_user_username}`
+                });
+            } catch (error) {
+                await interaction.reply({content:`There was an error when creating the private text thread ${private_text_thread}: ${error}`});
+                throw error;
+            }
+                
+            await interaction.reply({content:`The private thread ${private_text_thread} has been created for you`,ephemeral:true});
 
             if (private_text_thread) {
                 student_cache.set(discord_user_username+`Logged in`, true);

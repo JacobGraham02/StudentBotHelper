@@ -15,8 +15,9 @@ export default function() {
                 command_list = [
                     "**Admin specific commands:**",
                     "**1. /create-website-user - Creates a website user that will be able to log into the bot website and customize their own Discord bot**",
-                    "**2. /delete-website-user - Deletes a website user",
-                    "**3. /create-bot-role-button - Adds a button which allows users to grant themselves access to using bot commands",
+                    "**2. /delete-website-user - Deletes a website user**",
+                    "**3. /create-bot-role-button - Adds a button which allows users to grant themselves access to using bot commands**",
+                    "**4. /change-bot-username - Changes the username of the bot (rate limited to twice per hour)**",
                     "**Regular user commands:**",
                     "**1. /help - Generates this same list of commands again**",
                     "**2. /hello-world - Generates a nice 'hello world' message with instructions on how to get started using the bot**",
@@ -41,7 +42,11 @@ export default function() {
                     "**9. /show-classes - Generates a list of all the details for classes which are occurring this semester**"
                 ];
             }
-            await interaction.reply({content:`**Available Commands:**\n${command_list.join('\n')}`,ephemeral:true});
+            try {
+                await interaction.reply({content:`**Available Commands:**\n${command_list.join('\n')}`,ephemeral:true});
+            } catch (error) {
+                await interaction.reply({content:`There was an error when writing the list of available commands to Discord`,ephemeral:true});
+            }
         }
     }
     return generate_help_message;

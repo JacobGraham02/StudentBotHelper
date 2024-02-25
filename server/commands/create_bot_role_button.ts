@@ -20,19 +20,23 @@ export default function() {
             }
 
             if (channel_to_add_button !== null) {
-                await channel_to_add_button.send({ 
-                    content: `Click the button to get the 'Bot user' role`, 
-                    components: [new ActionRowBuilder<ButtonBuilder>({
-                        components: [
-                            new ButtonBuilder({
-                                customId: `assign_bot_role_button`,
-                                label: `Click to become a bot user`,
-                                style: ButtonStyle.Success
-                            })
-                        ]
-                    })]
-                });
-                await interaction.reply({ content: `The bot role button has been added to the channel ${channel_to_add_button}`});
+                try {
+                    await channel_to_add_button.send({ 
+                        content: `Click the button to get the 'Bot user' role`, 
+                        components: [new ActionRowBuilder<ButtonBuilder>({
+                            components: [
+                                new ButtonBuilder({
+                                    customId: `assign_bot_role_button`,
+                                    label: `Click to become a bot user`,
+                                    style: ButtonStyle.Success
+                                })
+                            ]
+                        })]
+                    });
+                    await interaction.reply({ content: `The bot role button has been added to the channel ${channel_to_add_button}`, ephemeral:true});
+                } catch (error) {
+                    throw error;
+                }
             }
         }
     }
