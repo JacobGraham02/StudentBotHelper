@@ -18,6 +18,12 @@ export default class Logger {
         this.discord_client = discord_bot_client;
     }
 
+    /**
+     * This is a helper function that utilizes the Discord.js package to send messages into a numerically-identified channel. 
+     * @param channel_id string that is an environment variable read from a .env file
+     * @param log_message string that is the log message we want to write 
+     * @returns nothing regardless of any errors occuring. 
+     */
     private async sendMessageToDiscordChannel(channel_id: string, log_message: string) {
         if (!channel_id) {
             return;
@@ -33,6 +39,24 @@ export default class Logger {
         } catch (error) {
             console.error(`There was an error when attempting to send a log message to the proper Discord channel. Please contact the site administrator about this error: ${error}`);
         }
+    }
+
+    /**
+     * This function takes advantage of the new Discord API feature which allows you format time in messages in such a way that the time will
+     * display as relative to the client's time zone. This is called Discord's Timestamp Styles. 
+     * You must first convert the current date into a unix timestamp, and then wrap that timestamp in the <t: :F> characters.
+     * @param message string message we want to log
+     * @returns string that displays an ISO 8601 date for compatability, the string message informing the server administrator of messages, and the discord api formatted
+     * timestamp. 
+     */
+    private formatDiscordApiRelativeDate(message: string) {
+        const formatted_error_string_date: Date = new Date();
+
+        const unix_timestamp_current_time: number = Math.floor(formatted_error_string_date.getTime() / 1000);
+
+        const discord_api_formatted_timestamp: string = `<t:${unix_timestamp_current_time}:F>`;
+
+        return `${formatted_error_string_date.toISOString()}: ${message}\n${discord_api_formatted_timestamp}`;
     }
 
     /**
@@ -60,8 +84,7 @@ export default class Logger {
             return;
         }
 
-        const formatted_error_string_date: Date = new Date();
-        const formatted_error_string = `${formatted_error_string_date.toISOString()}: ${error}\n`;
+        const formatted_error_message_string = this.formatDiscordApiRelativeDate(error);
 
         if (typeof this.log_error_messages_channel_id === 'undefined') {
             console.error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
@@ -69,7 +92,7 @@ export default class Logger {
         }
 
         try {
-            await this.sendMessageToDiscordChannel(this.log_error_messages_channel_id, formatted_error_string);
+            await this.sendMessageToDiscordChannel(this.log_error_messages_channel_id, formatted_error_message_string);
         } catch (error) {
             console.error(`There was an error when attempting to write to the errors log file: ${error}`);
         }
@@ -87,9 +110,8 @@ export default class Logger {
             console.error(`The information message to write to the message log file is undefined`);
             return;
         }
-
-        const formatted_message_string_date: Date = new Date();
-        const formatted_message_string = `${formatted_message_string_date.toISOString()}: ${message}`;
+        
+        const formatted_information_message_string = this.formatDiscordApiRelativeDate(message);
 
         if (typeof this.log_information_messages_channel_id === 'undefined') {
             console.error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
@@ -97,7 +119,7 @@ export default class Logger {
         }
 
         try {
-            await this.sendMessageToDiscordChannel(this.log_information_messages_channel_id, formatted_message_string);
+            await this.sendMessageToDiscordChannel(this.log_information_messages_channel_id, formatted_information_message_string);
         } catch (error) {
             console.error(`There was an error when attempting to write to the messages log file: ${message}`);
         }
