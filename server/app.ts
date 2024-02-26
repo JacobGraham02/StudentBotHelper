@@ -241,7 +241,7 @@ custom_event_emitter.on(
       discord_channel_for_messages.send({
         embeds: [database_operation_embedded_message],
       });
-      logger.logMessage(`The database operation has been successfully written to the channel that stores database operation results`)
+      logger.logMessage(`The database operation has been successfully recorded`)
     }
   }
 );

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 
 export default function() {
-    const generate_help_message: Object = {
+    const generate_help_message_object: Object = {
         data: new SlashCommandBuilder()
             .setName('help')
             .setDescription('Lists all available bot commands'),
@@ -49,5 +49,5 @@ export default function() {
             }
         }
     }
-    return generate_help_message;
+    return generate_help_message_object;
 }

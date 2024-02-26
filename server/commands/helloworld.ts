@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 
 export default function() {
-    const create_new_user_object: Object = {
+    const hello_world_object: Object = {
         data: new SlashCommandBuilder()
             .setName('hello-world')
             .setDescription('Use this command to get a hello world message!'),
@@ -19,5 +19,5 @@ export default function() {
             }
         }
     }
-    return create_new_user_object
+    return hello_world_object
 }
