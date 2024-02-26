@@ -36,6 +36,7 @@ import DiscordEvent from './utils/DiscordEvent.js';
 import Logger from './utils/Logger.js';
 const server_port: string | undefined = process.env.port;
 import handleButtonInteraction from './modules/handleButtonInteraction.js';
+import CommonClassWork from "./entity/CommonClassWork.js";
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -319,26 +320,29 @@ custom_event_emitter.on(
       /*
       forEach iterator is used to add additional fields to the EmbedBuilder before passing the embedded message to the Discord API for use there. 
       */
-      const class_work_array = class_work_hash_map.get(
+      const class_work_array: CommonClassWork[] = class_work_hash_map.get(
         common_class_info.class_id
       );
       if (class_work_array) {
-        class_work_array.forEach(
-          (class_work_document: {
-            homework_due_date: string;
-            homework_name: any;
-          }) => {
+        class_work_array.forEach((class_work_document) => {
             const class_work_document_due_date: string = formatDatetimeValue(
-              class_work_document.homework_due_date
+                class_work_document.homework_due_date.toString()
             );
-            class_in_schedule_embedded_message.addFields({
-              name: `${class_work_document.homework_name}`,
-              value: `Due on ${class_work_document_due_date}`,
-              inline: true,
-            });
-          }
-        );
-      }
+            class_in_schedule_embedded_message.addFields(
+                {
+                    name: `${class_work_document.homework_name}`,
+                    value: `Due on ${class_work_document_due_date}`,
+                    inline: true
+                },
+                {
+                    name: `Work notes`,
+                    value: `${class_work_document.homework_notes}`,
+                    inline: true
+                }
+            );
+        });
+    }
+    
 
       /*
       Must pass the message as a parameter value for the 'embeds' property, to indicate the message is an instance of EmbedBuilder

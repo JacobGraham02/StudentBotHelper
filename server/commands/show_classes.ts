@@ -20,7 +20,7 @@ export default function() {
 
                 await interaction.reply({content:`The classes that are registered in the Discord bot will be displayed shortly`,ephemeral: true});
             } catch (error) {
-                await interaction.reply({content:`There was an error when attempting to show all of the classes registered in the Discord bot: ${error}`});
+                await interaction.reply({content:`There was an error when attempting to show all of the classes registered in the Discord bot: ${error}`,ephemeral:true});
                 throw error;
             }
         }

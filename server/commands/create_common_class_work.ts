@@ -66,6 +66,7 @@ export default function() {
                 const work_document_due_date = interaction.options.getString('homework_due_date');
                 const work_document_notes = interaction.options.getString('homework_notes');
                 const selected_class_id = class_menu_interaction.values[0];
+
                 const common_class_work_document: CommonClassWork = new CommonClassWork(
                     randomUUID(), 
                     selected_class_id,
@@ -75,7 +76,7 @@ export default function() {
                 );
                 try {
                     await common_class_work_repository.create(common_class_work_document);
-                    await interaction.channel.send({content:`New work has been created for the class ${class_menu_interaction.values[0]}`,ephemeral:true});
+                    await interaction.channel.send({content:`New work has been created for the specified class`,ephemeral:true});
                 } catch (error) {
                     await interaction.channel.send({content:`There was an error when creating work for the class ${class_menu_interaction.values[0]}. Please inform the server adminstrator of this error: ${error}`,ephemeral:true});
                     throw error;
