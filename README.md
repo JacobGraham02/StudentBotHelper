@@ -43,7 +43,7 @@
   <article>
   <strong> Using the 'help' command with the Discord bot </strong> 
   
-  ![StudentBotHelper running help command image demonstration](server/images/DiscordBotPicture.PNG)
+  ![StudentBotHelper running help command image demonstration](server/images/DiscordBotHelpCommandPicture.PNG)
 
   <strong> The bot command used to create a study group within Discord </strong>
 
