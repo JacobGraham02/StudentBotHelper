@@ -7,12 +7,12 @@ export default function() {
             .setDescription(`Create a voice channel to use`)
             .addStringOption(option =>
                 option.setName(`voice_channel_name`)
-                .setDescription(`(Required) Set the name for the voice channel`)
+                .setDescription(`(Required) Set the name for the voice channel (e.g. Group study)`)
                 .setRequired(true)
             )
             .addStringOption(option =>
                 option.setName(`category_for_voice_channel`)
-                .setDescription(`(Required) Category where the new voice channel will be created`)
+                .setDescription(`(Required) Category where the new voice channel will be created (e.g. Voice channels)`)
                 .setRequired(true)
             ),
             

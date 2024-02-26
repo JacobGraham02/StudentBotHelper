@@ -10,11 +10,11 @@ export default function() {
         .setDescription('Use this command to create a class.')
         .addStringOption(options =>
             options.setName('class_name')
-            .setDescription('(Required) Class course name')
+            .setDescription('(Required) Class course name (e.g. Advanced Database)')
             .setRequired(true))
         .addStringOption(options => 
             options.setName('class_course_code')    
-            .setDescription('(Required) Class course code')
+            .setDescription('(Required) Class course code (e.g. comp2006)')
             .setRequired(true))
         .addStringOption(option => 
             option.setName('class_start_time')

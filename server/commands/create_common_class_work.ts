@@ -13,11 +13,11 @@ export default function() {
         .setDescription('Use this command to create work and associate that work with a class.')
         .addStringOption(option =>
             option.setName('homework_name')
-            .setDescription('(Required) Set the name of the homework document')
+            .setDescription('(Required) Set the name of the homework document (e.g. Assignment 1)')
             .setRequired(true))
         .addStringOption(option => 
             option.setName('homework_due_date')
-            .setDescription('(Required) Set the homework due date and time')
+            .setDescription('(Required) Set the homework due date and time (e.g. 2024-03-01 11:59:59')
             .setRequired(true))
         .addStringOption(option =>
             option.setName('homework_notes')
@@ -33,7 +33,7 @@ export default function() {
             try {
                 classes = await common_class_repository.findAll();
             } catch (error) {
-                await interaction.reply(`There was an error when attempting to get class work for classes. Please try the command again or inform the bot developer of this error: ${error}`);
+                await interaction.reply({content:`There was an error when attempting to get class work for classes. Please try the command again or inform the bot developer of this error: ${error}`, ephemeral: true});
                 return;
             }
             
