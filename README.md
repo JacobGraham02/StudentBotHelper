@@ -43,7 +43,7 @@
   <article>
   <strong> Using the 'help' command with the Discord bot </strong> 
   
-  ![StudentBotHelper running help command image demonstration](server/images/DiscordBotPicture.PNG.PNG)
+  ![StudentBotHelper running help command image demonstration](server/images/DiscordBotPicture.PNG)
 
   <strong> The bot command used to create a study group within Discord </strong>
 
@@ -84,6 +84,25 @@
   <strong> An image showing the MySQL database structure that was created for the bot </strong>
 
   ![StudentBotHelper database structure demonstration](server/images/StudentBotHelperDatabaseStructure.PNG)
+
+  <strong> An image showing a scheduled Discord event being created within the server </strong>
+
+  ![StudentBotHelper scheduled event](server/images/DiscordBotCreatingEvent.png)
+  ![StudentBotHelper scheduled event details](server/images/DiscordBotEventDetails.png)
+
+  <strong> An image showing the bot information log messages </strong>
+
+  ![StudentBotHelper log messages](server/images/DiscordBotLogInformationMessages.png)
+
+  <strong> An image showing the bot information error messages </strong>
+
+  ![StudentBotHelper error messages](server/images/DiscordBotErrorLogMessage.png)
+
+  <strong> An image showing the bot can create a button that allows a user to get the bot role </strong>
+  
+  ![StudentBotHelper bot role creation button](server/images/DiscordBotGettingBotUserRole.png)
+  ![StudentBotHelper bot giving user the bot role](server/images/DiscordUserHasBotUserRole.png)
+ 
   </article>
   <p align="right">(<a href="#readme-top">back to top</a>)</p>
 </section>

@@ -9,6 +9,7 @@ import { ButtonInteraction, CacheType, GuildMember, Role, User, escapeHeading } 
  * @returns Promise<void>
  */
 export default async function handleButtonInteraction(interaction: ButtonInteraction<CacheType>): Promise<void> {
+    const bot_role = `Bot user`;
     if (interaction.customId === `assign_bot_role_button`) {
 
         if (!interaction.member || !interaction.member.roles) {
@@ -22,18 +23,19 @@ export default async function handleButtonInteraction(interaction: ButtonInterac
         const interaction_user = interaction.member as GuildMember;
         
         try {
-            const bot_user_role: Role | undefined = interaction.guild.roles.cache.find(role => role.name === 'bot user');
+            const bot_user_role: Role | undefined = interaction.guild.roles.cache.find(role => role.name === `${bot_role}`);
 
             if (bot_user_role) {
                 await interaction_user.roles.add(bot_user_role);
                 await interaction.reply({content: `You have been given the role ${bot_user_role}`, ephemeral: true});
             } else {
-                await interaction.reply({content:`The ${bot_user_role} could not be found. Please contact your server administrator and inform them of this error`, ephemeral:true});
+                await interaction.reply({content:`The role '${bot_role}' could not be found in Discord. Please contact your server administrator and inform them of this error`, ephemeral:true});
             }
         } catch (error) {
             console.error(`There was an error assigning the bot user role: ${error}`);
             await interaction.reply({content:`There was an error when assigning the bot user role to you. Please contact your server administrator and inform them of this 
-                error`, ephemeral: true})
+                error`, ephemeral: true});
+            throw error;
         }
     } 
 }

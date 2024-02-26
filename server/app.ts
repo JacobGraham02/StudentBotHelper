@@ -173,13 +173,13 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
         `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
       );
       await interaction.reply({
-        content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,
+        content: `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
         ephemeral: true,
       });
     } 
   } else {
     await interaction.reply({
-      content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`,
+      content: `You do not have permission to execute the command ${command.data.name}. Please inform the server administrator if you believe this is an error`,
       ephemeral: true,
     });
     logger.logError(`The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`);
