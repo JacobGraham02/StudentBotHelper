@@ -31,7 +31,7 @@ export default function() {
                 await interaction.reply({content:`The YouTube video title is undefined. Please contact the site adminstrator and inform them of this error`,ephemeral:true});
                 return;
            }
-           const youtube_api_url = `https://www.googleapis.com/youtube/v3/search?maxResults=5&q=${encodeURIComponent(youtube_video_title_keywords)}&key=${youtube_data_api_key}&part=snippet&type=video`;
+           const youtube_api_url = `https://www.googleapis.com/youtube/v3/search?maxResults=${maximum_video_responses}&q=${encodeURIComponent(youtube_video_title_keywords)}&key=${youtube_data_api_key}&part=snippet&type=video`;
 
            try {
                 const youtube_api_response: AxiosResponse = await axios.get(youtube_api_url);
