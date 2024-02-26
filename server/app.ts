@@ -34,9 +34,9 @@ import IDatabaseResponseObject from './utils/IDiscordDatabaseResponse.js';
 import IDiscordEventData from './utils/IDiscordEventData.js';
 import DiscordEvent from './utils/DiscordEvent.js';
 import Logger from './utils/Logger.js';
-const logger: Logger = new Logger(process.env.discord_bot_messages_logs_file_path, process.env.discord_bot_error_logs_file_path);
 const server_port: string | undefined = process.env.port;
 import handleButtonInteraction from './modules/handleButtonInteraction.js';
+import CommonClassWork from "./entity/CommonClassWork.js";
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -48,12 +48,12 @@ const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   ],
   discord_commands: Collection<any, any>,
 });
+const logger: Logger = new Logger(process.env.discord_bot_information_messages_channel_id, process.env.discord_bot_error_messages_channel_id, discord_client_instance);
 /*
 Variables defined in the application .env file
 */
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
-const discord_voice_channel_category_id: string | undefined = process.env.discord_bot_voice_category_id;
 
 /*
 The string 'commands_folder_path' holds the directory path to the 'dist/commands' directory, which contains all of the '.js' command files, excluding the script used
@@ -81,7 +81,7 @@ async function fetchCommandFiles() {
     const command_file_path = path.join(commands_folder_path, command_file);
     const command = await import(command_file_path);
     if (Object.keys(command).length >= 1 && command.constructor === Object) {
-      const command_object = command.default();
+      const command_object = command.default(logger);
       discord_client_instance.discord_commands.set(
         command_object.data.name,
         command_object
@@ -119,11 +119,12 @@ discord_client_instance.on("ready", async () => {
  *  3. The channel that the interaction occurred on
  *
  */
-discord_client_instance.on('interactionCreate', async interaction => {
+discord_client_instance.on("interactionCreate", async (interaction) => {
+  
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
   }
-discord_client_instance.on("interactionCreate", async (interaction) => {
+
   if (!interaction.isCommand()) {
     return;
   }
@@ -164,24 +165,24 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       */
     try {
       logger.logMessage(
-        `The bot command ${interaction.commandName} was used\n`
+        `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
       );
       await command.execute(interaction);
     } catch (error) {
       logger.logError(
-        `An error occured while attempting to execute the bot command ${interaction.commandName}: ${error}\n`
+        `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
       );
       await interaction.reply({
         content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,
         ephemeral: true,
       });
-      console.error(error);
-    }
+    } 
   } else {
     await interaction.reply({
       content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`,
       ephemeral: true,
     });
+    logger.logError(`The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`);
   }
 });
 
@@ -216,8 +217,9 @@ custom_event_emitter.on(
       process.env.discord_bot_http_response_channel_id;
 
     if (!discord_channel_for_operation_results) {
+      logger.logError(`The discord channel id for database operation results to be stored could not be resolved`);
       throw new Error(
-        `The discord channel id for database operation results could not be fetched.`
+        `The discord channel id for database operation results to be stored could not be resolved`
       );
     }
 
@@ -239,6 +241,7 @@ custom_event_emitter.on(
       discord_channel_for_messages.send({
         embeds: [database_operation_embedded_message],
       });
+      logger.logMessage(`The database operation has been successfully written to the channel that stores database operation results`)
     }
   }
 );
@@ -259,8 +262,9 @@ custom_event_emitter.on(
     const discord_channel_for_class_data_results =
       process.env.discord_bot_command_channel_id;
     if (!discord_channel_for_class_data_results) {
+      logger.logError(`The discord channel id for showing classes this semester could not be resolved`)
       throw new Error(
-        `The discord channel id for database operation results could not be fetched.`
+        `The discord channel id for showing classes this semester could not be resolved.`
       );
     }
 
@@ -316,26 +320,29 @@ custom_event_emitter.on(
       /*
       forEach iterator is used to add additional fields to the EmbedBuilder before passing the embedded message to the Discord API for use there. 
       */
-      const class_work_array = class_work_hash_map.get(
+      const class_work_array: CommonClassWork[] = class_work_hash_map.get(
         common_class_info.class_id
       );
       if (class_work_array) {
-        class_work_array.forEach(
-          (class_work_document: {
-            homework_due_date: string;
-            homework_name: any;
-          }) => {
+        class_work_array.forEach((class_work_document) => {
             const class_work_document_due_date: string = formatDatetimeValue(
-              class_work_document.homework_due_date
+                class_work_document.homework_due_date.toString()
             );
-            class_in_schedule_embedded_message.addFields({
-              name: `${class_work_document.homework_name}`,
-              value: `Due on ${class_work_document_due_date}`,
-              inline: true,
-            });
-          }
-        );
-      }
+            class_in_schedule_embedded_message.addFields(
+                {
+                    name: `${class_work_document.homework_name}`,
+                    value: `Due on ${class_work_document_due_date}`,
+                    inline: true
+                },
+                {
+                    name: `Work notes`,
+                    value: `${class_work_document.homework_notes}`,
+                    inline: true
+                }
+            );
+        });
+    }
+    
 
       /*
       Must pass the message as a parameter value for the 'embeds' property, to indicate the message is an instance of EmbedBuilder
@@ -361,7 +368,8 @@ custom_event_emitter.on(
    *
    * @param message CommonClass[] an array of CommonClass objects
    */
-  async (classes: CommonClass[], day_of_the_week: string) => {
+  async (classes: CommonClass[]) => {
+    let number_of_events_created = 0;
     const guild_id: string | undefined = process.env.discord_bot_guild_id;
     let guild: Guild | undefined;
 
@@ -419,9 +427,10 @@ custom_event_emitter.on(
             location: "Lakehead University, Orillia",
           },
         };
-
+        ++number_of_events_created;
         discordEventClassInstance.createNewDiscordEvent(discord_event_data);
       }
+      logger.logMessage(`A total of ${number_of_events_created} class events have been created`);
     }
   }
 );

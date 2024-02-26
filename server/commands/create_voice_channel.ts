@@ -7,15 +7,16 @@ export default function() {
             .setDescription(`Create a voice channel to use`)
             .addStringOption(option =>
                 option.setName(`voice_channel_name`)
-                .setDescription(`(Required) Set the name for the voice channel`)
+                .setDescription(`(Required) Set the name for the voice channel (e.g. Group study)`)
                 .setRequired(true)
             )
             .addStringOption(option =>
                 option.setName(`category_for_voice_channel`)
-                .setDescription(`(Required) Category where the new voice channel will be created`)
+                .setDescription(`(Required) Category where the new voice channel will be created (e.g. Voice channels)`)
                 .setRequired(true)
             ),
-            authorization_role_name: ["Discord admin"],
+            
+            authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const voice_channel_name = interaction.options.getString("voice_channel_name");
@@ -39,11 +40,11 @@ export default function() {
                 await interaction.reply({content:`The voice channel ${voice_channel} was created successfully in the category ${category_channel}`,ephemeral:true});
             } catch (error) {
                 console.error(`There was an error creating your specified voice channel: ${error}`);
-                await interaction.reply({content:`There was an error while creating the specified voice channel`, ephemeral: true});
+                await interaction.reply({content:`There was an error while creating the specified voice channel: ${error}`, ephemeral: true});
+                throw error;
             }
         }
     }
-
     return create_voice_channel_object;
 }
 

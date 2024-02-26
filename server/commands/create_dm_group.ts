@@ -4,8 +4,8 @@ import StudentRepository from '../database/StudentRepository';
 export default function() {
     const create_dm_group_object: Object = {
         data: new SlashCommandBuilder()
-            .setName('create-group')
-            .setDescription('Use this command to create a private text channel with a maximum of 4 people (including yourself)')
+            .setName('create-dm-group')
+            .setDescription('Use this command to create a private DM group between yourself and up to three others.')
             .addStringOption(options => 
                 options.setName('group_name')
                 .setDescription('(Required) The group name')
@@ -25,13 +25,15 @@ export default function() {
             .addUserOption(option => 
                 option.setName('user_4')
                 .setDescription('(Optional) The fourth user for the group')
-                .setRequired(false)),
-        authorization_role_name: ["Discord admin"],
+                .setRequired(false)
+            ),
+            
+        authorization_role_name: ["Discord admin","Bot user"],
 
         async execute(interaction) {
             const student_repository = new StudentRepository();
             const discord_user_username = interaction.user.username;
-            const category_id = "1110654950066896957";
+            let new_dm_group;
 
             await student_repository.findByDiscordUsername(discord_user_username);
             
@@ -66,14 +68,18 @@ export default function() {
                 }
             }
 
-            const newChannel = await interaction.guild.channels.create({
-                name: interaction.options.getString(group_name_option),
-                type: ChannelType.GuildText,
-                permissionOverwrites: permissionOverwrites,
-                parent: category_id
-            });
-        
-            await interaction.reply({content: `Channel ${newChannel.name} has been created!`, ephemeral: true});
+            try {
+                new_dm_group = await interaction.guild.channels.create({
+                    name: interaction.options.getString(group_name_option),
+                    type: ChannelType.GuildText,
+                    permissionOverwrites: permissionOverwrites,
+                    parent: interaction.channel.id
+                });
+                await interaction.reply({content: `The dm group ${new_dm_group.name} has been created`, ephemeral: true});
+            } catch (error) {
+                await interaction.reply({content: `There was an error when attempting to create the dm group ${new_dm_group.name}. Please inform the server administrator of this error: ${error}`, ephemeral: true});
+                throw error;
+            }
         }
     }
 
