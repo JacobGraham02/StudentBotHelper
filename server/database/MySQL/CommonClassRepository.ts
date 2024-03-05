@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import 'dotenv/config';
 dotenv.config({ path: './.env' });
 import { UUID, randomUUID } from "crypto";
-import CommonClass from "../entity/CommonClass";
+import CommonClass from "../../entity/CommonClass";
 import { ICommonClassRepository } from "./ICommonClassRepository";
 import DatabaseConnectionManager from "./DatabaseConnectionManager";
 import IDatabaseConfig from "./IDatabaseConfig";

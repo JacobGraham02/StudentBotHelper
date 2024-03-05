@@ -27,7 +27,7 @@ import apiRouter from './api/routes/botapi.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
-import CommonClassWorkRepository from './database/CommonClassWorkRepository.js';
+import CommonClassWorkRepository from './database/MySQL/CommonClassWorkRepository.js';
 import CommonClass from './entity/CommonClass.js';
 import { formatDatetimeValue, formatTimeValue } from './utils/NormalizeDatetimeAndTimeValue.js';
 import IDatabaseResponseObject from './utils/IDiscordDatabaseResponse.js';

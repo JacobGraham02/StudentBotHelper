@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import StudentClassWork from "../entity/StudentClassWork";
+import StudentClassWork from "../../entity/StudentClassWork";
 
 
 export default interface IStudentClassWorkRepository {

@@ -1,5 +1,5 @@
 import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, ThreadChannel } from 'discord.js';
-import StudentRepository from '../database/StudentRepository';
+import StudentRepository from '../database/MySQL/StudentRepository';
 import Cache from '../utils/Cache';
 
 export default function() {

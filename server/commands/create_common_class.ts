@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import CommonClassRepository from '../database/CommonClassRepository';
+import CommonClassRepository from '../database/MySQL/CommonClassRepository';
 import CommonClass from '../entity/CommonClass';
 import { randomUUID } from 'crypto';
 

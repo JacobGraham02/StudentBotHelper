@@ -1,5 +1,5 @@
 import {ChannelType, PermissionsBitField, SlashCommandBuilder, User } from 'discord.js';
-import StudentRepository from '../database/StudentRepository';
+import StudentRepository from '../database/MySQL/StudentRepository';
 
 export default function() {
     const create_dm_group_object: Object = {

@@ -143,4 +143,9 @@ bot_commands_router.post('/changeDiscordBotAvatar', initializeDiscordApiFunction
     }
 });
 
+bot_commands_router.post('/changeDiscordChannelIds', initializeDiscordApiFunctionsMiddleware, ensureDiscordApiOperationsClassNotUndefinedMiddleware,
+    ensureLoggerClassNotUndefinedMiddleware, async function(request: Request, response: Response, next: NextFunction) {
+        
+});
+
 export default bot_commands_router;

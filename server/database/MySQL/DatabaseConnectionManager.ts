@@ -4,7 +4,7 @@ dotenv.config({path: './.env'});
 import IDatabaseConfig from "./IDatabaseConfig";
 import mysql from 'mysql2/promise';
 import fs from 'fs';
-import CustomEventEmitter from '../utils/CustomEventEmitter';
+import CustomEventEmitter from '../../utils/CustomEventEmitter';
 
 export default class DatabaseConnectionManager {
     private database_connection_limit: number = 10;
