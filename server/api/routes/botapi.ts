@@ -6,16 +6,28 @@ import 'dotenv/config';
 import Logger from '../../utils/Logger';
 dotenv.config({path: '../../../.env'});
 
+/**
+ * This is used to declare a custom interface that the compiler will use that allows the developer to
+ * create a custom request. In this instance, we are attaching the Logger class instance and the 
+ * DiscordAPIOperations class instance to the request for use at a later time. 
+ */
 declare global {
     namespace Express {
         interface Request {
             discordApiOperations: DiscordAPIOperations;
             logger: Logger;
-            botname: string;
         }
     }
 }
 
+/**
+ * Middleware function that attaches the DiscordAPIOperations class instance and Logger class instance to any incoming request, and forwards the modified request
+ * to the next function in the call stack. 
+ * @param request Request incoming to the function
+ * @param response Response that is outgoing from the middleware, which has the Logger and DiscordAPIOperations class instances attached
+ * @param next NextFunction that is the next function in the call stack
+ * @returns {void}
+ */
 function initializeDiscordApiFunctionsMiddleware(request: Request, response: Response, next: NextFunction): void {
     const registerBotCommands = new DiscordAPIOperations(
         process.env.discord_bot_token,
@@ -28,6 +40,13 @@ function initializeDiscordApiFunctionsMiddleware(request: Request, response: Res
     next();
 }
 
+/**
+ * Middleware function that validates whether the DiscordAPIOperations class instance that is attached to the incoming request is not a falsy value
+ * @param request Request that is incoming with both the Logger and DiscordAPIOperations class instances attached
+ * @param response Response that is outgoing from the middleware, which has the Logger and DiscordAPIOperations class instances attached
+ * @param next NextFunction that is the next function in the call stack
+ * @returns {void}
+ */
 function ensureDiscordApiOperationsClassNotUndefinedMiddleware(request: Request, response: Response, next: NextFunction): void {
     const discordApiOperations = request.discordApiOperations;
     if (!discordApiOperations) {
@@ -40,6 +59,13 @@ function ensureDiscordApiOperationsClassNotUndefinedMiddleware(request: Request,
     next();
 }
 
+/**
+ * Middleware function that validates whether the Logger class instance that is attached to the incoming request is not a falsy value
+ * @param request Request that is incoming with both the Logger and DiscordAPIOperations class instances attached
+ * @param response Response that is outgoing from the middleware, which has the Logger and DiscordAPIOperations class instances attacheds
+ * @param next NextFunction that is the next function in the call stack
+ * @returns {void}
+ */
 function ensureLoggerClassNotUndefinedMiddleware(request: Request, response: Response, next: NextFunction): void {
     const loggerOperations = request.logger;
 
@@ -53,6 +79,15 @@ function ensureLoggerClassNotUndefinedMiddleware(request: Request, response: Res
     next();
 }
 
+/**
+ * When the API endpoint '/registerCommands' is triggered, this routing function will do the following:
+ *  1. Use middleware to determine if both the Logger and DiscordAPIOperations classes are truthy
+ *  2. Assign the request DiscordAPIOperations class instance to a variable for use
+ *  3. Use a try/catch clause to:   
+ *    3.1: Push the modified commands into the command list
+ *    3.2: Register all of the commands in the command list with the Discord bot
+ *  4. If an error occurs, propogate the error up the call stack by throwing the error, and informing the user an error has occurred. 
+ */
 bot_commands_router.post('/registerCommands', initializeDiscordApiFunctionsMiddleware, ensureDiscordApiOperationsClassNotUndefinedMiddleware, 
     ensureLoggerClassNotUndefinedMiddleware, async function(request: Request, response: Response, next: NextFunction) {
     const discordApiOperations = request.discordApiOperations;
@@ -66,6 +101,14 @@ bot_commands_router.post('/registerCommands', initializeDiscordApiFunctionsMiddl
     }
 });
 
+/**
+ * When the API endpoint '/registerCommands' is triggered, this routing function will do the following:
+ *  1. Use middleware to determine if both the Logger and DiscordAPIOperations classes are truthy
+ *  2. Assign the request DiscordAPIOperations class instance to a variable for use
+ *  3. Use a try/catch clause to:   
+ *    3.1: Change the Discord bot name
+ *  4. If an error occurs, propogate the error up the call stack by throwing the error, and informing the user an error has occurred. 
+ */
 bot_commands_router.post('/changeDiscordBotName', initializeDiscordApiFunctionsMiddleware, ensureDiscordApiOperationsClassNotUndefinedMiddleware, 
     ensureLoggerClassNotUndefinedMiddleware, async function(request: Request, response: Response, next: NextFunction) {
 
@@ -79,6 +122,14 @@ bot_commands_router.post('/changeDiscordBotName', initializeDiscordApiFunctionsM
     }
 });
 
+/**
+ * When the API endpoint '/changeDiscordBotAvatar' is triggered, this routing function will do the following:
+ *  1. Use middleware to determine if both the Logger and DiscordAPIOperations classes are truthy
+ *  2. Assign the request DiscordAPIOperations class instance to a variable for use
+ *  3. Use a try/catch clause to:   
+ *    3.1: Change the Discord bot avatar
+ *  4. If an error occurs, propogate the error up the call stack by throwing the error, and informing the user an error has occurred. 
+ */
 bot_commands_router.post('/changeDiscordBotAvatar', initializeDiscordApiFunctionsMiddleware, ensureDiscordApiOperationsClassNotUndefinedMiddleware,
     ensureLoggerClassNotUndefinedMiddleware, async function(request: Request, response: Response, next: NextFunction) {
 
