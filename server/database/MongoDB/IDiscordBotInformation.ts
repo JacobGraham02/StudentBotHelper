@@ -5,10 +5,10 @@ import { UUID } from "crypto";
  * This interface defines all of the properties that exist for that object. 
  */
 export default interface IDiscordBotInformation {
-    bot_id: UUID;
-    bot_username: string;
-    bot_password: string;
-    bot_email: string;
+    bot_id?: UUID;
+    bot_username?: string;
+    bot_password?: string;
+    bot_email?: string;
     bot_commands_channel_id: string;
     bot_database_responses_channel_id: string;
     bot_github_commits_channel_id: string;

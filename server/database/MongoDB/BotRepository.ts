@@ -2,12 +2,12 @@ import { UUID } from 'crypto';
 import DatabaseConnectionManager from './DatabaseConnectionManager';
 import IDiscordBotInformation from './IDiscordBotInformation';
 
-const database_connection_manager = new DatabaseConnectionManager();
-
 export default class BotRepository {
 
+    private database_connection_manager = new DatabaseConnectionManager();
+
     public async findBotByUUID(bot_uuid: UUID): Promise<any> {
-        const database_connection = await database_connection_manager.getConnection();
+        const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
             const bot = await bot_collection.findOne({ bot_uuid: bot_uuid });
@@ -27,7 +27,7 @@ export default class BotRepository {
      * @param discord_bot_information IDiscordBotInformation
      */
     public async createBot(discord_bot_information: IDiscordBotInformation): Promise<void> {
-        const database_connection = await database_connection_manager.getConnection();
+        const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
 
@@ -59,7 +59,7 @@ export default class BotRepository {
     private async releaseConnectionSafely(database_connection: any): Promise<void> {
         if (database_connection) {
             try {
-                await database_connection_manager.releaseConnection(database_connection);
+                await this.database_connection_manager.releaseConnection(database_connection);
             } catch (error) {
                 console.error(`An error has occurred during the execution of releaseConnectionSafely function: ${error}`);
                 throw error;
