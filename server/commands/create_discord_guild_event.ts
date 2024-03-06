@@ -4,7 +4,7 @@ import CommonClass from '../entity/CommonClass';
 import CommonClassRepository from '../database/MySQL/CommonClassRepository';
 
 export default function() {
-    const create_common_class_object: Object = {
+    const create_guild_event_object: Object = {
         data: new SlashCommandBuilder()
         .setName('create-scheduled-event')
         .setDescription('Use this command to create one scheduled event per class.'),
@@ -30,5 +30,5 @@ export default function() {
             }
         }
     }
-    return create_common_class_object;
+    return create_guild_event_object;
 }

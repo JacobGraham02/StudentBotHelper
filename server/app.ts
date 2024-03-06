@@ -173,13 +173,13 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
         `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
       );
       await interaction.reply({
-        content: `There was an error when attempting to execute the command. Please inform the bot developer of this error ${error}`,
+        content: `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
         ephemeral: true,
       });
     } 
   } else {
     await interaction.reply({
-      content: `You do not have permission to execute the command ${command.data.name}. Please contact your bot administrator if this is an error`,
+      content: `You do not have permission to execute the command ${command.data.name}. Please inform the server administrator if you believe this is an error`,
       ephemeral: true,
     });
     logger.logDiscordError(`The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`);
@@ -241,7 +241,7 @@ custom_event_emitter.on(
       discord_channel_for_messages.send({
         embeds: [database_operation_embedded_message],
       });
-      logger.logDiscordMessage(`The database operation has been successfully written to the channel that stores database operation results`)
+      logger.logDiscordMessage(`The database operation has been successfully recorded`)
     }
   }
 );

@@ -1,0 +1,90 @@
+name: Build and deploy Node.js app to Azure Web App - studentbothelper
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x' # Use appropriate Node.js version
+
+      - name: Install dependencies and build server 
+        working-directory: server
+        run: |
+          npm install
+          npm run build --if-present
+
+      # - name: Install dependencies and build client 
+      #   working-directory: client
+      #   run: |
+      #     npm install
+      #     npm run build --if-present
+
+      - name: Zip artifact for deployment
+        run: zip release.zip ./server/* ./client/* -r
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-app
+          path: release.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    env:
+      DISCORD_BOT_CLIENT_SECRET: ${{ secrets.DISCORD_BOT_CLIENT_SECRET }}
+      DISCORD_BOT_COMMAND_CHANNEL_ID: ${{ secrets.DISCORD_BOT_COMMAND_CHANNEL_ID }}
+      DISCORD_BOT_ERROR_MESSAGES_CHANNEL_ID: ${{ secrets.DISCORD_BOT_ERROR_MESSAGES_CHANNEL_ID }}
+      DISCORD_BOT_GUILD_ID: ${{ secrets.DISCORD_BOT_GUILD_ID }}
+      DISCORD_BOT_HTTP_RESPONSE_CHANNEL_ID: ${{ secrets.DISCORD_BOT_HTTP_RESPONSE_CHANNEL_ID }}
+      DISCORD_BOT_INFORMATION_MESSAGES_CHANNEL_ID: ${{ secrets.DISCORD_BOT_INFORMATION_MESSAGES_CHANNEL_ID }}
+      DISCORD_BOT_NAME: ${{ secrets.DISCORD_BOT_NAME }}
+      DISCORD_BOT_THREAD_CREATION_CHANNEL_ID: ${{ secrets.DISCORD_BOT_THREAD_CREATION_CHANNEL_ID }}
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      EXPRESS_SESSION_KEY: ${{ secrets.EXPRESS_SESSION_KEY }}
+      GOOGLE_CLOUD_API_KEY: ${{ secrets.GOOGLE_CLOUD_API_KEY }}
+      MONGODB_CONNECTION_STRING: ${{ secrets.MONGODB_CONNECTION_STRING }}
+      MYSQL_SERVER_ADMIN_CONNECTION_PORT: ${{ secrets.MYSQL_SERVER_ADMIN_CONNECTION_PORT }}
+      MYSQL_SERVER_ADMIN_DATABASE_NAME: ${{ secrets.MYSQL_SERVER_ADMIN_DATABASE_NAME }}
+      MYSQL_SERVER_ADMIN_HOSTNAME: ${{ secrets.MYSQL_SERVER_ADMIN_HOSTNAME }}
+      MYSQL_SERVER_ADMIN_PASSWORD: ${{ secrets.MYSQL_SERVER_ADMIN_PASSWORD }}
+      MYSQL_SERVER_ADMIN_PATH_TO_SSL_CERTIFICATE: ${{ secrets.MYSQL_SERVER_ADMIN_PATH_TO_SSL_CERTIFICATE }}
+      MYSQL_SERVER_ADMIN_USERNAME: ${{ secrets.MYSQL_SERVER_ADMIN_USERNAME }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      PORT: ${{ secrets.PORT }}
+      YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: node-app
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'studentbothelper'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2DD9EB804CB84B30831B93E00A244643 }}
+          package: .
+      
+      - name: 'Start node.js application backend'
+        run: npm run start

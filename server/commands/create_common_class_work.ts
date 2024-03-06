@@ -7,7 +7,7 @@ import { randomUUID } from 'crypto';
 import CommonClassWorkRepository from '../database/MySQL/CommonClassWorkRepository';
 
 export default function() {
-    const create_common_class_object: Object = {
+    const create_common_class_work_object: Object = {
         data: new SlashCommandBuilder()
         .setName('create-class-work')
         .setDescription('Use this command to create work and associate that work with a class.')
@@ -91,6 +91,6 @@ export default function() {
             });
         }
     }
-    return create_common_class_object;
+    return create_common_class_work_object;
 }
 
