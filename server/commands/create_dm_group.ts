@@ -1,5 +1,4 @@
 import {ChannelType, PermissionsBitField, SlashCommandBuilder, User } from 'discord.js';
-import StudentRepository from '../database/StudentRepository';
 
 export default function() {
     const create_dm_group_object: Object = {
@@ -31,11 +30,7 @@ export default function() {
         authorization_role_name: ["Discord admin","Bot user"],
 
         async execute(interaction) {
-            const student_repository = new StudentRepository();
-            const discord_user_username = interaction.user.username;
             let new_dm_group;
-
-            await student_repository.findByDiscordUsername(discord_user_username);
             
             const permissionOverwrites = [
                 {
@@ -73,7 +68,6 @@ export default function() {
                     name: interaction.options.getString(group_name_option),
                     type: ChannelType.GuildText,
                     permissionOverwrites: permissionOverwrites,
-                    parent: interaction.channel.id
                 });
                 await interaction.reply({content: `The dm group ${new_dm_group.name} has been created`, ephemeral: true});
             } catch (error) {

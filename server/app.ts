@@ -27,16 +27,16 @@ import apiRouter from './api/routes/botapi.js';
 import CustomDiscordClient from './utils/CustomDiscordClient.js';
 import CustomEventEmitter from './utils/CustomEventEmitter.js';
 import { EmbedBuilder } from '@discordjs/builders';
-import CommonClassWorkRepository from './database/CommonClassWorkRepository.js';
+import CommonClassWorkRepository from './database/MySQL/CommonClassWorkRepository.js';
 import CommonClass from './entity/CommonClass.js';
 import { formatDatetimeValue, formatTimeValue } from './utils/NormalizeDatetimeAndTimeValue.js';
 import IDatabaseResponseObject from './utils/IDiscordDatabaseResponse.js';
 import IDiscordEventData from './utils/IDiscordEventData.js';
 import DiscordEvent from './utils/DiscordEvent.js';
-import Logger from './utils/Logger.js';
 const server_port: string | undefined = process.env.port;
 import handleButtonInteraction from './modules/handleButtonInteraction.js';
 import CommonClassWork from "./entity/CommonClassWork.js";
+import Logger from "./utils/Logger.js";
 const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
@@ -164,12 +164,12 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
     try {
-      logger.logMessage(
+      logger.logDiscordMessage(
         `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
       );
       await command.execute(interaction);
     } catch (error) {
-      logger.logError(
+      logger.logDiscordError(
         `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
       );
       await interaction.reply({
@@ -182,7 +182,7 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       content: `You do not have permission to execute the command ${command.data.name}. Please inform the server administrator if you believe this is an error`,
       ephemeral: true,
     });
-    logger.logError(`The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`);
+    logger.logDiscordError(`The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`);
   }
 });
 
@@ -217,7 +217,7 @@ custom_event_emitter.on(
       process.env.discord_bot_http_response_channel_id;
 
     if (!discord_channel_for_operation_results) {
-      logger.logError(`The discord channel id for database operation results to be stored could not be resolved`);
+      logger.logDiscordError(`The discord channel id for database operation results to be stored could not be resolved`);
       throw new Error(
         `The discord channel id for database operation results to be stored could not be resolved`
       );
@@ -241,7 +241,7 @@ custom_event_emitter.on(
       discord_channel_for_messages.send({
         embeds: [database_operation_embedded_message],
       });
-      logger.logMessage(`The database operation has been successfully recorded`)
+      logger.logDiscordMessage(`The database operation has been successfully recorded`)
     }
   }
 );
@@ -262,7 +262,7 @@ custom_event_emitter.on(
     const discord_channel_for_class_data_results =
       process.env.discord_bot_command_channel_id;
     if (!discord_channel_for_class_data_results) {
-      logger.logError(`The discord channel id for showing classes this semester could not be resolved`)
+      logger.logDiscordError(`The discord channel id for showing classes this semester could not be resolved`)
       throw new Error(
         `The discord channel id for showing classes this semester could not be resolved.`
       );
@@ -430,7 +430,7 @@ custom_event_emitter.on(
         ++number_of_events_created;
         discordEventClassInstance.createNewDiscordEvent(discord_event_data);
       }
-      logger.logMessage(`A total of ${number_of_events_created} class events have been created`);
+      logger.logDiscordMessage(`A total of ${number_of_events_created} class events have been created`);
     }
   }
 );

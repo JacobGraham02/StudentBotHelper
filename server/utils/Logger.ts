@@ -9,13 +9,18 @@ export default class Logger {
     log_information_messages_channel_id: string | undefined;
     log_error_messages_channel_id: string | undefined;
     error_and_info_regex_pattern: RegExp = /[a-zA-Z0-9()\[\]'":/.,{} ]{1,1000}/g
-    discord_client: Client;
+    discord_client: Client | undefined;
 
-
-    constructor(bot_information_messages_channel_id: string | undefined, bot_error_messages_channel_id: string | undefined, discord_bot_client: Client) {
-        this.log_information_messages_channel_id = bot_information_messages_channel_id;
-        this.log_error_messages_channel_id = bot_error_messages_channel_id;
-        this.discord_client = discord_bot_client;
+    constructor(bot_information_messages_channel_id?: string | undefined, bot_error_messages_channel_id?: string | undefined, discord_bot_client?: Client) {
+        if (bot_information_messages_channel_id) {
+            this.log_information_messages_channel_id = bot_information_messages_channel_id;
+        }
+        if (bot_error_messages_channel_id) {
+            this.log_error_messages_channel_id = bot_error_messages_channel_id;
+        }
+        if (discord_bot_client) { 
+            this.discord_client = discord_bot_client;
+        }
     }
 
     /**
@@ -28,6 +33,12 @@ export default class Logger {
         if (!channel_id) {
             return;
         }
+
+        if (!this.discord_client) {
+            console.error(`The discord bot instance is undefined or null. Please inform the server administrator of this error`);
+            return;
+        }
+
         const channel_for_message: Channel | null = await this.discord_client.channels.fetch(channel_id);
 
         if (!channel_for_message || !(channel_for_message instanceof TextChannel)) {
@@ -59,6 +70,20 @@ export default class Logger {
         return `${formatted_error_string_date.toISOString()}: ${message}\n${discord_api_formatted_timestamp}`;
     }
 
+    private formatLogMessageToRelativeDate(message: string) {
+        const formatted_error_string_date: Date = new Date();
+
+        const timezoneOffset: number = formatted_error_string_date.getTimezoneOffset();
+
+        const timestamp_adjusted_for_timezone: number = formatted_error_string_date.getTime() - (timezoneOffset * 60 * 1000);
+
+        const adjusted_date: Date = new Date(timestamp_adjusted_for_timezone);
+
+        const formatted_date: string = adjusted_date.toLocaleString();
+
+        return `${formatted_date}: ${message}`;
+    }
+
     /**
      * Utility function that will check if the supplied string is defined and conforms to the following regex pattern: /[a-zA-Z0-9()\[\]'":/.,{} ]{1,1000}/g.
      * @param message string that defines the message we want to write to a log file.
@@ -78,7 +103,7 @@ export default class Logger {
      * @param error string containing the error message
      * @returns nothing 
      */
-    public async logError(error: string) {
+    public async logDiscordError(error: string) {
         if (!this.validateStringIsDefinedAndConformsToRegex(error)) {
             console.error(`The error message that we want to write to the Discord error messages text channel is undefined or null`);
             return;
@@ -105,9 +130,9 @@ export default class Logger {
      * @param error string containing the log message
      * @returns nothing 
      */
-    public async logMessage(message: string) {
+    public async logDiscordMessage(message: string) {
         if (!this.validateStringIsDefinedAndConformsToRegex(message)) {
-            console.error(`The information message to write to the message log file is undefined`);
+            console.error(`The information message to write to the message log Discord channel is undefined`);
             return;
         }
         
@@ -123,5 +148,16 @@ export default class Logger {
         } catch (error) {
             console.error(`There was an error when attempting to write to the messages log file: ${message}`);
         }
+    }
+
+    public async getWebsiteLogMessage(message: string) {
+        if (!this.validateStringIsDefinedAndConformsToRegex(message)) {
+            console.error(`The information message to write to the bot website contains invalid characters. Please inform the server administrator if you believe this is an error`);
+            return;
+        }
+
+        const formatted_information_message_string = this.formatLogMessageToRelativeDate(message);
+
+        return formatted_information_message_string;
     }
 }

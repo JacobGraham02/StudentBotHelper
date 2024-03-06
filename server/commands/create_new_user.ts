@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, User } from 'discord.js';
 import { randomUUID } from 'crypto';
-import StudentRepository from '../database/StudentRepository';
+import StudentRepository from '../database/MySQL/StudentRepository';
 import Student from '../entity/Student';
 import { hashPassword } from '../modules/hashAndValidatePassword';
 import Cache from '../utils/Cache';

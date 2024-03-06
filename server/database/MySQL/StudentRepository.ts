@@ -2,9 +2,9 @@ import * as dotenv from 'dotenv';
 import 'dotenv/config';
 dotenv.config({path: './.env'});
 import { UUID } from "crypto";
-import Student from "../entity/Student";
+import Student from "../../entity/Student";
 import { IStudentRepository } from "./IStudentRepository";
-import { hashPassword } from "../modules/hashAndValidatePassword";
+import { hashPassword } from "../../modules/hashAndValidatePassword";
 import DatabaseConnectionManager from "./DatabaseConnectionManager";
 import IDatabaseConfig from "./IDatabaseConfig";
 

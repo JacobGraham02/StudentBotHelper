@@ -1,10 +1,10 @@
 import { ActionRowBuilder, ComponentType, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
-import CommonClassRepository from '../database/CommonClassRepository';
+import CommonClassRepository from '../database/MySQL/CommonClassRepository';
 import CommonClass from '../entity/CommonClass';
 import { StringSelectMenuOptionBuilder } from '@discordjs/builders';
 import CommonClassWork from '../entity/CommonClassWork';
 import { randomUUID } from 'crypto';
-import CommonClassWorkRepository from '../database/CommonClassWorkRepository';
+import CommonClassWorkRepository from '../database/MySQL/CommonClassWorkRepository';
 
 export default function() {
     const create_common_class_work_object: Object = {

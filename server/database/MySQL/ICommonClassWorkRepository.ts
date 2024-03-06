@@ -1,5 +1,5 @@
 import { UUID } from 'crypto';
-import CommonClassWork from '../entity/CommonClassWork';
+import CommonClassWork from '../../entity/CommonClassWork';
 
 export interface ICommonClassWorkRepository {
     findAll(): Promise<CommonClassWork[] | undefined>;

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import CustomEventEmitter from '../utils/CustomEventEmitter';
 import CommonClass from '../entity/CommonClass';
-import CommonClassRepository from '../database/CommonClassRepository';
+import CommonClassRepository from '../database/MySQL/CommonClassRepository';
 
 export default function() {
     const create_guild_event_object: Object = {
