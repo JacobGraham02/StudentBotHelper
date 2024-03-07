@@ -101,6 +101,10 @@ bot_commands_router.post('/registerCommands', initializeDiscordApiFunctionsMiddl
     }
 });
 
+bot_commands_router.post('/testroute', function(request: Request, response: Response, next: NextFunction) {
+    response.status(200).json({ content: `This is the test API route page` });
+});
+
 /**
  * When the API endpoint '/registerCommands' is triggered, this routing function will do the following:
  *  1. Use middleware to determine if both the Logger and DiscordAPIOperations classes are truthy
