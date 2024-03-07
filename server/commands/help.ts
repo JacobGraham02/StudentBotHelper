@@ -1,28 +1,53 @@
 import { SlashCommandBuilder } from 'discord.js';
 
 export default function() {
-    const generate_help_message: Object = {
+    const generate_help_message_object: Object = {
         data: new SlashCommandBuilder()
             .setName('help')
             .setDescription('Lists all available bot commands'),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
-            const commands_list_strings: string[] = [
-                "**1. /create-group - This command is used to create a private DM group for up to 4 people including yourself**",
-                "**2. /create-common-class-work - This command is used by the server administrator to create class work that is common to most other students**",
-                "**3. /create-common-class - This command is used by the server administrator to create a class that is common to most other students**",
-                "**4. /create-discord-guild-event - This command is used by the server administrator to generate a Discord event that shows every user when classes occur that day**",
-                "**5. /create-group - This command is used by any user to create a private group within the server for themself and up to four other players**",
-                "**6. /placeinfo - This command is used to generate information about a location of your choosing**",
-                "**7. /create-user - This command is used to create a new user that is registered with our discord server bot**",
-                "**8. /create-private-thread - This command is used to create a private thread inside of a discord channel for you only. You can later add others to the group**",
-                "**9. /delete-user - This command is used to delete a user from the discord bot. You can only use this command on yourself**",
-                "**10. /hello-world - Generates a nice hello world message with instructions on how to get started (generating this 'help' list)**",
-                "**11. /help - Generates this same list again!**"
-            ];
-            await interaction.reply({content:`**Available Commands:**\n${commands_list_strings.join('\n')}`,ephemeral:true});
+            const is_user_admin: boolean = interaction.member.roles.cache.some(role => role.name === `Discord admin`);
+            let command_list: string[] = [];
+
+            if (is_user_admin) {
+                command_list = [
+                    "**Admin specific commands:**",
+                    "**1. /create-website-user - Creates a website user that will be able to log into the bot website and customize their own Discord bot**",
+                    "**2. /delete-website-user - Deletes a website user**",
+                    "**3. /create-bot-role-button - Adds a button which allows users to grant themselves access to using bot commands**",
+                    "**4. /change-bot-username - Changes the username of the bot (rate limited to twice per hour)**",
+                    "**Regular user commands:**",
+                    "**1. /help - Generates this same list of commands again**",
+                    "**2. /hello-world - Generates a nice 'hello world' message with instructions on how to get started using the bot**",
+                    "**3. /create-dm-group - Creates a private DM (Direct Message) group between yourself and up to three others**",
+                    "**4. /create-thread - Creates private thread for yourself**",
+                    "**5. /create-voice-channel - Creates a public voice channel**",
+                    "**6. /create-class - Creates a class that is running this semester**",
+                    "**7. /create-class-work - Creates a work item that can be assigned to a class**",
+                    "**8. /create-scheduled-event - Creates scheduled events in Discord that globally inform users of the classes occurring on that day**",
+                    "**9. /show-classes - Generates a list of all the details for classes which are occurring this semester**",
+                ]; 
+            } else {
+                command_list = [
+                    "**1. /help - Generates this same list of commands again**",
+                    "**2. /hello-world - Generates a nice 'hello world' message with instructions on how to get started using the bot**",
+                    "**3. /create-dm-group - Creates a private DM (Direct Message) group between yourself and up to three others**",
+                    "**4. /create-thread - Creates private thread for yourself**",
+                    "**5. /create-voice-channel - Creates a public voice channel**",
+                    "**6. /create-class - Creates a class that is running this semester**",
+                    "**7. /create-class-work - Creates a work item that can be assigned to a class**",
+                    "**8. /create-scheduled-event - Creates scheduled events in Discord that globally inform users of the classes occurring on that day**",
+                    "**9. /show-classes - Generates a list of all the details for classes which are occurring this semester**"
+                ];
+            }
+            try {
+                await interaction.reply({content:`**Available Commands:**\n${command_list.join('\n')}`,ephemeral:true});
+            } catch (error) {
+                await interaction.reply({content:`There was an error when writing the list of available commands to Discord`,ephemeral:true});
+            }
         }
     }
-    return generate_help_message;
+    return generate_help_message_object;
 }

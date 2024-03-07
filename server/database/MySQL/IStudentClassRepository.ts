@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import StudentClass from "../entity/StudentClass";
+import StudentClass from "../../entity/StudentClass";
 
 export default interface IStudentClassRepository {
     findAll(): Promise<StudentClass[] | undefined>

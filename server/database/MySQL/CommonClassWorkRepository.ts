@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import CommonClassWork from "../entity/CommonClassWork";
+import CommonClassWork from "../../entity/CommonClassWork";
 import DatabaseConnectionManager from "./DatabaseConnectionManager";
 import { ICommonClassWorkRepository } from "./ICommonClassWorkRepository";
 import IDatabaseConfig from "./IDatabaseConfig";

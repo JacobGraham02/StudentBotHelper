@@ -77,6 +77,7 @@ export default class DiscordAPIOperations {
                     message: `The application encountered an error when registering commands with the Discord bot. All environment variables are valid.`,
                     error: `${error}`
                 });
+                throw error;
             });
         });
     }
@@ -125,6 +126,7 @@ export default class DiscordAPIOperations {
                 message: `There was an error when attempting to change the Discord bot username`,
                 error: error
             });
+            throw error;
         }
     }
 
@@ -166,6 +168,7 @@ export default class DiscordAPIOperations {
             response.status(500).json({
                 message: `There was an internal server error when attempting to update the Discord bot avatar. Please inform the site administrator of this error`
             });
+            throw error;
         }
     }
 

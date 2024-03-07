@@ -1,5 +1,5 @@
 import { UUID } from 'crypto';
-import Student from '../entity/Student';
+import Student from '../../entity/Student';
 
 /**
  * An interface containing all of the basic CRUD functions which you would expect for an entity class that represents a user

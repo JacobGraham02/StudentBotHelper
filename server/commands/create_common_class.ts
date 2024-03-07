@@ -1,20 +1,20 @@
 import { SlashCommandBuilder } from 'discord.js';
-import CommonClassRepository from '../database/CommonClassRepository';
+import CommonClassRepository from '../database/MySQL/CommonClassRepository';
 import CommonClass from '../entity/CommonClass';
 import { randomUUID } from 'crypto';
 
 export default function() {
     const create_common_class_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-common-class')
-        .setDescription('Use this command to create a private thread for yourself.')
+        .setName('create-class')
+        .setDescription('Use this command to create a class.')
         .addStringOption(options =>
             options.setName('class_name')
-            .setDescription('(Required) Class course name')
+            .setDescription('(Required) Class course name (e.g. Advanced Database)')
             .setRequired(true))
         .addStringOption(options => 
             options.setName('class_course_code')    
-            .setDescription('(Required) Class course code')
+            .setDescription('(Required) Class course code (e.g. comp2006)')
             .setRequired(true))
         .addStringOption(option => 
             option.setName('class_start_time')
@@ -45,7 +45,7 @@ export default function() {
             .setDescription('(Required) true or false')
             .setRequired(true)
         ),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const common_class_repository:CommonClassRepository = new CommonClassRepository();
@@ -81,9 +81,10 @@ export default function() {
             
             try {
                 await common_class_repository.create(common_class);
-                await interaction.reply({content:`A common class that all students have in common was created successfully`,ephemeral: true});
+                await interaction.reply({content:`A class was created successfully`,ephemeral: true});
             } catch (error) {
-                await interaction.reply({content:`The bot was unable to create a student class. Please try the command again or inform the bot developer of this error: ${error}`});
+                await interaction.reply({content:`The bot was unable to create a student class. Please try the command again or inform the server administrator of this error: ${error}`});
+                throw error;
             }            
         }
     }

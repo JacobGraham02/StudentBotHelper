@@ -54,10 +54,10 @@ export default class CustomEventEmitter extends EventEmitter {
      * @param day_of_week string value representing the current day of the week. 
      * @returns nothing if common_classes is undefined. 
      */
-    emitGuildEventCreationMessage(common_classes: CommonClass[] | undefined, day_of_week: string) {
+    emitGuildEventCreationMessage(common_classes: CommonClass[] | undefined) {
         if (common_classes === undefined) {
             return;
         }
-        this.emit('createDiscordGuildEvent', common_classes, day_of_week);
+        this.emit('createDiscordGuildEvent', common_classes);
     }
 }

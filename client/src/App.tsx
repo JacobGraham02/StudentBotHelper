@@ -22,6 +22,7 @@ import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import CommandsPage from "./pages/CommandsPage.js";
+import ConfigurationsOptionsPage from './pages/ConfigurationOptionsPage.js'
 
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: 'commands',
         element: <CommandsPage />
+      },
+      {
+        path: 'configurations',
+        element: <ConfigurationsOptionsPage />
       },
       {
         path: "home",

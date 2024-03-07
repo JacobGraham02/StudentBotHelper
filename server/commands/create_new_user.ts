@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, User } from 'discord.js';
 import { randomUUID } from 'crypto';
-import StudentRepository from '../database/StudentRepository';
+import StudentRepository from '../database/MySQL/StudentRepository';
 import Student from '../entity/Student';
 import { hashPassword } from '../modules/hashAndValidatePassword';
 import Cache from '../utils/Cache';
@@ -8,8 +8,8 @@ import Cache from '../utils/Cache';
 export default function() {
     const create_new_user_object: Object = {
         data: new SlashCommandBuilder()
-            .setName('create-user')
-            .setDescription('Use this command to create a new user for yourself')
+            .setName('create-website-user')
+            .setDescription('Use this command to create a new user that will allow a user to log in to the website')
             .addStringOption(options =>
                 options.setName('username')
                 .setDescription('(Required) your username')
@@ -19,6 +19,7 @@ export default function() {
                 .setDescription('(Required) your password')
                 .setRequired(true)
             ),
+            
         authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
@@ -51,9 +52,14 @@ export default function() {
                 undefined,
                 undefined);
             
-            await student_repository.create(student_for_database);
-            student_cache.clear(discord_user_username);
-            interaction.reply({content:`An account has been created for you. Remember to save your login credentials somewhere safe`,ephemeral: true});
+            try {
+                await student_repository.create(student_for_database);
+                student_cache.clear(discord_user_username);
+                await interaction.reply({content:`An account has been created for you. Remember to save your login credentials somewhere safe`,ephemeral: true});
+            } catch (error) {
+                await interaction.reply({content: `There was an error when attempting to create an account for a user: ${error}`,ephemeral:true});
+                throw error;
+            }
         }
     }
     return create_new_user_object;

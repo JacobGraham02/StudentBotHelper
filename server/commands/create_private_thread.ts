@@ -1,11 +1,11 @@
-import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, User } from 'discord.js';
-import StudentRepository from '../database/StudentRepository';
+import { ChannelType, SlashCommandBuilder, ThreadAutoArchiveDuration, ThreadChannel } from 'discord.js';
+import StudentRepository from '../database/MySQL/StudentRepository';
 import Cache from '../utils/Cache';
 
 export default function() {
     const create_private_thread_object: Object = {
         data: new SlashCommandBuilder()
-        .setName('create-private-thread')
+        .setName('create-thread')
         .setDescription('Use this command to create a private thread for yourself.')
         .addStringOption(options =>
             options.setName('username')
@@ -20,13 +20,14 @@ export default function() {
             .setDescription('(Required) The first user for the thread')
             .setRequired(true)
         ),
-        authorization_role_name: ["Discord admin"],
+        authorization_role_name: ["Discord admin", "Bot user"],
 
         async execute(interaction) {
             const student_repository: StudentRepository = new StudentRepository();
             const discord_user_username: string = interaction.user.username;
             const channel_to_create_thread = interaction.channel;
             const student_cache: Cache = Cache.getCacheInstance();
+            let private_text_thread: any;
 
             let existing_student = student_cache.get(discord_user_username);
 
@@ -36,18 +37,24 @@ export default function() {
                 if (existing_student) {
                     student_cache.set(discord_user_username, existing_student);
                 } else {
-                    interaction.reply({content:`Please register a user account using the command /create-user`,ephemeral:true});
+                    interaction.reply({content:`Please contact the server administrator and ask to have an account created for you`,ephemeral:true});
                     return;
                 }
             }
 
-            const private_text_thread = await channel_to_create_thread.threads.create({
-                name: `Private thread for ${discord_user_username}`,
-                autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
-                type: ChannelType.PrivateThread,
-                reason: `This thread is a private thread for ${discord_user_username}`
-            });
-            interaction.reply({content:`The private thread ${private_text_thread} has been created for you`,ephemeral:true});
+            try {
+                private_text_thread = await channel_to_create_thread.threads.create({
+                    name: `Private thread for ${discord_user_username}`,
+                    autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
+                    type: ChannelType.PrivateThread,
+                    reason: `Private thread for ${discord_user_username}`
+                });
+            } catch (error) {
+                await interaction.reply({content:`There was an error when creating the private text thread ${private_text_thread}: ${error}`});
+                throw error;
+            }
+                
+            await interaction.reply({content:`The private thread ${private_text_thread} has been created for you`,ephemeral:true});
 
             if (private_text_thread) {
                 student_cache.set(discord_user_username+`Logged in`, true);

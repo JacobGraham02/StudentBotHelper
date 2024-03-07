@@ -1,5 +1,5 @@
 import { UUID } from 'crypto';
-import CommonClass from '../entity/CommonClass';
+import CommonClass from '../../entity/CommonClass';
 
 export interface ICommonClassRepository {
     findAll(): Promise<CommonClass[] | undefined>;
