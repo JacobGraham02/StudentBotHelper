@@ -10,7 +10,7 @@ const ConfigurationPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                 </p>
 
                 <section className="bot_configuration_options_form_section">
-                    <form id="bot_configuration_options_form" method="POST" action="/api/testroute">
+                    <form id="bot_configuration_options_form" method="POST" action="http://localhost:8080/api/testroute">
                         <fieldset className="bot_configuration_options_form_fieldset">
                             <label className="bot_configuration_options_label" htmlFor="bot_configurations_discord_guild_id_input"/>
                             <input className="bot_configuration_options_input" type="text" name="bot_configurations_discord_guild_id_input"

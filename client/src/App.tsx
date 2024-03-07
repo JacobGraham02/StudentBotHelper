@@ -89,24 +89,3 @@ function App() {
 }
 
 export default App;
-
-/* <Routes>
-        <Route
-          path="/login"
-          element={
-            <Layout
-              pageTitle="My page title"
-              pageLayoutContent={<LoginPage />}
-            />
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <Layout
-              pageTitle="My page title"
-              pageLayoutContent={<LandingPage />}
-            />
-          }
-        />
-      </Routes> */
