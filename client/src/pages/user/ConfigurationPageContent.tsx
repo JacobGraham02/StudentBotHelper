@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 
 import { useNavigate } from "react-router-dom";
+import { postBotConfigurations } from "../../services/bot/index";
 
 type ConfigurationForm = {
   guildId: {
@@ -134,8 +135,18 @@ const ConfigurationPageContent = ({
   const onSubmitHandler = (e) => {
     e.preventDefault();
 
+    const configurationResponse = postBotConfigurations({
+      guildId: configurationData.guildId.value,
+      commandChannelId: configurationData.commandChannelId.value,
+      buttonChannelId: configurationData.buttonChannelId.value,
+      botInfoChannelId: configurationData.botInfoChannelId.value,
+      botErrorChannelId: configurationData.botErrorChannelId.value,
+    });
+
     // Had validations
     console.log(configurationData);
+
+    console.log(configurationResponse);
   };
 
   if (userLoggedIn) {
