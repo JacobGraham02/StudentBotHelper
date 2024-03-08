@@ -3,7 +3,7 @@ import { instance } from "../index";
 export const requestUserGithub = async (code: string) => {
   try {
     console.log(instance);
-    const response = await instance.post("user/oauth/github", {
+    const response = await instance.post("users/oauth/github", {
       code,
     });
 
@@ -15,7 +15,7 @@ export const requestUserGithub = async (code: string) => {
 
 export const registerUser = async (userData) => {
   try {
-    const response = await instance.post("user/register", userData);
+    const response = await instance.post("users/register", userData);
 
     return response.data;
   } catch (error) {
@@ -26,7 +26,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (userData) => {
   try {
-    const response = await instance.post("user/login", userData);
+    const response = await instance.post("users/login", userData);
 
     return response.data;
   } catch (error) {

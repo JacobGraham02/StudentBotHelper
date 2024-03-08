@@ -453,6 +453,13 @@ custom_event_emitter.on(
 
 const app = express();
 
+app.use((req, res, next) => {
+  console.log(
+    `${new Date().toISOString()} - ${req.method} request to ${req.url}`
+  );
+  next(); // Continue to the next middleware or route handler
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -461,14 +468,14 @@ app.use(express.static(path.join(__dirname, "../public")));
 const corsOptions = {
   origin: "http://localhost:5173",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  credentials: true,
+  // credentials: true,
   optionsSuccessStatus: 204,
 };
 app.use(cors(corsOptions));
 
-app.use("/", indexRouter);
-app.use("/user", userRouter);
-app.use("/api", apiRouter);
+app.use("/api/users", userRouter);
+app.use("/api/bot", apiRouter);
+app.use("/api", indexRouter);
 
 /**
  * Catch any 404 errors and forward them to the error handler

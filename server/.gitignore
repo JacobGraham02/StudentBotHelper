@@ -4,3 +4,4 @@ azure_database_login_student_helper_bot
 DigiCertGlobalRootCA.crt.pem
 dist
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+.DS_Store
