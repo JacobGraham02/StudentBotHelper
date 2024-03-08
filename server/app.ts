@@ -21,23 +21,27 @@ import {
 /*
 Imports from Custom classes
 */
-import indexRouter from './api/routes/index.js';
-import userRouter from './api/routes/user.js';
-import apiRouter from './api/routes/botapi.js';
-import CustomDiscordClient from './utils/CustomDiscordClient.js';
-import CustomEventEmitter from './utils/CustomEventEmitter.js';
-import { EmbedBuilder } from '@discordjs/builders';
-import CommonClassWorkRepository from './database/MySQL/CommonClassWorkRepository.js';
-import CommonClass from './entity/CommonClass.js';
-import { formatDatetimeValue, formatTimeValue } from './utils/NormalizeDatetimeAndTimeValue.js';
-import IDatabaseResponseObject from './utils/IDiscordDatabaseResponse.js';
-import IDiscordEventData from './utils/IDiscordEventData.js';
-import DiscordEvent from './utils/DiscordEvent.js';
+import indexRouter from "./api/routes/index.ts";
+import userRouter from "./api/routes/user.ts";
+import apiRouter from "./api/routes/botapi.ts";
+import CustomDiscordClient from "./utils/CustomDiscordClient.ts";
+import CustomEventEmitter from "./utils/CustomEventEmitter.ts";
+import { EmbedBuilder } from "@discordjs/builders";
+import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository.ts";
+import CommonClass from "./entity/CommonClass.ts";
+import {
+  formatDatetimeValue,
+  formatTimeValue,
+} from "./utils/NormalizeDatetimeAndTimeValue.ts";
+import IDatabaseResponseObject from "./utils/IDiscordDatabaseResponse.ts";
+import IDiscordEventData from "./utils/IDiscordEventData.ts";
+import DiscordEvent from "./utils/DiscordEvent.ts";
 const server_port: string | undefined = process.env.port;
-import handleButtonInteraction from './modules/handleButtonInteraction.js';
-import CommonClassWork from "./entity/CommonClassWork.js";
-import Logger from "./utils/Logger.js";
-const common_class_work_repository: CommonClassWorkRepository = new CommonClassWorkRepository();
+import handleButtonInteraction from "./modules/handleButtonInteraction.ts";
+import CommonClassWork from "./entity/CommonClassWork.ts";
+import Logger from "./utils/Logger.ts";
+const common_class_work_repository: CommonClassWorkRepository =
+  new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -48,7 +52,11 @@ const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   ],
   discord_commands: Collection<any, any>,
 });
-const logger: Logger = new Logger(process.env.discord_bot_information_messages_channel_id, process.env.discord_bot_error_messages_channel_id, discord_client_instance);
+const logger: Logger = new Logger(
+  process.env.discord_bot_information_messages_channel_id,
+  process.env.discord_bot_error_messages_channel_id,
+  discord_client_instance
+);
 /*
 Variables defined in the application .env file
 */
@@ -120,7 +128,6 @@ discord_client_instance.on("ready", async () => {
  *
  */
 discord_client_instance.on("interactionCreate", async (interaction) => {
-  
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
   }
@@ -176,13 +183,15 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
         content: `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
         ephemeral: true,
       });
-    } 
+    }
   } else {
     await interaction.reply({
       content: `You do not have permission to execute the command ${command.data.name}. Please inform the server administrator if you believe this is an error`,
       ephemeral: true,
     });
-    logger.logDiscordError(`The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`);
+    logger.logDiscordError(
+      `The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`
+    );
   }
 });
 
@@ -217,7 +226,9 @@ custom_event_emitter.on(
       process.env.discord_bot_http_response_channel_id;
 
     if (!discord_channel_for_operation_results) {
-      logger.logDiscordError(`The discord channel id for database operation results to be stored could not be resolved`);
+      logger.logDiscordError(
+        `The discord channel id for database operation results to be stored could not be resolved`
+      );
       throw new Error(
         `The discord channel id for database operation results to be stored could not be resolved`
       );
@@ -241,7 +252,9 @@ custom_event_emitter.on(
       discord_channel_for_messages.send({
         embeds: [database_operation_embedded_message],
       });
-      logger.logDiscordMessage(`The database operation has been successfully recorded`)
+      logger.logDiscordMessage(
+        `The database operation has been successfully recorded`
+      );
     }
   }
 );
@@ -262,7 +275,9 @@ custom_event_emitter.on(
     const discord_channel_for_class_data_results =
       process.env.discord_bot_command_channel_id;
     if (!discord_channel_for_class_data_results) {
-      logger.logDiscordError(`The discord channel id for showing classes this semester could not be resolved`)
+      logger.logDiscordError(
+        `The discord channel id for showing classes this semester could not be resolved`
+      );
       throw new Error(
         `The discord channel id for showing classes this semester could not be resolved.`
       );
@@ -325,24 +340,23 @@ custom_event_emitter.on(
       );
       if (class_work_array) {
         class_work_array.forEach((class_work_document) => {
-            const class_work_document_due_date: string = formatDatetimeValue(
-                class_work_document.homework_due_date.toString()
-            );
-            class_in_schedule_embedded_message.addFields(
-                {
-                    name: `${class_work_document.homework_name}`,
-                    value: `Due on ${class_work_document_due_date}`,
-                    inline: true
-                },
-                {
-                    name: `Work notes`,
-                    value: `${class_work_document.homework_notes}`,
-                    inline: true
-                }
-            );
+          const class_work_document_due_date: string = formatDatetimeValue(
+            class_work_document.homework_due_date.toString()
+          );
+          class_in_schedule_embedded_message.addFields(
+            {
+              name: `${class_work_document.homework_name}`,
+              value: `Due on ${class_work_document_due_date}`,
+              inline: true,
+            },
+            {
+              name: `Work notes`,
+              value: `${class_work_document.homework_notes}`,
+              inline: true,
+            }
+          );
         });
-    }
-    
+      }
 
       /*
       Must pass the message as a parameter value for the 'embeds' property, to indicate the message is an instance of EmbedBuilder
@@ -430,7 +444,9 @@ custom_event_emitter.on(
         ++number_of_events_created;
         discordEventClassInstance.createNewDiscordEvent(discord_event_data);
       }
-      logger.logDiscordMessage(`A total of ${number_of_events_created} class events have been created`);
+      logger.logDiscordMessage(
+        `A total of ${number_of_events_created} class events have been created`
+      );
     }
   }
 );
@@ -443,11 +459,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "../public")));
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  origin: "http://localhost:5173",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   credentials: true,
-  optionsSuccessStatus: 204
-}
+  optionsSuccessStatus: 204,
+};
 app.use(cors(corsOptions));
 
 app.use("/", indexRouter);
