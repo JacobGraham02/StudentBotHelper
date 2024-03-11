@@ -1,10 +1,15 @@
-import LandingPageContent from '../components/LandingPageContent/LandingPageContent';
+
+import LandingPageContent from './user/LandingPageContent';
 import Layout from '../components/Layout/Layout';
 
-const LandingPage = ({ isUserLoggedIn }: { isUserLoggedIn: boolean }) => {
-    return (
-        <Layout pageTitle="Welcome to Student Bot Helper!" pageLayoutContent={<LandingPageContent userLoggedIn={isUserLoggedIn}/>}></Layout>
-    )
-}
+
+const LandingPage = () => {
+  return (
+    <Layout
+      pageTitle="Welcome to Student Bot Helper!"
+      pageLayoutContent={<LandingPageContent userLoggedIn={false} />}
+    ></Layout>
+  );
+};
 
 export default LandingPage;

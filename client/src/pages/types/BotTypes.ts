@@ -1,3 +1,5 @@
+import { UUID} from "crypto";
+
 export type BotConfiguration = {
     guildId: string;
     commandChannelId: string;
@@ -5,20 +7,30 @@ export type BotConfiguration = {
     botInfoChannelId: string;
     botErrorChannelId: string;
 };
-  
-export type CommandOption = {
-    command_option_name: string,
-    command_option_description: string,
-    command_option_required: boolean
-};
+
+export type Bot = {
+  botId: UUID;
+  botEmail: string;
+  botPassword: string;
+}
   
 export type BotCommand = {
-    name: string,
-    description: string,
-    command_option: CommandOption[];
-    authorization_role_name: string[];
-    execute_function_body: Function;
+    commandName: string,
+    commandDescription: string,
+    commandDescriptionForFunction: string;
+    commandAuthorizedUsers: string[];
 };
+
+export type LogsForm = {
+  infoLog: {
+    name: string;
+    uri: string;
+  }
+  errorLog: {
+    name: string;
+    uri: string;
+  }
+}
 
 export type CommandsForm = {
     commandName: {
@@ -33,31 +45,40 @@ export type CommandsForm = {
       touched: boolean;
       error: string;
     };
-    commandRequired: {
-      value: boolean;
-      valid: boolean;
-      touched: boolean;
-      error: string;
-    };
-    commandOptions: {
-        value: CommandOption[];
+    commandAuthorizedUser: {
+        value: string;
         valid: boolean;
         touched: boolean;
         error: string;
     };
-    authorizedRoleName: {
-        value: string[];
-        valid: boolean;
-        touched: boolean;
-        error: string;
+    commandDescriptionForFunction: {
+      value: string,
+      error: string,
+      valid: boolean,
+      touched: boolean
     };
-    commandExecute: {
-        value: Function;
-        valid: boolean;
-        touched: boolean;
-        error: string;
-    }
+
+    commandAuthorizedUsers: string[]
 };
+
+export type RegexPatterns = {
+  [key: string]: RegExp;
+}
+
+export type ProfileInfoForm = {
+  name: {
+    value: string;
+    valid: boolean;
+    touched: boolean;
+    error: string;
+  };
+  email: {
+    value: string;
+    valid: boolean;
+    touched: boolean;
+    error: string;
+  }
+}
 
 export type ConfigurationForm = {
     guildId: {

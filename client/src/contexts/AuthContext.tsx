@@ -1,11 +1,26 @@
-import React, { createContext, useReducer } from "react";
+import React, { useEffect, createContext, useReducer } from "react";
+import Cookies from "js-cookie";
+
+type BotCredentials = {
+  _id?: any;
+  bot_guild_id?: any;
+  bot_command_usage_error_channel?: any;
+  bot_command_usage_information_channel?: any;
+  bot_commands_channel?: any;
+  bot_email?: any;
+  bot_id?: any;
+  bot_password?: any;
+  bot_role_button_channel_id?: any;
+  bot_username?: any;
+}
 
 type UserAuthDetails = {
-  // Have to continue building this.
-  id: string;
-  username: string;
+  id: any;
+  token: string;
+  name: string;
   email: string;
-  refreshToken: string;
+  role: number;
+  bot: BotCredentials
 };
 
 type AuthProviderProps = {
@@ -16,16 +31,31 @@ type AuthContextType = {
   userAuthDetails: UserAuthDetails;
   login: (userDetails: UserAuthDetails) => void;
   logout: () => void;
+  isLoggedIn: () => boolean;
+  updateBotChannels: (channels: { [key: string]: any }) => void; 
 };
 
 const initialState: UserAuthDetails = {
   id: "",
-  username: "",
+  token: "",
+  name: "",
   email: "",
-  refreshToken: "",
+  role: 0,
+  bot: {
+    _id: null,
+    bot_guild_id: null,
+    bot_command_usage_error_channel: null,
+    bot_command_usage_information_channel: null,
+    bot_commands_channel: null,
+    bot_email: null,
+    bot_id: null,
+    bot_password: null,
+    bot_role_button_channel_id: null,
+    bot_username: null
+  },
 };
 
-type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" };
+type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" } | { type: "UPDATE_NAME"; payload: string } | { type: "UPDATE_BOT_CHANNEL"; payload: { [key: string]: any}};
 
 // Create reducer for CRUD actions
 const authReducer = (
@@ -36,7 +66,11 @@ const authReducer = (
     case "LOGIN":
       return { ...action.payload };
     case "LOGOUT":
-      return { id: "", username: "", email: "", refreshToken: "" };
+      return { id: "", token: "", name: "", email: "", role: 0, bot: {} };
+    case "UPDATE_NAME":
+      return { ...state, name: action.payload };
+    case "UPDATE_BOT_CHANNEL":
+      return { ...state, bot: { ...state.bot, ...action.payload } };
     default:
       return state;
   }
@@ -47,19 +81,59 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userAuthDetails, dispatch] = useReducer(authReducer, initialState);
 
+  const setAuthCookies = (userDetails: UserAuthDetails) => {
+    Cookies.set("userAuthDetails", JSON.stringify(userDetails), { expires: 7 });
+  };
+
+  const clearAuthCookies = () => {
+    Cookies.remove("userAuthDetails");
+  };
+
+  const isLoggedIn = (): boolean => {
+    return !!userAuthDetails.token;
+  };
+
   const login = (userDetails: UserAuthDetails) => {
     dispatch({ type: "LOGIN", payload: userDetails });
+    setAuthCookies(userDetails);
+  };
+  
+  const updateName = (name: string) => {
+    dispatch({ type: "UPDATE_NAME", payload: name });
+  };
+
+  const updateBotChannels = (channels: { [key: string]: any }) => {
+    dispatch({ type: "UPDATE_BOT_CHANNEL", payload: channels });
   };
 
   const logout = () => {
     dispatch({ type: "LOGOUT" });
+    clearAuthCookies();
   };
 
+  // Effect to initialize state from cookies
+  useEffect(() => {
+    const cookieData = Cookies.get("userAuthDetails");
+    if (cookieData) {
+      const userDetails = JSON.parse(cookieData);
+      dispatch({ type: "LOGIN", payload: userDetails });
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ userAuthDetails, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        userAuthDetails,
+        login,
+        logout,
+        isLoggedIn,
+        updateBotChannels
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export default AuthProvider;
