@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LoginForm = () => {
+const SupportPage = () => {
   
   const handleSubmit:  React.FormEventHandler<HTMLFormElement> = function(event: React.FormEvent<HTMLFormElement> ) {
     event.preventDefault();
@@ -36,4 +36,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default SupportPage;
