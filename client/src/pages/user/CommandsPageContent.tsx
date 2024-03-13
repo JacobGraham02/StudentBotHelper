@@ -168,17 +168,17 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
             <main id="main" className="text-center">
                 <aside id="bot_command_options_page_content">
                     <h1 id="bot_command_options_page_title">
-                        Bot command options
+                        Request  bot command
                     </h1>
                 </aside>
                 <p id="bot_command_options_page_message">
-                    Add commands to your Discord bot below:
+                    Request a command for your Discord bot below:
                 </p>
 
                 <section className="bot_command_options_form_section">
                     <Container>
                         <Form>
-                            <Row className="my-2">
+                            <Row className="my-2 text-start">
                                 <Col xs={12} md={6} className="my-2">
                                     <FormGroup>
                                         <FormLabel 
@@ -246,7 +246,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                 </Col>
                             </Row>
 
-                            <Row className="my-2">
+                            <Row className="my-2 text-start">
                                 <Col xs={12} md={6} className="my-2">
                                     <FormGroup>
                                         <FormLabel 
@@ -281,13 +281,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                               </Col>
                             </Row>
 
-                            {/* commandDescriptionForFunction */}
-
-                            <Button className="btn btn-primary" onClick={addAuthorizedUserField}>
-                                  Add additional authorized users
-                            </Button>
-
-                            <Row className="my-2">
+                            <Row className="my-2 text-start">
                               {commandData.commandAuthorizedUsers.map((user, index) => (
                                 <Col xs={12} md={6} className="my-2" key={index}>
                                   <FormGroup>
@@ -322,6 +316,10 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                 </Col>
                               ))}
                             </Row>
+
+                            <Button className="btn btn-primary" onClick={addAuthorizedUserField}>
+                                  Add additional authorized users
+                            </Button>
 
                             <Row className="my-1 justify-content-center">
                               <Col xs={6} md={3}>
