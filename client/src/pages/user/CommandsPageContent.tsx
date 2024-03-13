@@ -7,11 +7,10 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
-  Button,
-  FormCheck,
+  Button
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { CommandsForm } from "../types/BotTypes";
+import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotConfigurations } from "../../services/bot";
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
@@ -33,13 +32,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
 
-      commandRequired: {
-        value: false,
-        error: "Invalid command required option. Please enter either true or false",
-        valid: false,
-        touched: false
-      },
-
       commandOptions: { 
         value: [{
           command_option_name: "",
@@ -51,20 +43,12 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
      
-      authorizedRoleName: {
-        value: [
-          ""
-        ],
+      commandAuthorizedUser: {
+        value: "",
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
         valid: false,
         touched: false
-      },
-      commandExecute: {
-        value: "",
-        error: "",
-        valid: false,
-        touched: false
-      },
+      }
     }
   );
 
@@ -84,13 +68,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
 
-      commandRequired: {
-        value: false,
-        error: "Invalid command required option. Please enter either true or false",
-        valid: false,
-        touched: false
-      },
-
       commandOptions: { 
         value: [{
           command_option_name: "",
@@ -102,17 +79,9 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
      
-      authorizedRoleName: {
-        value: [
-          ""
-        ],
+      commandAuthorizedUser: {
+        value: "",
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
-        valid: false,
-        touched: false
-      },
-      commandExecute: {
-        value: Function,
-        error: "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters",
         valid: false,
         touched: false
       },
@@ -122,13 +91,21 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
   const onChangeHandler = (event: any) => {
     const { name, value } = event.target; // Destructure name and value from the event target
 
-    const commandNameRegexPattern = /^[a-zA-Z0-9]{1,32}$/;
-    const commandDescriptionRegexPattern = /^[a-zA-Z0-9]{1,100}$/;
-    const commandRoleRegexPattern = /^[a-zA-Z0-9]{1,50}$/;
-    const commandFunctionRegexPattern = /^[a-zA-Z0-9{}[];:'",<.>()!@#$%^&*]{1,1000}$/;
+    const regexPatterns: RegexPatterns = {
+      commandNameRegexPattern: /^[a-zA-Z0-9]{1,32}$/,
+      commandDescriptionRegexPattern: /^[a-zA-Z0-9]{1,100}$/,
+      commandAuthorizedUserRegexPattern: /^[a-zA-Z0-9]{1,50}$/
+    };
 
     let newValue = value;
-    let isValid = false; 
+    let isValid = false;
+
+    const inputFieldName = name + "RegexPattern";
+    const regexPattern = regexPatterns[inputFieldName];
+
+    if (regexPattern) {
+      isValid = regexPattern.test(value);
+    }
 
     // Update your form state here with newValue and isValid
     // Example:
@@ -146,6 +123,13 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
   const onSubmitHandler = (e: any) => {
     e.preventDefault();
+
+    const allFieldsValid = Object.values(commandData).every(field => field.valid);
+
+    if (!allFieldsValid) {
+      alert("Please correct the form errors shown on screen before submitting");
+      return;
+    }
 
   };
     if (userLoggedIn) {
@@ -168,7 +152,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                     <FormGroup>
                                         <FormLabel 
                                             className="command_name_label"
-                                            htmlFor="command_name_input"
+                                            htmlFor="commandName"
                                         >
                                             Command name
                                         </FormLabel>
@@ -177,7 +161,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                             type="text"
                                             onChange={onChangeHandler}
                                             value={commandData.commandName.value}
-                                            name="command_name_input"
+                                            name="commandName"
                                             placeholder="1-32 letters and/or numbers (e.g., Bot role 2)"
                                             pattern="[a-zA-Z0-9]{0,32}"
                                             title="Please enter 1-32 letters and/or numbers (e.g., Bot role 2)"
@@ -193,7 +177,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                            <FormControl.Feedback type="invalid">
                                             {commandData.commandName.error}
                                            </FormControl.Feedback>
-                                           )};
+                                          )}
                                     </FormGroup>
                                 </Col>
 
@@ -201,13 +185,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                   <FormGroup>
                                     <FormLabel
                                       className="command_description_label"
-                                      htmlFor="command_description_input"
+                                      htmlFor="commandDescription"
                                     >
+                                      Command description
                                     </FormLabel>
                                     <FormControl
                                       className="bot_command_description_input"
                                       type="text"
-                                      name="command_description_input"
+                                      name="commandDescription"
                                       placeholder="1-100 letters and/or numbers (e.g., This commands allows customization of a bot)"
                                       pattern="[a-zA-Z0-9]{0,100}"
                                       title="1-100 letters and.or numbers (e.g., This command allows customization of a bot)"
@@ -225,7 +210,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                       <FormControl.Feedback type="invalid">
                                         {commandData.commandDescription.error}
                                       </FormControl.Feedback>
-                                    )};
+                                    )}
                                   </FormGroup>
                                 </Col>
                             </Row>
@@ -234,64 +219,55 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                               <Col xs={12} md={6} className="my-2">
                                   <FormGroup>
                                       <FormLabel 
-                                          className="command_required_label"
-                                          htmlFor="commandRequired"
+                                          className="command_authorized_user_label"
+                                          htmlFor="commandAuthorizedUser"
                                       >
-                                          Command required
+                                          Authorized user
                                       </FormLabel>
-                                      <FormCheck 
-                                        id="commandRequired"
-                                        type="switch"
-                                        label={commandData.commandRequired.value ? 'Yes' : 'No'}
-                                        checked={commandData.commandRequired.value}
-                                        onChange={(e) => onChangeHandler({
-                                            target: {
-                                                name: 'command_required',
-                                                value: e.target.checked.toString(), 
-                                            }
-                                        })}
-                                        name="command_required"
+                                      <FormControl 
+                                        className="commandAuthorizedUser"
+                                        type="text"
+                                        name="commandAuthorizedUser"
+                                        placeholder="1-100 letters and/or numbers (e.g., Server bot administrator)"
+                                        pattern="[a-zA-Z0-9]{0,100}"
+                                        title="1-100 letters and/or numbers (e.g., Server bot administrator)"
+                                        required
+                                        onChange={onChangeHandler}
+                                        value={commandData.commandAuthorizedUser.value}
+                                        
                                         isInvalid={
-                                          commandData.commandRequired.touched && 
-                                          !commandData.commandRequired.valid
+                                          commandData.commandAuthorizedUser.touched &&
+                                          !commandData.commandAuthorizedUser.valid &&
+                                          commandData.commandAuthorizedUser.value.length > 0
                                         }
-                                      />
-                                        {commandData.commandRequired.error && !commandData.commandRequired.valid && (
+                                        />
+                                        {commandData.commandAuthorizedUser.error && 
+                                        commandData.commandAuthorizedUser.valid === false && (
                                             <FormControl.Feedback type="invalid">
-                                              {commandData.commandRequired.error}
+                                              {commandData.commandAuthorizedUser.error}
                                             </FormControl.Feedback>
                                         )}
                                   </FormGroup>
                               </Col>
                             </Row>
 
-                            <Row className="my-2">
-                                <Col xs={12} md={6} className="my-2">
-                                  <FormGroup>
-                                    <FormLabel
-                                      className="command_body"
-                                      htmlFor="commandExecute"
-                                    > 
-                                      Command function 
-                                    </FormLabel>
-                                    <FormControl
-                                      className="command_execute_input"
-                                      type="textarea"
-                                      name="commandExecute"
-                                      placeholder="1-1000 letters, numbers, and special characters to hold the function that will be executed"
-                                      pattern="[a-zA-Z0-9{}[];:',<.>()!@#$%^&*]{1,1000}$/</.>"
-                                      title="1-1000 letters, numbers, and special characters to hold the function that will be executed"
-                                      required
-                                      onChange={onChangeHandler}
-                                      value={commandData.commandExecute.value}
-                                      isInvalid={
-                                        commandData.commandExecute.touched &&
-                                        !commandData.commandExecute.valid &&
-                                        commandData.commandExecute.value.length > 0
-                                      }
-                                    />
-                                  </FormGroup>
-                                </Col>
+
+                            <Row className="my-1">
+                              <Col xs={3}>
+                                <Button variant="danger" onClick={() => navigate(-1)}>
+                                  Cancel
+                                </Button>
+                              </Col>
+                              <Col xs={4}>
+                                <Button variant="secondary" onClick={onClearHandler}>
+                                  Reset inputs
+                                </Button>
+                              </Col>
+                              <Col xs={5}>
+                                <Button variant="primary" onClick={onSubmitHandler}>
+                                  Submit changes
+                                </Button>
+                              </Col>
                             </Row>
                         </Form>
                     </Container>
