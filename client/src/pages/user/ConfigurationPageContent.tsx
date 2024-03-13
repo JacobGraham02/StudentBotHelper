@@ -315,17 +315,17 @@ const ConfigurationPageContent = ({
 
               <Row className="my-1">
                 <Col xs={3}>
-                  <Button variant="danger" onClick={() => navigate(-1)}>
+                  <Button className="btn btn-danger" onClick={() => navigate(-1)}>
                     Cancel
                   </Button>
                 </Col>
                 <Col xs={4}>
-                  <Button variant="secondary" onClick={onClearHandler}>
+                  <Button className="btn btn-secondary" onClick={onClearHandler}>
                     Reset inputs
                   </Button>
                 </Col>
                 <Col xs={5}>
-                  <Button variant="primary" onClick={onSubmitHandler}>
+                  <Button className="btn btn-info" onClick={onSubmitHandler}>
                     Submit changes
                   </Button>
                 </Col>

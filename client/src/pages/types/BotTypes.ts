@@ -45,6 +45,12 @@ export type CommandsForm = {
         touched: boolean;
         error: string;
     };
+    commandDescriptionForFunction: {
+      value: string,
+      error: string,
+      valid: boolean,
+      touched: boolean
+    };
 
     commandAuthorizedUsers: string[]
 };
