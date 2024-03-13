@@ -12,6 +12,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotConfigurations } from "../../services/bot";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBackwardFast } from "@fortawesome/free-solid-svg-icons/faBackwardFast";
+import { faBell, faEraser } from "@fortawesome/free-solid-svg-icons";
+
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const navigate = useNavigate();
@@ -90,14 +94,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
       commandDescriptionForFunction: {
         value: "",
-        error: "Invalid command function description. Please enter a description so the admins can create a command for you (a-z)",
+        error: "Invalid command description. Please enter a valid description so the admins can create a command for you (1 - 1000 characters a-z)",
         valid: false,
         touched: false
       },
      
       commandAuthorizedUser: {
         value: "",
-        error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
+        error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (1 - 50 characters a-z)",
         valid: false,
         touched: false
       },
@@ -121,10 +125,10 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
   const validateField = (name: string, value: string) => {
     const regexPatterns: RegexPatterns = {
-      commandNameRegexPattern: /^[a-zA-Z0-9]{1,32}$/,
-      commandDescriptionRegexPattern: /^[a-zA-Z0-9]{1,100}$/,
-      commandAuthorizedUserRegexPattern: /^[a-zA-Z0-9]{1,50}$/,
-      commandDescriptionForFunctionRegexPattern: /^[a-zA-Z0-9]{1,1000}$/
+      commandNameRegexPattern: /^[a-zA-Z0-9 ]{1,32}$/,
+      commandDescriptionRegexPattern: /^[a-zA-Z0-9 ]{1,100}$/,
+      commandAuthorizedUserRegexPattern: /^[a-zA-Z0-9 ]{1,50}$/,
+      commandDescriptionForFunctionRegexPattern: /^[a-zA-Z0-9 ]{1,1000}$/
     };
 
     const inputFieldName = name + "RegexPattern";
@@ -175,6 +179,24 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                     Request a command for your Discord bot below:
                 </p>
 
+                <Container>
+                  <Row className="my-1 justify-content-between mt-5">
+                    <Col xs="auto">
+                      <Button className="btn btn-danger" onClick={() => navigate(-1)}>
+                        <FontAwesomeIcon icon={faBackwardFast} className="mx-1"/>
+                        Cancel
+                      </Button>
+                    </Col>
+
+                    <Col xs="auto">
+                      <Button className="btn btn-secondary" onClick={onClearHandler}>
+                        <FontAwesomeIcon icon={faEraser} className="mx-1"/>
+                        Reset
+                      </Button>
+                    </Col>
+                  </Row>
+                </Container>
+
                 <section className="bot_command_options_form_section">
                     <Container>
                         <Form>
@@ -185,7 +207,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                             className="command_name_label"
                                             htmlFor="commandName"
                                         >
-                                            Command name
+                                            Name for your command
                                         </FormLabel>
                                         <FormControl
                                             id="bot_commands_name_input"
@@ -218,7 +240,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                       className="command_description_label"
                                       htmlFor="commandDescription"
                                     >
-                                      Command description
+                                      Description for your command
                                     </FormLabel>
                                     <FormControl
                                       className="bot_command_description_input"
@@ -247,22 +269,22 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                             </Row>
 
                             <Row className="my-2 text-start">
-                                <Col xs={12} md={6} className="my-2">
+                                <Col xs={12} md={6} className="my-2 w-100">
                                     <FormGroup>
                                         <FormLabel 
                                           className="command_name_label"
                                           htmlFor="commandDescriptionForFunction"
                                         >
-                                            Command function description
+                                            What do you want the command to do?
                                         </FormLabel>
                                         <FormControl
                                           id="bot_commands_name_input"
-                                          type="text"
+                                          as="textarea"
                                           onChange={onChangeHandler}
                                           value={commandData.commandDescriptionForFunction.value}
                                           name="commandDescriptionForFunction"
-                                          placeholder="1-32 letters and/or numbers (e.g., Bot role 2)"
-                                          pattern="[a-zA-Z0-9]{0,32}"
+                                          placeholder="1-1000 letters and/or numbers (e.g., I want the command that will respond to a user with 'Ping' if they use the command '/pong')"
+                                          pattern="[a-zA-Z0-9 ]{1,1000}"
                                           title="Please enter 1-32 letters and/or numbers (e.g., Bot role 2)"
                                           required
                                           isInvalid={
@@ -277,6 +299,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                           {commandData.commandDescriptionForFunction.error}
                                           </FormControl.Feedback>
                                         )}
+                                      
                                   </FormGroup>
                               </Col>
                             </Row>
@@ -321,19 +344,10 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                   Add additional authorized users
                             </Button>
 
-                            <Row className="my-1 justify-content-center">
-                              <Col xs={6} md={3}>
-                                <Button className="btn btn-danger" onClick={() => navigate(-1)}>
-                                  Cancel
-                                </Button>
-                              </Col>
-                              <Col xs={6} md={3}>
-                                <Button className="btn btn-secondary" onClick={onClearHandler}>
-                                  Reset
-                                </Button>
-                              </Col>
+                            <Row className="my-1 justify-content-center mt-5">
                               <Col xs={6} md={3}>
                                 <Button className="btn btn-info" onClick={onSubmitHandler}>
+                                  <FontAwesomeIcon icon={faBell} />
                                   Request command
                                 </Button>
                               </Col>
