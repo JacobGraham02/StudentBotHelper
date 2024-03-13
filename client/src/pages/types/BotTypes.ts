@@ -33,31 +33,31 @@ export type CommandsForm = {
       touched: boolean;
       error: string;
     };
-    commandRequired: {
-      value: boolean;
-      valid: boolean;
-      touched: boolean;
-      error: string;
-    };
     commandOptions: {
         value: CommandOption[];
         valid: boolean;
         touched: boolean;
         error: string;
     };
-    authorizedRoleName: {
-        value: string[];
+    commandAuthorizedUser: {
+        value: string;
         valid: boolean;
         touched: boolean;
         error: string;
     };
-    commandExecute: {
-        value: Function;
-        valid: boolean;
-        touched: boolean;
-        error: string;
-    }
+    commandDescriptionForFunction: {
+      value: string,
+      error: string,
+      valid: boolean,
+      touched: boolean
+    };
+
+    commandAuthorizedUsers: string[]
 };
+
+export type RegexPatterns = {
+  [key: string]: RegExp;
+}
 
 export type ConfigurationForm = {
     guildId: {

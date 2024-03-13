@@ -111,6 +111,13 @@ const ConfigurationPageContent = ({
   const onSubmitHandler = (e: any) => {
     e.preventDefault();
 
+    const allFieldsValid = Object.values(configurationData).every(field => field.valid);
+
+    if (!allFieldsValid) {
+      alert("Please correct the form errors shown on screen before submitting");
+      return;
+    }
+
     const configurationResponse = postBotConfigurations({
       guildId: configurationData.guildId.value,
       commandChannelId: configurationData.commandChannelId.value,
@@ -140,7 +147,7 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="discord_guild_id_input"
+                      htmlFor="guildId"
                     >
                       Guild id
                     </FormLabel>
@@ -149,15 +156,15 @@ const ConfigurationPageContent = ({
                       type="text"
                       onChange={onChangeHandler}
                       value={configurationData.guildId.value}
-                      name="discord_guild_id_input"
+                      name="guildId"
                       placeholder="18 digits (e.g., 123456789123456789)"
                       pattern="[0-9]{18}"
                       title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
                       required
                       isInvalid={
                         configurationData.guildId.touched &&
-                        configurationData.guildId.valid === false &&
-                        configurationData.guildId.value.length <= 0
+                        !configurationData.guildId.valid &&
+                        configurationData.guildId.value.length > 0
                       }
                     />
                      {configurationData.guildId.error &&
@@ -173,14 +180,14 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="discord_command_channel_input"
+                      htmlFor="commandChannelId"
                     >
                       Command channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
                       type="text"
-                      name="discord_command_channel_input"
+                      name="commandChannelId"
                       placeholder="18 digits (e.g., 123456789123456789)"
                       pattern="[0-9]{18}"
                       title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
@@ -189,7 +196,7 @@ const ConfigurationPageContent = ({
                       value={configurationData.commandChannelId.value}
                       isInvalid={
                         configurationData.commandChannelId.touched &&
-                        configurationData.commandChannelId.valid === false &&
+                        !configurationData.commandChannelId.valid &&
                         configurationData.commandChannelId.value.length > 0
                       }
                     />
@@ -208,14 +215,14 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="bot_role_button_channel_id_input"
+                      htmlFor="buttonChannelId"
                     >
                       Bot role button channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
                       type="text"
-                      name="bot_role_button_channel_id_input"
+                      name="buttonChannelId"
                       placeholder="18 digits (e.g., 123456789123456789)"
                       pattern="[0-9]{18}"
                       title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
@@ -224,7 +231,7 @@ const ConfigurationPageContent = ({
                       value={configurationData.buttonChannelId.value}
                       isInvalid={
                         configurationData.buttonChannelId.touched &&
-                        configurationData.buttonChannelId.valid === false &&
+                        !configurationData.buttonChannelId.valid &&
                         configurationData.buttonChannelId.value.length > 0
                       }
                       />
@@ -241,14 +248,14 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="information_messages_channel_id_input"
+                      htmlFor="botInfoChannelId"
                     >
                       Bot info messages channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
                       type="text"
-                      name="information_messages_channel_id_input"
+                      name="botInfoChannelId"
                       placeholder="18 digits (e.g., 123456789123456789)"
                       pattern="[0-9]{18}"
                       title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
@@ -257,7 +264,7 @@ const ConfigurationPageContent = ({
                       value={configurationData.botInfoChannelId.value}
                       isInvalid={
                         configurationData.botInfoChannelId.touched &&
-                        configurationData.botInfoChannelId.valid === false &&
+                        !configurationData.botInfoChannelId.valid &&
                         configurationData.botInfoChannelId.value.length > 0
                       }
                       />
@@ -276,14 +283,14 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="error_messages_channel_id_input"
+                      htmlFor="botErrorChannelId"
                     >
                       Bot error messages channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
                       type="text"
-                      name="error_messages_channel_id_input"
+                      name="botErrorChannelId"
                       placeholder="18 digits (e.g., 123456789123456789)"
                       pattern="[0-9]{18}"
                       title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
@@ -292,7 +299,7 @@ const ConfigurationPageContent = ({
                       value={configurationData.botErrorChannelId.value}
                       isInvalid={
                         configurationData.botErrorChannelId.touched &&
-                        configurationData.botErrorChannelId.valid === false &&
+                        !configurationData.botErrorChannelId.valid &&
                         configurationData.botErrorChannelId.value.length > 0
                       }
                       />
@@ -308,17 +315,17 @@ const ConfigurationPageContent = ({
 
               <Row className="my-1">
                 <Col xs={3}>
-                  <Button variant="danger" onClick={() => navigate(-1)}>
+                  <Button className="btn btn-danger" onClick={() => navigate(-1)}>
                     Cancel
                   </Button>
                 </Col>
                 <Col xs={4}>
-                  <Button variant="secondary" onClick={onClearHandler}>
+                  <Button className="btn btn-secondary" onClick={onClearHandler}>
                     Reset inputs
                   </Button>
                 </Col>
                 <Col xs={5}>
-                  <Button variant="primary" onClick={onSubmitHandler}>
+                  <Button className="btn btn-info" onClick={onSubmitHandler}>
                     Submit changes
                   </Button>
                 </Col>

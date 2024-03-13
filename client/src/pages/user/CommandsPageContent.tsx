@@ -7,11 +7,10 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
-  Button,
-  FormCheck,
+  Button
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { CommandsForm } from "../types/BotTypes";
+import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotConfigurations } from "../../services/bot";
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
@@ -33,13 +32,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
 
-      commandRequired: {
-        value: false,
-        error: "Invalid command required option. Please enter either true or false",
-        valid: false,
-        touched: false
-      },
-
       commandOptions: { 
         value: [{
           command_option_name: "",
@@ -51,20 +43,21 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
      
-      authorizedRoleName: {
-        value: [
-          ""
-        ],
+      commandAuthorizedUser: {
+        value: "",
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
         valid: false,
         touched: false
       },
-      commandExecute: {
-        value: Function,
-        error: "",
+
+      commandDescriptionForFunction: {
+        value: "",
+        error: "Invalid command function description. Please enter a description so the admins can create a command for you (a-z)",
         valid: false,
         touched: false
       },
+
+      commandAuthorizedUsers: [""]
     }
   );
 
@@ -84,13 +77,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
 
-      commandRequired: {
-        value: false,
-        error: "Invalid command required option. Please enter either true or false",
-        valid: false,
-        touched: false
-      },
-
       commandOptions: { 
         value: [{
           command_option_name: "",
@@ -101,61 +87,85 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         valid: false,
         touched: false
       },
+
+      commandDescriptionForFunction: {
+        value: "",
+        error: "Invalid command function description. Please enter a description so the admins can create a command for you (a-z)",
+        valid: false,
+        touched: false
+      },
      
-      authorizedRoleName: {
-        value: [
-          ""
-        ],
+      commandAuthorizedUser: {
+        value: "",
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
         valid: false,
         touched: false
       },
-      commandExecute: {
-        value: Function,
-        error: "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters",
-        valid: false,
-        touched: false
-      },
+
+      commandAuthorizedUsers: [""]
     });
   };
 
-  const onChangeHandler = (event) => {
-    const { name, value } = event.target; // Destructure name and value from the event target
+  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setCommandData(prevState => ({
+      ...prevState,
+      [name]: {
+        ...prevState[name],
+        value: value,
+        valid: validateField(name, value), // Validate dynamically added fields
+        touched: true
+      }
+    }));
+  };
 
-    const commandNameRegexPattern = /^[a-zA-Z0-9]{1,32}$/;
-    const commandDescriptionRegexPattern = /^[a-zA-Z0-9]{1,100}$/;
-    const commandRoleRegexPattern = /^[a-zA-Z0-9]{1,50}$/;
+  const validateField = (name: string, value: string) => {
+    const regexPatterns: RegexPatterns = {
+      commandNameRegexPattern: /^[a-zA-Z0-9]{1,32}$/,
+      commandDescriptionRegexPattern: /^[a-zA-Z0-9]{1,100}$/,
+      commandAuthorizedUserRegexPattern: /^[a-zA-Z0-9]{1,50}$/,
+      commandDescriptionForFunctionRegexPattern: /^[a-zA-Z0-9]{1,1000}$/
+    };
 
-    let newValue = value;
-    let isValid = false; 
+    const inputFieldName = name + "RegexPattern";
+    const regexPattern = regexPatterns[inputFieldName];
 
-    if (name === 'command_required') {
-        newValue = value === true; 
+    return regexPattern ? regexPattern.test(value) : false;
+  };
 
-        isValid = newValue === true || newValue === false;
-    }
 
-    // Update your form state here with newValue and isValid
-    // Example:
-    setCommandData({
-        ...commandData,
-        [name]: {
-            ...commandData[name],
-            value: newValue,
-            valid: isValid,
-            touched: true, // Mark as touched to show feedback if needed
-        },
-    });
-};
+  const onChangeAuthorizedUser = (index: number, value: string) => {
+    setCommandData(prevState => ({
+      ...prevState,
+      commandAuthorizedUsers: prevState.commandAuthorizedUsers.map((user, i) =>
+        i === index ? value : user
+      )
+    }));
+  };
 
+
+  const addAuthorizedUserField = () => {
+    setCommandData(prevState => ({
+      ...prevState,
+      commandAuthorizedUsers: [...prevState.commandAuthorizedUsers, ""]
+    }));
+  };
 
   const onSubmitHandler = (e: any) => {
     e.preventDefault();
+    const allFieldsValid = Object.values(commandData).every(field =>
+      Array.isArray(field) ? field.every(user => validateField("commandAuthorizedUser", user)) : field.valid
+    );
+
+    if (!allFieldsValid) {
+      alert("Please correct the form errors shown on screen before submitting");
+      return;
+    }
 
   };
     if (userLoggedIn) {
         return (
-            <main id="main">
+            <main id="main" className="text-center">
                 <aside id="bot_command_options_page_content">
                     <h1 id="bot_command_options_page_title">
                         Bot command options
@@ -173,7 +183,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                     <FormGroup>
                                         <FormLabel 
                                             className="command_name_label"
-                                            htmlFor="command_name_input"
+                                            htmlFor="commandName"
                                         >
                                             Command name
                                         </FormLabel>
@@ -182,15 +192,15 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                             type="text"
                                             onChange={onChangeHandler}
                                             value={commandData.commandName.value}
-                                            name="command_name_input"
+                                            name="commandName"
                                             placeholder="1-32 letters and/or numbers (e.g., Bot role 2)"
                                             pattern="[a-zA-Z0-9]{0,32}"
                                             title="Please enter 1-32 letters and/or numbers (e.g., Bot role 2)"
                                             required
                                             isInvalid={
                                               commandData.commandName.touched &&
-                                              commandData.commandName.valid === false &&
-                                              commandData.commandName.value.length <= 0
+                                              !commandData.commandName.valid &&
+                                              commandData.commandName.value.length > 0
                                             }
                                         />
                                           {commandData.commandName.error &&
@@ -198,7 +208,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                            <FormControl.Feedback type="invalid">
                                             {commandData.commandName.error}
                                            </FormControl.Feedback>
-                                           )};
+                                          )}
                                     </FormGroup>
                                 </Col>
 
@@ -206,13 +216,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                   <FormGroup>
                                     <FormLabel
                                       className="command_description_label"
-                                      htmlFor="command_description_input"
+                                      htmlFor="commandDescription"
                                     >
+                                      Command description
                                     </FormLabel>
                                     <FormControl
                                       className="bot_command_description_input"
                                       type="text"
-                                      name="command_description_input"
+                                      name="commandDescription"
                                       placeholder="1-100 letters and/or numbers (e.g., This commands allows customization of a bot)"
                                       pattern="[a-zA-Z0-9]{0,100}"
                                       title="1-100 letters and.or numbers (e.g., This command allows customization of a bot)"
@@ -221,7 +232,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                       value={commandData.commandDescription.value}
                                       isInvalid={
                                         commandData.commandDescription.touched &&
-                                        commandData.commandDescription.valid === false &&
+                                        !commandData.commandDescription.valid &&
                                         commandData.commandDescription.value.length > 0
                                       }
                                     />
@@ -230,40 +241,103 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                       <FormControl.Feedback type="invalid">
                                         {commandData.commandDescription.error}
                                       </FormControl.Feedback>
-                                    )};
+                                    )}
                                   </FormGroup>
                                 </Col>
                             </Row>
 
                             <Row className="my-2">
-                              <Col xs={12} md={6} className="my-2">
-                                  <FormGroup>
-                                      <FormLabel 
-                                          className="command_required_label"
-                                          htmlFor="command_required_switch"
-                                      >
-                                          Command required
-                                      </FormLabel>
-                                      <FormCheck 
-                                        id="command_required_switch"
-                                        type="switch"
-                                        label={commandData.commandRequired.value ? 'Yes' : 'No'}
-                                        checked={commandData.commandRequired.value}
-                                        onChange={(e) => onChangeHandler({
-                                            target: {
-                                                name: 'command_required',
-                                                value: e.target.checked.toString(), 
-                                            }
-                                        })}
-                                        name="command_required"
-                                        isInvalid={commandData.commandRequired.touched && !commandData.commandRequired.valid}
-                                      />
-                                        {commandData.commandRequired.error && !commandData.commandRequired.valid && (
-                                            <FormControl.Feedback type="invalid">
-                                              {commandData.commandRequired.error}
-                                            </FormControl.Feedback>
+                                <Col xs={12} md={6} className="my-2">
+                                    <FormGroup>
+                                        <FormLabel 
+                                          className="command_name_label"
+                                          htmlFor="commandDescriptionForFunction"
+                                        >
+                                            Command function description
+                                        </FormLabel>
+                                        <FormControl
+                                          id="bot_commands_name_input"
+                                          type="text"
+                                          onChange={onChangeHandler}
+                                          value={commandData.commandDescriptionForFunction.value}
+                                          name="commandDescriptionForFunction"
+                                          placeholder="1-32 letters and/or numbers (e.g., Bot role 2)"
+                                          pattern="[a-zA-Z0-9]{0,32}"
+                                          title="Please enter 1-32 letters and/or numbers (e.g., Bot role 2)"
+                                          required
+                                          isInvalid={
+                                            commandData.commandDescriptionForFunction.touched &&
+                                            !commandData.commandDescriptionForFunction.valid &&
+                                            commandData.commandDescriptionForFunction.value.length > 0
+                                          }
+                                        />
+                                        {commandData.commandDescriptionForFunction.error &&
+                                          commandData.commandDescriptionForFunction.valid == false && (
+                                          <FormControl.Feedback type="invalid">
+                                          {commandData.commandDescriptionForFunction.error}
+                                          </FormControl.Feedback>
                                         )}
                                   </FormGroup>
+                              </Col>
+                            </Row>
+
+                            {/* commandDescriptionForFunction */}
+
+                            <Button className="btn btn-primary" onClick={addAuthorizedUserField}>
+                                  Add additional authorized users
+                            </Button>
+
+                            <Row className="my-2">
+                              {commandData.commandAuthorizedUsers.map((user, index) => (
+                                <Col xs={12} md={6} className="my-2" key={index}>
+                                  <FormGroup>
+                                    <FormLabel
+                                      className="command_authorized_user_label"
+                                      htmlFor={`commandAuthorizedUser${index}`}
+                                    >
+                                      Authorized user #{index + 1}
+                                    </FormLabel>
+                                    <FormControl
+                                      className="commandAuthorizedUser"
+                                      type="text"
+                                      name={`commandAuthorizedUser${index}`}
+                                      placeholder="1-100 letters and/or numbers (e.g., Server bot administrator)"
+                                      pattern="[a-zA-Z0-9]{0,100}"
+                                      title="1-100 letters and/or numbers (e.g., Server bot administrator)"
+                                      required
+                                      value={user}
+                                      onChange={(e) => onChangeAuthorizedUser(index, e.target.value)}
+                                      isInvalid={!!(
+                                        commandData.commandAuthorizedUsers[index] &&
+                                        !validateField("commandAuthorizedUser", user)
+                                      )}
+                                    />
+                                     {commandData.commandAuthorizedUsers[index] &&
+                                      !validateField("commandAuthorizedUser", user) && (
+                                        <FormControl.Feedback type="invalid">
+                                          {commandData.commandAuthorizedUser.error}
+                                        </FormControl.Feedback>
+                                      )}
+                                  </FormGroup>
+                                </Col>
+                              ))}
+                            </Row>
+
+                            <Row className="my-1 justify-content-center">
+                              <Col xs={6} md={3}>
+                                <Button className="btn btn-danger" onClick={() => navigate(-1)}>
+                                  Cancel
+                                </Button>
+                              </Col>
+                              <Col xs={6} md={3}>
+                                <Button className="btn btn-secondary" onClick={onClearHandler}>
+                                  Reset
+                                </Button>
+                              </Col>
+                              <Col xs={6} md={3}>
+                                <Button className="btn btn-info" onClick={onSubmitHandler}>
+                                  Request command
+                                </Button>
                               </Col>
                             </Row>
                         </Form>
