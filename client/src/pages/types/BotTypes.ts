@@ -52,7 +52,7 @@ export type CommandsForm = {
         error: string;
     };
     commandExecute: {
-        value: Function;
+        value: string;
         valid: boolean;
         touched: boolean;
         error: string;

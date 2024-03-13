@@ -60,7 +60,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         touched: false
       },
       commandExecute: {
-        value: Function,
+        value: "",
         error: "",
         valid: false,
         touched: false
@@ -119,33 +119,28 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     });
   };
 
-  const onChangeHandler = (event) => {
+  const onChangeHandler = (event: any) => {
     const { name, value } = event.target; // Destructure name and value from the event target
 
     const commandNameRegexPattern = /^[a-zA-Z0-9]{1,32}$/;
     const commandDescriptionRegexPattern = /^[a-zA-Z0-9]{1,100}$/;
     const commandRoleRegexPattern = /^[a-zA-Z0-9]{1,50}$/;
+    const commandFunctionRegexPattern = /^[a-zA-Z0-9{}[];:'",<.>()!@#$%^&*]{1,1000}$/;
 
     let newValue = value;
     let isValid = false; 
 
-    if (name === 'command_required') {
-        newValue = value === true; 
-
-        isValid = newValue === true || newValue === false;
-    }
-
     // Update your form state here with newValue and isValid
     // Example:
-    setCommandData({
-        ...commandData,
+    setCommandData((prevState) => ({
+        ...prevState,
         [name]: {
-            ...commandData[name],
+            ...prevState[name],
             value: newValue,
             valid: isValid,
             touched: true, // Mark as touched to show feedback if needed
         },
-    });
+    }));
 };
 
 
@@ -189,8 +184,8 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                             required
                                             isInvalid={
                                               commandData.commandName.touched &&
-                                              commandData.commandName.valid === false &&
-                                              commandData.commandName.value.length <= 0
+                                              !commandData.commandName.valid &&
+                                              commandData.commandName.value.length > 0
                                             }
                                         />
                                           {commandData.commandName.error &&
@@ -221,7 +216,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                       value={commandData.commandDescription.value}
                                       isInvalid={
                                         commandData.commandDescription.touched &&
-                                        commandData.commandDescription.valid === false &&
+                                        !commandData.commandDescription.valid &&
                                         commandData.commandDescription.value.length > 0
                                       }
                                     />
@@ -240,12 +235,12 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                   <FormGroup>
                                       <FormLabel 
                                           className="command_required_label"
-                                          htmlFor="command_required_switch"
+                                          htmlFor="commandRequired"
                                       >
                                           Command required
                                       </FormLabel>
                                       <FormCheck 
-                                        id="command_required_switch"
+                                        id="commandRequired"
                                         type="switch"
                                         label={commandData.commandRequired.value ? 'Yes' : 'No'}
                                         checked={commandData.commandRequired.value}
@@ -256,7 +251,10 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                             }
                                         })}
                                         name="command_required"
-                                        isInvalid={commandData.commandRequired.touched && !commandData.commandRequired.valid}
+                                        isInvalid={
+                                          commandData.commandRequired.touched && 
+                                          !commandData.commandRequired.valid
+                                        }
                                       />
                                         {commandData.commandRequired.error && !commandData.commandRequired.valid && (
                                             <FormControl.Feedback type="invalid">
@@ -265,6 +263,35 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                         )}
                                   </FormGroup>
                               </Col>
+                            </Row>
+
+                            <Row className="my-2">
+                                <Col xs={12} md={6} className="my-2">
+                                  <FormGroup>
+                                    <FormLabel
+                                      className="command_body"
+                                      htmlFor="commandExecute"
+                                    > 
+                                      Command function 
+                                    </FormLabel>
+                                    <FormControl
+                                      className="command_execute_input"
+                                      type="textarea"
+                                      name="commandExecute"
+                                      placeholder="1-1000 letters, numbers, and special characters to hold the function that will be executed"
+                                      pattern="[a-zA-Z0-9{}[];:',<.>()!@#$%^&*]{1,1000}$/</.>"
+                                      title="1-1000 letters, numbers, and special characters to hold the function that will be executed"
+                                      required
+                                      onChange={onChangeHandler}
+                                      value={commandData.commandExecute.value}
+                                      isInvalid={
+                                        commandData.commandExecute.touched &&
+                                        !commandData.commandExecute.valid &&
+                                        commandData.commandExecute.value.length > 0
+                                      }
+                                    />
+                                  </FormGroup>
+                                </Col>
                             </Row>
                         </Form>
                     </Container>
