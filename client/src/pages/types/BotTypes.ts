@@ -45,6 +45,8 @@ export type CommandsForm = {
         touched: boolean;
         error: string;
     };
+
+    commandAuthorizedUsers: string[]
 };
 
 export type RegexPatterns = {

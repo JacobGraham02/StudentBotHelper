@@ -48,7 +48,9 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
         valid: false,
         touched: false
-      }
+      },
+
+      commandAuthorizedUsers: [""]
     }
   );
 
@@ -85,46 +87,60 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         valid: false,
         touched: false
       },
+
+      commandAuthorizedUsers: [""]
     });
   };
 
-  const onChangeHandler = (event: any) => {
-    const { name, value } = event.target; // Destructure name and value from the event target
+  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setCommandData(prevState => ({
+      ...prevState,
+      [name]: {
+        ...prevState[name],
+        value: value,
+        valid: validateField(name, value), // Validate dynamically added fields
+        touched: true
+      }
+    }));
+  };
 
+  const validateField = (name: string, value: string) => {
     const regexPatterns: RegexPatterns = {
       commandNameRegexPattern: /^[a-zA-Z0-9]{1,32}$/,
       commandDescriptionRegexPattern: /^[a-zA-Z0-9]{1,100}$/,
       commandAuthorizedUserRegexPattern: /^[a-zA-Z0-9]{1,50}$/
     };
 
-    let newValue = value;
-    let isValid = false;
-
     const inputFieldName = name + "RegexPattern";
     const regexPattern = regexPatterns[inputFieldName];
 
-    if (regexPattern) {
-      isValid = regexPattern.test(value);
-    }
+    return regexPattern ? regexPattern.test(value) : false;
+  };
 
-    // Update your form state here with newValue and isValid
-    // Example:
-    setCommandData((prevState) => ({
-        ...prevState,
-        [name]: {
-            ...prevState[name],
-            value: newValue,
-            valid: isValid,
-            touched: true, // Mark as touched to show feedback if needed
-        },
+
+  const onChangeAuthorizedUser = (index: number, value: string) => {
+    setCommandData(prevState => ({
+      ...prevState,
+      commandAuthorizedUsers: prevState.commandAuthorizedUsers.map((user, i) =>
+        i === index ? value : user
+      )
     }));
-};
+  };
 
+
+  const addAuthorizedUserField = () => {
+    setCommandData(prevState => ({
+      ...prevState,
+      commandAuthorizedUsers: [...prevState.commandAuthorizedUsers, ""]
+    }));
+  };
 
   const onSubmitHandler = (e: any) => {
     e.preventDefault();
-
-    const allFieldsValid = Object.values(commandData).every(field => field.valid);
+    const allFieldsValid = Object.values(commandData).every(field =>
+      Array.isArray(field) ? field.every(user => validateField("commandAuthorizedUser", user)) : field.valid
+    );
 
     if (!allFieldsValid) {
       alert("Please correct the form errors shown on screen before submitting");
@@ -216,6 +232,47 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                             </Row>
 
                             <Row className="my-2">
+                              {commandData.commandAuthorizedUsers.map((user, index) => (
+                                <Col xs={12} md={6} className="my-2" key={index}>
+                                  <FormGroup>
+                                    <FormLabel
+                                      className="command_authorized_user_label"
+                                      htmlFor={`commandAuthorizedUser${index}`}
+                                    >
+                                      Authorized user #{index + 1}
+                                    </FormLabel>
+                                    <FormControl
+                                      className="commandAuthorizedUser"
+                                      type="text"
+                                      name={`commandAuthorizedUser${index}`}
+                                      placeholder="1-100 letters and/or numbers (e.g., Server bot administrator)"
+                                      pattern="[a-zA-Z0-9]{0,100}"
+                                      title="1-100 letters and/or numbers (e.g., Server bot administrator)"
+                                      required
+                                      value={user}
+                                      onChange={(e) => onChangeAuthorizedUser(index, e.target.value)}
+                                      isInvalid={!!(
+                                        commandData.commandAuthorizedUsers[index] &&
+                                        !validateField("commandAuthorizedUser", user)
+                                      )}
+                                    />
+                                     {commandData.commandAuthorizedUsers[index] &&
+                                      !validateField("commandAuthorizedUser", user) && (
+                                        <FormControl.Feedback type="invalid">
+                                          {commandData.commandAuthorizedUser.error}
+                                        </FormControl.Feedback>
+                                      )}
+                                  </FormGroup>
+                                </Col>
+                              ))}
+                              <Col xs={12} className="my-2">
+                                <Button variant="secondary" onClick={addAuthorizedUserField}>
+                                  Add Authorized User
+                                </Button>
+                              </Col>
+                            </Row>
+
+                            {/* <Row className="my-2">
                               <Col xs={12} md={6} className="my-2">
                                   <FormGroup>
                                       <FormLabel 
@@ -249,8 +306,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                         )}
                                   </FormGroup>
                               </Col>
-                            </Row>
-
+                            </Row> */}
 
                             <Row className="my-1">
                               <Col xs={3}>
@@ -265,7 +321,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                               </Col>
                               <Col xs={5}>
                                 <Button variant="primary" onClick={onSubmitHandler}>
-                                  Submit changes
+                                  Request command be created
                                 </Button>
                               </Col>
                             </Row>
