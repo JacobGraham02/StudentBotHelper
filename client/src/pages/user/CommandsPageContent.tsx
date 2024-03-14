@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -14,11 +14,64 @@ import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotConfigurations } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import CustomModal from "../../components/Modal/CustomModal";
 
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const navigate = useNavigate();
+
+    const [confirmClear, setConfirmClear] = useState(false);
   
+    const [showModal, setShowModal] = useState(false);
+
+    const [modalContent, setModalContent] = useState({
+      title: "",
+      body: "",
+      cancelButtonText: "",
+      confirmButtonText: "",
+      onConfirm: () => {}  
+    });
+
+    useEffect(() => {
+      if (confirmClear) {
+        onClearHandler();
+        setConfirmClear(false);
+        setShowModal(false);
+      }
+    }, [confirmClear]);
+
+    const handleModalConfirmButtonClick = () => {
+      setConfirmClear(true);
+    }
+
+    const showCancelConfirmation = () => {
+      setModalContent({
+        title: `Cancel confirmation`,
+        body: `Are you sure you want to cancel?`,
+        cancelButtonText: `Cancel`,
+        confirmButtonText: `Confirm`,
+        onConfirm: () => {
+          navigate(-1)
+        }
+      });
+      setShowModal(true);
+    }
+  
+    const showClearConfirmation = () => {
+      setModalContent({
+        title: `Clear input fields`,
+        body: `Are you sure you want to clear the input fields?`,
+        cancelButtonText: `Cancel`,
+        confirmButtonText: `Confirm`,
+        onConfirm: () => {
+          onClearHandler();
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+  
+
     const [commandData, setCommandData] = useState<CommandsForm>(
     {
       commandName: {
@@ -31,17 +84,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       commandDescription: {
         value: "",
         error: "Invalid command description. Please enter a command description whose length is equal to or less than 100 characters (a-z)",
-        valid: false,
-        touched: false
-      },
-
-      commandOptions: { 
-        value: [{
-          command_option_name: "",
-          command_option_description: "",
-          command_option_required: false
-        }], 
-        error: "Invalid command option. Please enter valid configuration options",
         valid: false,
         touched: false
       },
@@ -150,7 +192,9 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     );
 
     if (!allFieldsValid) {
-      alert("Please correct the form errors shown on screen before submitting");
+
+      setShowModal(true);
+      //alert("Please correct the form errors shown on screen before submitting");
       return;
     }
   };
@@ -163,8 +207,20 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         e.target.style.height = 'inherit'; // Reset the height, allowing the TextArea to shrink if necessary
         e.target.style.height = `${e.target.scrollHeight}px`; // Set the height to scroll height to remove the scroll bar
       }
+      
         return (
             <main id="main" className="text-center">
+              <CustomModal
+                showModal={showModal}
+                setShowModal={setShowModal}
+                title={modalContent.title}
+                body={modalContent.body}
+                cancelButtonText={modalContent.cancelButtonText}
+                confirmButtonText={modalContent.confirmButtonText}
+                onConfirm={modalContent.onConfirm}
+              >
+              </CustomModal>
+
                 <aside id="bot_command_options_page_content">
                     <h1 id="bot_command_options_page_title">
                         Request bot command
@@ -177,14 +233,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                 <Container>
                   <Row className="my-1 justify-content-between mt-5">
                     <Col xs="auto">
-                      <Button className="btn btn-danger" onClick={() => navigate(-1)}>
+                      <Button className="btn btn-danger" onClick={() => showCancelConfirmation()}>
                         <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
                         Cancel
                       </Button>
                     </Col>
 
                     <Col xs="auto">
-                      <Button className="btn btn-secondary" onClick={onClearHandler}>
+                      <Button className="btn btn-secondary" onClick={() => showClearConfirmation()}>
                         <FontAwesomeIcon icon={faEraser} className="mx-1"/>
                         Reset
                       </Button>
