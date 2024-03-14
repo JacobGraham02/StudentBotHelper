@@ -37,8 +37,6 @@ export default class BotRepository {
                 bot_username: discord_bot_information.bot_username,
                 bot_password: discord_bot_information.bot_password,
                 bot_commands_channel: discord_bot_information.bot_commands_channel_id,
-                bot_database_responses_channel: discord_bot_information.bot_database_responses_channel_id,
-                bot_github_commits_channel: discord_bot_information.bot_github_commits_channel_id,
                 bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
                 bot_command_usage_error_channel: discord_bot_information.bot_command_usage_errors_channel_id
             };
@@ -48,7 +46,7 @@ export default class BotRepository {
                 { $setOnInsert: new_discord_bot_information_document },
                 { upsert: true }
             );
-        } catch (error) {
+        } catch (error: any) {
             console.error(`There was an error when attempting to create a Disord bot document in the database. Please inform the server administrator of this error: ${error}`);
             throw error;
         } finally {

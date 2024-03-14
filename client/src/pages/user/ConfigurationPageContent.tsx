@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ConfigurationForm } from "../types/BotTypes";
 import {
   Container,
   Row,
@@ -13,39 +14,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { postBotConfigurations } from "../../services/bot/index";
 
-type ConfigurationForm = {
-  guildId: {
-    value: string;
-    valid: boolean;
-    touched: boolean;
-    error: string;
-  };
-  commandChannelId: {
-    value: string;
-    valid: boolean;
-    touched: boolean;
-    error: string;
-  };
-  buttonChannelId: {
-    value: string;
-    valid: boolean;
-    touched: boolean;
-    error: string;
-  };
-  botInfoChannelId: {
-    value: string;
-    valid: boolean;
-    touched: boolean;
-    error: string;
-  };
-  botErrorChannelId: {
-    value: string;
-    valid: boolean;
-    touched: boolean;
-    error: string;
-  };
-};
-
 const ConfigurationPageContent = ({
   userLoggedIn,
 }: {
@@ -56,31 +24,31 @@ const ConfigurationPageContent = ({
     {
       guildId: {
         value: "",
-        error: "",
+        error: "Invalid guild id. Please input a string of 18 numbers",
         valid: false,
         touched: false,
       },
       commandChannelId: {
         value: "",
-        error: "Invalid Command Channel Id",
+        error: "Invalid bot command channel id. Please input a string of 18 numbers",
         valid: false,
-        touched: true,
+        touched: false,
       },
       buttonChannelId: {
         value: "",
-        error: "",
+        error: "Invalid bot role button channel id. Please input a string of 18 numbers",
         valid: false,
         touched: false,
       },
       botInfoChannelId: {
         value: "",
-        error: "",
+        error: "Invalid info channel id. Please input a string of 18 numbers",
         valid: false,
         touched: false,
       },
       botErrorChannelId: {
         value: "",
-        error: "",
+        error: "Invalid error channel id. Please input a string of 18 numbers",
         valid: false,
         touched: false,
       },
@@ -91,49 +59,64 @@ const ConfigurationPageContent = ({
     setConfigurationData({
       guildId: {
         value: "",
-        error: "",
+        error: "Invalid guild id",
         valid: false,
         touched: false,
       },
       commandChannelId: {
         value: "",
-        error: "",
+        error: "Invalid command channel id",
         valid: false,
         touched: false,
       },
       buttonChannelId: {
         value: "",
-        error: "",
+        error: "Invalid bot role button channel id",
         valid: false,
         touched: false,
       },
       botInfoChannelId: {
         value: "",
-        error: "",
+        error: "Invalid info channel id",
         valid: false,
         touched: false,
       },
       botErrorChannelId: {
         value: "",
-        error: "",
+        error: "Invalid error channel id",
         valid: false,
         touched: false,
       },
     });
   };
 
-  const onChangeHandler = (e) => {
-    const { name, value } = e.target;
-    console.log(name);
+  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target as HTMLInputElement;
+
+    const channelIdRegexPattern = /^[0-9]{18}$/;
+
+    const isTextValid = channelIdRegexPattern.test(value);
 
     setConfigurationData((prevState) => ({
       ...prevState,
-      [name]: { value },
+      [name]: { 
+        ...prevState[name],
+        valid: isTextValid,
+        value: value,
+        touched: true
+      }
     }));
   };
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = (e: any) => {
     e.preventDefault();
+
+    const allFieldsValid = Object.values(configurationData).every(field => field.valid);
+
+    if (!allFieldsValid) {
+      alert("Please correct the form errors shown on screen before submitting");
+      return;
+    }
 
     const configurationResponse = postBotConfigurations({
       guildId: configurationData.guildId.value,
@@ -142,11 +125,6 @@ const ConfigurationPageContent = ({
       botInfoChannelId: configurationData.botInfoChannelId.value,
       botErrorChannelId: configurationData.botErrorChannelId.value,
     });
-
-    // Had validations
-    console.log(configurationData);
-
-    console.log(configurationResponse);
   };
 
   if (userLoggedIn) {
@@ -158,7 +136,7 @@ const ConfigurationPageContent = ({
           </h1>
         </aside>
         <p id="bot_configuration_options_page_message">
-          Modify the configuration options for your bot below:
+          Modify the configuration options for your Discord bot below:
         </p>
 
         <section className="bot_configuration_options_form_section">
@@ -169,9 +147,9 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="bot_configurations_discord_guild_id_input"
+                      htmlFor="guildId"
                     >
-                      Guild Id
+                      Guild id
                     </FormLabel>
                     <FormControl
                       id="bot_configuration_options"
@@ -183,7 +161,18 @@ const ConfigurationPageContent = ({
                       pattern="[0-9]{18}"
                       title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
                       required
+                      isInvalid={
+                        configurationData.guildId.touched &&
+                        !configurationData.guildId.valid &&
+                        configurationData.guildId.value.length > 0
+                      }
                     />
+                     {configurationData.guildId.error &&
+                      configurationData.guildId.valid === false && (
+                        <FormControl.Feedback type="invalid">
+                          {configurationData.guildId.error}
+                        </FormControl.Feedback>
+                      )}
                   </FormGroup>
                 </Col>
 
@@ -191,9 +180,9 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="bot_configurations_discord_command_channel_input"
+                      htmlFor="commandChannelId"
                     >
-                      Command Channel Id
+                      Command channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
@@ -207,7 +196,8 @@ const ConfigurationPageContent = ({
                       value={configurationData.commandChannelId.value}
                       isInvalid={
                         configurationData.commandChannelId.touched &&
-                        configurationData.commandChannelId.valid === false
+                        !configurationData.commandChannelId.valid &&
+                        configurationData.commandChannelId.value.length > 0
                       }
                     />
                     {configurationData.commandChannelId.error &&
@@ -225,9 +215,9 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="bot_configurations_discord_bot_role_button_channel_id_input"
+                      htmlFor="buttonChannelId"
                     >
-                      Button Channel Id
+                      Bot role button channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
@@ -239,7 +229,18 @@ const ConfigurationPageContent = ({
                       required
                       onChange={onChangeHandler}
                       value={configurationData.buttonChannelId.value}
-                    />
+                      isInvalid={
+                        configurationData.buttonChannelId.touched &&
+                        !configurationData.buttonChannelId.valid &&
+                        configurationData.buttonChannelId.value.length > 0
+                      }
+                      />
+                     {configurationData.buttonChannelId.error &&
+                      configurationData.buttonChannelId.valid === false && (
+                        <FormControl.Feedback type="invalid">
+                          {configurationData.buttonChannelId.error}
+                        </FormControl.Feedback>
+                      )}
                   </FormGroup>
                 </Col>
 
@@ -247,9 +248,9 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="bot_configurations_discord_information_messages_channel_id_input"
+                      htmlFor="botInfoChannelId"
                     >
-                      Bot-Info Channel Id
+                      Bot info messages channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
@@ -261,7 +262,18 @@ const ConfigurationPageContent = ({
                       required
                       onChange={onChangeHandler}
                       value={configurationData.botInfoChannelId.value}
-                    />
+                      isInvalid={
+                        configurationData.botInfoChannelId.touched &&
+                        !configurationData.botInfoChannelId.valid &&
+                        configurationData.botInfoChannelId.value.length > 0
+                      }
+                      />
+                     {configurationData.botInfoChannelId.error &&
+                      configurationData.botInfoChannelId.valid === false && (
+                        <FormControl.Feedback type="invalid">
+                          {configurationData.botInfoChannelId.error}
+                        </FormControl.Feedback>
+                      )}
                   </FormGroup>
                 </Col>
               </Row>
@@ -271,9 +283,9 @@ const ConfigurationPageContent = ({
                   <FormGroup>
                     <FormLabel
                       className="bot_configuration_options_label"
-                      htmlFor="bot_configurations_discord_error_messages_channel_id_input"
+                      htmlFor="botErrorChannelId"
                     >
-                      Bot-Error Channel Id
+                      Bot error messages channel id
                     </FormLabel>
                     <FormControl
                       className="bot_configuration_options_input"
@@ -285,25 +297,36 @@ const ConfigurationPageContent = ({
                       required
                       onChange={onChangeHandler}
                       value={configurationData.botErrorChannelId.value}
-                    />
+                      isInvalid={
+                        configurationData.botErrorChannelId.touched &&
+                        !configurationData.botErrorChannelId.valid &&
+                        configurationData.botErrorChannelId.value.length > 0
+                      }
+                      />
+                     {configurationData.botErrorChannelId.error &&
+                      configurationData.botErrorChannelId.valid === false && (
+                        <FormControl.Feedback type="invalid">
+                          {configurationData.botErrorChannelId.error}
+                        </FormControl.Feedback>
+                      )}
                   </FormGroup>
                 </Col>
               </Row>
 
               <Row className="my-1">
                 <Col xs={3}>
-                  <Button variant="danger" onClick={() => navigate(-1)}>
+                  <Button className="btn btn-danger" onClick={() => navigate(-1)}>
                     Cancel
                   </Button>
                 </Col>
                 <Col xs={4}>
-                  <Button variant="secondary" onClick={onClearHandler}>
-                    Clear Inputs
+                  <Button className="btn btn-secondary" onClick={onClearHandler}>
+                    Reset inputs
                   </Button>
                 </Col>
                 <Col xs={5}>
-                  <Button variant="primary" onClick={onSubmitHandler}>
-                    Submit Configuration
+                  <Button className="btn btn-info" onClick={onSubmitHandler}>
+                    Submit changes
                   </Button>
                 </Col>
               </Row>
@@ -312,135 +335,8 @@ const ConfigurationPageContent = ({
 
           <form
             id="bot_configuration_options_form"
-            // method="POST"
-            // action="http://localhost:8080/api/testroute"
             onSubmit={onSubmitHandler}
           >
-            {/* <fieldset className="bot_configuration_options_form_fieldset">
-              <label
-                className="bot_configuration_options_label"
-                htmlFor="bot_configurations_discord_guild_id_input"
-              />
-              <input
-                className="bot_configuration_options_input"
-                type="text"
-                onChange={onChangeHandler}
-                value={configurationData.guildId.value}
-                name="guildId"
-                placeholder="18 digits (e.g., 123456789123456789)"
-                pattern="[0-9]{18}"
-                title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
-                required
-              />
-            </fieldset> */}
-
-            {/* <fieldset className="bot_configuration_options_form_fieldset">
-              <label
-                className="bot_configuration_options_label"
-                htmlFor="bot_configurations_discord_command_channel_input"
-              />
-              <input
-                className="bot_configuration_options_input"
-                type="text"
-                name="bot_configurations_discord_command_channel_input"
-                placeholder="18 digits (e.g., 123456789123456789)"
-                pattern="[0-9]{18}"
-                title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
-                required
-              />
-            </fieldset>
-
-            <fieldset className="bot_configuration_options_form_fieldset">
-              <label
-                className="bot_configuration_options_label"
-                htmlFor="bot_configurations_discord_database_responses_id_input"
-              />
-              <input
-                className="bot_configuration_options_input"
-                type="text"
-                name="bot_configurations_discord_database_responses_id_input"
-                placeholder="18 digits (e.g., 123456789123456789)"
-                pattern="[0-9]{18}"
-                title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
-                required
-              />
-            </fieldset>
-
-            <fieldset className="bot_configuration_options_form_fieldset">
-              <label
-                className="bot_configuration_options_label"
-                htmlFor="bot_configurations_discord_bot_role_button_channel_id_input"
-              />
-              <input
-                className="bot_configuration_options_input"
-                type="text"
-                name="bot_configurations_discord_bot_role_button_channel_id_input"
-                placeholder="18 digits (e.g., 123456789123456789)"
-                pattern="[0-9]{18}"
-                title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
-                required
-              />
-            </fieldset> */}
-            {/* 
-            <fieldset className="bot_configuration_options_form_fieldset">
-              <label
-                className="bot_configuration_options_label"
-                htmlFor="bot_configurations_discord_voice_channel_category_id_input"
-              />
-              <input
-                className="bot_configuration_options_input"
-                type="text"
-                name="bot_configurations_discord_voice_channel_category_id_input"
-                placeholder="18 digits (e.g., 123456789123456789)"
-                pattern="[0-9]{18}"
-                title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
-                required
-              />
-            </fieldset>
-
-            <fieldset className="bot_configuration_options_form_fieldset">
-              <label
-                className="bot_configuration_options_label"
-                htmlFor="bot_configurations_discord_information_messages_channel_id_input"
-              />
-              <input
-                className="bot_configuration_options_input"
-                type="text"
-                name="bot_configurations_discord_information_messages_channel_id_input"
-                placeholder="18 digits (e.g., 123456789123456789)"
-                pattern="[0-9]{18}"
-                title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
-                required
-              />
-            </fieldset>
-
-            <fieldset className="bot_configuration_options_form_fieldset">
-              <label
-                className="bot_configuration_options_label"
-                htmlFor="bot_configurations_discord_error_messages_channel_id_input"
-              />
-              <input
-                className="bot_configuration_options_input"
-                type="text"
-                name="bot_configurations_discord_error_messages_channel_id_input"
-                placeholder="18 digits (e.g., 123456789123456789)"
-                pattern="[0-9]{18}"
-                title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
-                required
-              />
-            </fieldset> */}
-
-            {/* <aside id="bot_configuration_options_form_buttons_article">
-              <button className="bot_form_button" type="submit">
-                Change bot settings
-              </button>
-              <button className="bot_form_button" type="reset">
-                Erase input fields
-              </button>
-              <button className="bot_form_button" type="button">
-                Cancel
-              </button>
-            </aside> */}
           </form>
         </section>
       </main>
