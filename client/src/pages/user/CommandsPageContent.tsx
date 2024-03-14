@@ -13,8 +13,9 @@ import { useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotConfigurations } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowUpRightFromSquare, faBell, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import CustomModal from "../../components/Modal/CustomModal";
+import IModalContent from "./interfaces/IModalContent";
 
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
@@ -24,7 +25,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
   
     const [showModal, setShowModal] = useState(false);
 
-    const [modalContent, setModalContent] = useState({
+    const [modalContent, setModalContent] = useState<IModalContent>({
       title: "",
       body: "",
       cancelButtonText: "",
@@ -56,7 +57,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const showClearConfirmation = () => {
       setModalContent({
         title: `Clear input fields confirmation`,
-        body: `Are you sure you want to clear the input fields?`,
+        body: `Are you sure you want to clear the input fields on this form?`,
         cancelButtonText: `No`,
         confirmButtonText: `Yes`,
         onConfirm: () => {
@@ -76,6 +77,18 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         onConfirm: () => {
           onSubmitHandler(e);
           setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+
+    const formHasErrorsConfirmation = (formSubmitEvent: any) => {
+      setModalContent({
+        title: `Submission errors`,
+        body: `There were some errors in the form fields! Please fix the errors in the input fields indicated on the form.`,
+        confirmButtonText: `Ok`,
+        onConfirm: () => {
+          onSubmitHandler(formSubmitEvent);
         }
       });
       setShowModal(true);
@@ -195,14 +208,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     }));
   };
 
-  const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmitHandler = (formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
+    formSubmitEvent.preventDefault();
     const allFieldsValid = Object.values(commandData).every(field =>
       Array.isArray(field) ? field.every(user => validateField("commandAuthorizedUser", user)) : field.valid
     );
 
     if (!allFieldsValid) {
-      alert("Please correct the form errors shown on screen before submitting");
+      formHasErrorsConfirmation(formSubmitEvent);
       return;
     }
   };
@@ -414,7 +427,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                             <Row className="my-1 justify-content-center mt-5">
                               <Col xs={6} md={3}>
                                 <Button className="btn btn-info mx-1" onClick={(formSubmitEvent) => submitFormConfirmation(formSubmitEvent)}>
-                                  <FontAwesomeIcon icon={faBell} className="mx-1"/>
+                                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="mx-1"/>
                                   Request command
                                 </Button>
                               </Col>
