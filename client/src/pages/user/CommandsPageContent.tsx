@@ -13,8 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotConfigurations } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBackwardFast } from "@fortawesome/free-solid-svg-icons/faBackwardFast";
-import { faBell, faEraser, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
@@ -179,7 +178,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                   <Row className="my-1 justify-content-between mt-5">
                     <Col xs="auto">
                       <Button className="btn btn-danger" onClick={() => navigate(-1)}>
-                        <FontAwesomeIcon icon={faBackwardFast} className="mx-1"/>
+                        <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
                         Cancel
                       </Button>
                     </Col>

@@ -13,6 +13,8 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { postBotConfigurations } from "../../services/bot/index";
+import { faArrowUpRightFromSquare, faEraser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ConfigurationPageContent = ({
   userLoggedIn,
@@ -129,7 +131,7 @@ const ConfigurationPageContent = ({
 
   if (userLoggedIn) {
     return (
-      <main id="main">
+      <main id="main" className="text-center">
         <aside id="bot_configuration_options_page_content">
           <h1 id="bot_onfiguration_options_page_title">
             Bot configuration options
@@ -139,10 +141,28 @@ const ConfigurationPageContent = ({
           Modify the configuration options for your Discord bot below:
         </p>
 
+        <Container>
+          <Row className="my-1 justify-content-between mt-5">
+            <Col xs="auto">
+              <Button className="btn btn-danger" onClick={() => navigate(-1)}>
+                <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
+                Cancel
+              </Button>
+            </Col>
+
+            <Col xs="auto">
+              <Button className="btn btn-secondary" onClick={onClearHandler}>
+                <FontAwesomeIcon icon={faEraser} className="mx-1"/>
+                Reset
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+
         <section className="bot_configuration_options_form_section">
           <Container>
             <Form>
-              <Row className="my-2">
+              <Row className="my-2 text-start">
                 <Col xs={12} md={6} className="my-2">
                   <FormGroup>
                     <FormLabel
@@ -210,7 +230,7 @@ const ConfigurationPageContent = ({
                 </Col>
               </Row>
 
-              <Row className="my-2">
+              <Row className="my-2 text-start">
                 <Col xs={12} md={6} className="my-2">
                   <FormGroup>
                     <FormLabel
@@ -278,7 +298,7 @@ const ConfigurationPageContent = ({
                 </Col>
               </Row>
 
-              <Row className="my-2">
+              <Row className="my-2 text-start">
                 <Col xs={12} md={6} className="my-2">
                   <FormGroup>
                     <FormLabel
@@ -313,19 +333,23 @@ const ConfigurationPageContent = ({
                 </Col>
               </Row>
 
-              <Row className="my-1">
+              {/* <Row className="my-1">
                 <Col xs={3}>
                   <Button className="btn btn-danger" onClick={() => navigate(-1)}>
+                    <FontAwesomeIcon icon={faXmark} className="mx-1"/>
                     Cancel
                   </Button>
                 </Col>
                 <Col xs={4}>
                   <Button className="btn btn-secondary" onClick={onClearHandler}>
-                    Reset inputs
+                    <FontAwesomeIcon icon={faEraser} className="mx-1"/>
+                    Reset
                   </Button>
-                </Col>
-                <Col xs={5}>
+                </Col> */}
+              <Row className="my-1 justify-content-center mt-5">
+                <Col xs={6} md={3}>
                   <Button className="btn btn-info" onClick={onSubmitHandler}>
+                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="mx-1"/>
                     Submit changes
                   </Button>
                 </Col>
