@@ -6,16 +6,9 @@ export type BotConfiguration = {
     botErrorChannelId: string;
 };
   
-export type CommandOption = {
-    command_option_name: string,
-    command_option_description: string,
-    command_option_required: boolean
-};
-  
 export type BotCommand = {
     name: string,
     description: string,
-    command_option: CommandOption[];
     authorization_role_name: string[];
     execute_function_body: Function;
 };
@@ -32,12 +25,6 @@ export type CommandsForm = {
       valid: boolean;
       touched: boolean;
       error: string;
-    };
-    commandOptions: {
-        value: CommandOption[];
-        valid: boolean;
-        touched: boolean;
-        error: string;
     };
     commandAuthorizedUser: {
         value: string;

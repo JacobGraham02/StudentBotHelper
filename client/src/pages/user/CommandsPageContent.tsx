@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import {
   Container,
   Row,
@@ -14,7 +14,7 @@ import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotConfigurations } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBackwardFast } from "@fortawesome/free-solid-svg-icons/faBackwardFast";
-import { faBell, faEraser } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faEraser, faUser } from "@fortawesome/free-solid-svg-icons";
 
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
@@ -77,17 +77,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       commandDescription: {
         value: "",
         error: "Invalid command description. Please enter a command description whose length is equal to or less than 100 characters (a-z)",
-        valid: false,
-        touched: false
-      },
-
-      commandOptions: { 
-        value: [{
-          command_option_name: "",
-          command_option_description: "",
-          command_option_required: false
-        }], 
-        error: "Invalid command option. Please enter valid configuration options",
         valid: false,
         touched: false
       },
@@ -165,14 +154,21 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       alert("Please correct the form errors shown on screen before submitting");
       return;
     }
-
   };
     if (userLoggedIn) {
+      /*
+      Whenever any text is input into the 'command description' text area, the text area will dynamically grow vertically to accomodate for additional text being 
+      added by the user that overflows the default area of the text area. 
+      */
+      const adjustTextareaHeight = (e: any) => {
+        e.target.style.height = 'inherit'; // Reset the height, allowing the TextArea to shrink if necessary
+        e.target.style.height = `${e.target.scrollHeight}px`; // Set the height to scroll height to remove the scroll bar
+      }
         return (
             <main id="main" className="text-center">
                 <aside id="bot_command_options_page_content">
                     <h1 id="bot_command_options_page_title">
-                        Request  bot command
+                        Request bot command
                     </h1>
                 </aside>
                 <p id="bot_command_options_page_message">
@@ -292,6 +288,8 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                             !commandData.commandDescriptionForFunction.valid &&
                                             commandData.commandDescriptionForFunction.value.length > 0
                                           }
+                                          onInput={adjustTextareaHeight}
+                                          style={{ overflow: 'hidden' }}
                                         />
                                         {commandData.commandDescriptionForFunction.error &&
                                           commandData.commandDescriptionForFunction.valid == false && (
@@ -340,14 +338,21 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                               ))}
                             </Row>
 
-                            <Button className="btn btn-primary" onClick={addAuthorizedUserField}>
-                                  Add additional authorized users
-                            </Button>
+                            
+                            <Row className="my-1 justify-content-center mt-5">
+                              <Col xs={6} md={3}>
+                                <Button className="btn btn-primary" onClick={addAuthorizedUserField}>
+                                <FontAwesomeIcon icon={faUser} className="mx-1"/>
+                                Add additional authorized users
+                                </Button>
+                              </Col>
+                            </Row>
+                            
 
                             <Row className="my-1 justify-content-center mt-5">
                               <Col xs={6} md={3}>
-                                <Button className="btn btn-info" onClick={onSubmitHandler}>
-                                  <FontAwesomeIcon icon={faBell} />
+                                <Button className="btn btn-info mx-1" onClick={onSubmitHandler}>
+                                  <FontAwesomeIcon icon={faBell} className="mx-1"/>
                                   Request command
                                 </Button>
                               </Col>
