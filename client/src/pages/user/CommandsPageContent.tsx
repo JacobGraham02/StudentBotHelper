@@ -40,14 +40,10 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       }
     }, [confirmClear]);
 
-    const handleModalConfirmButtonClick = () => {
-      setConfirmClear(true);
-    }
-
     const showCancelConfirmation = () => {
       setModalContent({
         title: `Cancel confirmation`,
-        body: `Are you sure you want to cancel?`,
+        body: `Are you sure you want to cancel? Confirming will bring you to the last page you were on`,
         cancelButtonText: `Cancel`,
         confirmButtonText: `Confirm`,
         onConfirm: () => {
@@ -59,12 +55,26 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
   
     const showClearConfirmation = () => {
       setModalContent({
-        title: `Clear input fields`,
+        title: `Clear input fields confirmation`,
         body: `Are you sure you want to clear the input fields?`,
-        cancelButtonText: `Cancel`,
-        confirmButtonText: `Confirm`,
+        cancelButtonText: `No`,
+        confirmButtonText: `Yes`,
         onConfirm: () => {
           onClearHandler();
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+
+    const submitFormConfirmation = (e: any) => {
+      setModalContent({
+        title: `Submit new command request confirmation`,
+        body: `Are you sure you want to request this command?`,
+        cancelButtonText: `No`,
+        confirmButtonText: `Yes`,
+        onConfirm: () => {
+          onSubmitHandler(e);
           setShowModal(false);
         }
       });
@@ -97,7 +107,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
       commandDescriptionForFunction: {
         value: "",
-        error: "Invalid command function description. Please enter a description so the admins can create a command for you (a-z)",
+        error: "Invalid command function description. Please enter a description that is less than 1000 characters long (a-z)",
         valid: false,
         touched: false
       },
@@ -140,7 +150,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     });
   };
 
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeHandler = (event: any) => {
     const { name, value } = event.target;
     setCommandData(prevState => ({
       ...prevState,
@@ -185,16 +195,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     }));
   };
 
-  const onSubmitHandler = (e: any) => {
+  const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const allFieldsValid = Object.values(commandData).every(field =>
       Array.isArray(field) ? field.every(user => validateField("commandAuthorizedUser", user)) : field.valid
     );
 
     if (!allFieldsValid) {
-
-      setShowModal(true);
-      //alert("Please correct the form errors shown on screen before submitting");
+      alert("Please correct the form errors shown on screen before submitting");
       return;
     }
   };
@@ -335,7 +343,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                           value={commandData.commandDescriptionForFunction.value}
                                           name="commandDescriptionForFunction"
                                           placeholder="1-1000 letters and/or numbers (e.g., I want the command that will respond to a user with 'Ping' if they use the command '/pong')"
-                                          pattern="[a-zA-Z0-9 ]{1,1000}"
                                           title="Please enter 1-32 letters and/or numbers (e.g., Bot role 2)"
                                           required
                                           isInvalid={
@@ -406,7 +413,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
                             <Row className="my-1 justify-content-center mt-5">
                               <Col xs={6} md={3}>
-                                <Button className="btn btn-info mx-1" onClick={onSubmitHandler}>
+                                <Button className="btn btn-info mx-1" onClick={(formSubmitEvent) => submitFormConfirmation(formSubmitEvent)}>
                                   <FontAwesomeIcon icon={faBell} className="mx-1"/>
                                   Request command
                                 </Button>
