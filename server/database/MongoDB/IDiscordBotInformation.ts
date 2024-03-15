@@ -9,9 +9,9 @@ export default interface IDiscordBotInformation {
   bot_username?: string;
   bot_password?: string;
   bot_email?: string;
-  bot_commands_channel_id: string;
-  bot_database_responses_channel_id: string;
-  bot_github_commits_channel_id: string;
-  bot_command_usage_information_channel_id: string;
-  bot_command_usage_errors_channel_id: string;
+  bot_commands_channel_id?: string;
+  bot_database_responses_channel_id?: string;
+  bot_github_commits_channel_id?: string;
+  bot_command_usage_information_channel_id?: string;
+  bot_command_usage_errors_channel_id?: string;
 }
