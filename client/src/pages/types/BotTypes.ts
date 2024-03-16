@@ -15,10 +15,10 @@ export type Bot = {
 }
   
 export type BotCommand = {
-    name: string,
-    description: string,
-    authorization_role_name: string[];
-    execute_function_body: Function;
+    commandName: string,
+    commandDescription: string,
+    commandDescriptionForFunction: string;
+    commandAuthorizedUsers: string[];
 };
 
 export type CommandsForm = {

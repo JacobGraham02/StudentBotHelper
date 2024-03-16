@@ -5,6 +5,7 @@
   "scripts": {
     "build": "tsc",
     "deploy-commands": "node dist/commands/deploy-commands.js",
+    "nodemon": "nodemon dist/app.js",
     "start": "node dist/app.js",
     "test": "jest",
     "dev": "nodemon ./bin/www",

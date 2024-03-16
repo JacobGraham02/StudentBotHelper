@@ -1,6 +1,7 @@
 import { UUID } from 'crypto';
 import DatabaseConnectionManager from './DatabaseConnectionManager';
-import IDiscordBotInformation from './IDiscordBotInformation';
+import { DiscordBotCommandType } from './types/DiscordBotCommandType';
+import { DiscordBotInformationType } from './types/DiscordBotInformationType';
 
 export default class BotRepository {
 
@@ -26,7 +27,7 @@ export default class BotRepository {
      * If an existing bot document with the same UUID as the bot document is present, then the document will be updated with new values. 
      * @param discord_bot_information IDiscordBotInformation
      */
-    public async createBot(discord_bot_information: IDiscordBotInformation): Promise<void> {
+    public async createBot(discord_bot_information: DiscordBotInformationType): Promise<void> {
         const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
@@ -47,13 +48,40 @@ export default class BotRepository {
                 { upsert: true }
             );
         } catch (error: any) {
-            console.error(`There was an error when attempting to create a Disord bot document in the database. Please inform the server administrator of this error: ${error}`);
+            console.error(`There was an error when attempting to create a Discord bot document in the database. Please inform the server administrator of this error: ${error}`);
             throw error;
         } finally {
             await this.releaseConnectionSafely(database_connection);
         }
     }
-    
+
+    public async createBotCommand(bot_command: DiscordBotCommandType): Promise<void> {
+        const database_connection = await this.database_connection_manager.getConnection();
+
+        try {
+            const commands_collection = database_connection.collection('commands');
+
+            const new_command_document = {
+                bot_id: bot_command.botId,
+                command_name: bot_command.commandName,
+                command_description: bot_command.commandDescription,
+                command_function: bot_command.commandDescriptionForFunction,
+                command_users: bot_command.commandAuthorizedUsers
+            };
+
+            await commands_collection.updateOne(
+                { bot_id: bot_command.botId },
+                { $setOnInsert: new_command_document },
+                { upsert: true}
+            )
+        } catch (error: any) {
+            console.error(`There was an error when attempting to create Discord bot command in the database. Please inform the server administrator of this error: ${error}`);
+            throw error;
+        } finally {
+            await this.releaseConnectionSafely(database_connection);
+        }
+    }
+
     private async releaseConnectionSafely(database_connection: any): Promise<void> {
         if (database_connection) {
             try {

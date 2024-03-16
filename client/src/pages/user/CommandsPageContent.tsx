@@ -11,9 +11,9 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
-import { postBotConfigurations } from "../../services/bot";
+import { postBotCommands } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUpRightFromSquare, faBell, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowUpRightFromSquare, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 
@@ -68,33 +68,31 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       setShowModal(true);
     }
 
-    const submitFormConfirmation = (e: any) => {
+    const submitFormConfirmation = (formSubmitEvent: any) => {
       setModalContent({
         title: `Submit new command request confirmation`,
         body: `Are you sure you want to request this command?`,
         cancelButtonText: `No`,
         confirmButtonText: `Yes`,
         onConfirm: () => {
-          onSubmitHandler(e);
-          setShowModal(false);
-        }
-      });
-      setShowModal(true);
-    }
-
-    const formHasErrorsConfirmation = (formSubmitEvent: any) => {
-      setModalContent({
-        title: `Submission errors`,
-        body: `There were some errors in the form fields! Please fix the errors in the input fields indicated on the form.`,
-        confirmButtonText: `Ok`,
-        onConfirm: () => {
           onSubmitHandler(formSubmitEvent);
         }
       });
       setShowModal(true);
     }
-  
 
+    const formHasErrorsConfirmation = () => {
+      setModalContent({
+        title: `Submission errors`,
+        body: `There were some errors in the form fields! Please fix the errors in the input fields indicated on the form.`,
+        confirmButtonText: `Ok`,
+        onConfirm: () => {
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+  
     const [commandData, setCommandData] = useState<CommandsForm>(
     {
       commandName: {
@@ -210,14 +208,26 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
   const onSubmitHandler = (formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
     formSubmitEvent.preventDefault();
-    const allFieldsValid = Object.values(commandData).every(field =>
-      Array.isArray(field) ? field.every(user => validateField("commandAuthorizedUser", user)) : field.valid
-    );
+
+    const allFieldsValid: boolean = commandData.commandAuthorizedUsers.every(user => validateField("commandAuthorizedUser", user));
 
     if (!allFieldsValid) {
-      formHasErrorsConfirmation(formSubmitEvent);
+      formHasErrorsConfirmation();
       return;
     }
+
+    const formSubmissionData = {
+      commandName: commandData.commandName.value,
+      commandDescription: commandData.commandDescription.value,
+      commandDescriptionForFunction: commandData.commandDescriptionForFunction.value,
+      commandAuthorizedUsers: commandData.commandAuthorizedUsers
+    }
+
+    const postRequestBotCommandResponse = postBotCommands(
+      formSubmissionData
+    );
+
+    console.log(`Form submission data is: ${Object.values(formSubmissionData)}`);
   };
     if (userLoggedIn) {
       /*
@@ -237,7 +247,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                 title={modalContent.title}
                 body={modalContent.body}
                 cancelButtonText={modalContent.cancelButtonText}
-                confirmButtonText={modalContent.confirmButtonText}
+                confirmButtonText={modalContent.confirmButtonText!}
                 onConfirm={modalContent.onConfirm}
               >
               </CustomModal>

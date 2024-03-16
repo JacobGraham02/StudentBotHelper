@@ -15,7 +15,7 @@ export const postBotConfigurations = async (botConfiguration: BotConfiguration) 
 
 export const postBotCommands = async (botCommand: BotCommand) => {
   try {
-      const postBotCommandsResponse = await instance.post("bot/commands", botCommand);
+      const postBotCommandsResponse = await instance.post("api/bot/commands", botCommand);
     
       return postBotCommandsResponse;
 
