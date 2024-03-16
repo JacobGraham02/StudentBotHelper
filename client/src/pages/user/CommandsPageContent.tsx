@@ -68,6 +68,30 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       setShowModal(true);
     }
 
+    const showSuccessSubmissionConfirmation = () => {
+      setModalContent({
+        title: `Command submission request successful`,
+        body: `The server administrator will be in contact with you within 24 hours`,
+        confirmButtonText: `Ok`,
+        onConfirm: () => {
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+
+    const showErrorSubmissionConfirmation = () => {
+      setModalContent({
+        title: `Command submission request unsuccessful`,
+        body: `There was an error when attempting to request this command. Please try again or contact the server administrator if you believe this is an error`,
+        confirmButtonText: `Ok`,
+        onConfirm: () => {
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+
     const submitFormConfirmation = (formSubmitEvent: any) => {
       setModalContent({
         title: `Submit new command request confirmation`,
@@ -75,7 +99,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         cancelButtonText: `No`,
         confirmButtonText: `Yes`,
         onConfirm: () => {
-          onSubmitHandler(formSubmitEvent);
+          const submittedFormInvalid = onSubmitHandler(formSubmitEvent);
+
+          if (!submittedFormInvalid) {
+            setShowModal(true);
+          } 
+          if (typeof submittedFormInvalid === 'undefined') {
+            setShowModal(false);
+          }
         }
       });
       setShowModal(true);
@@ -200,20 +231,30 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
 
   const addAuthorizedUserField = () => {
-    setCommandData(prevState => ({
-      ...prevState,
-      commandAuthorizedUsers: [...prevState.commandAuthorizedUsers, ""]
-    }));
+    setCommandData(prevState => {
+      // Check if the current number of authorized user fields is less than 8
+      if (prevState.commandAuthorizedUsers.length < 8) {
+        // Add a new authorized user field if less than 8 fields exist
+        return {
+          ...prevState,
+          commandAuthorizedUsers: [...prevState.commandAuthorizedUsers, ""]
+        };
+      } else {
+        // Do not add a new field if 8 fields already exist
+        return prevState;
+      }
+    });
   };
+  
 
-  const onSubmitHandler = (formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
+  const onSubmitHandler = async (formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
     formSubmitEvent.preventDefault();
 
     const allFieldsValid: boolean = commandData.commandAuthorizedUsers.every(user => validateField("commandAuthorizedUser", user));
 
     if (!allFieldsValid) {
       formHasErrorsConfirmation();
-      return;
+      return false;
     }
 
     const formSubmissionData = {
@@ -223,11 +264,17 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       commandAuthorizedUsers: commandData.commandAuthorizedUsers
     }
 
-    const postRequestBotCommandResponse = postBotCommands(
-      formSubmissionData
-    );
-
-    console.log(`Form submission data is: ${Object.values(formSubmissionData)}`);
+    try {
+      const postCommandResponse = await postBotCommands(
+        formSubmissionData
+      );
+      if (postCommandResponse) {
+        onClearHandler();
+        showSuccessSubmissionConfirmation();
+      }
+    } catch (error) {
+      showErrorSubmissionConfirmation();
+    }
   };
     if (userLoggedIn) {
       /*
@@ -425,8 +472,16 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
                             
                             <Row className="my-1 justify-content-center mt-5">
-                              <Col xs={6} md={3}>
-                                <Button className="btn btn-primary" onClick={addAuthorizedUserField}>
+                              <Col xs={12} md={6}>
+                                <FormLabel 
+                                  className="command_authorized_user_label"
+                                >
+                                  You can add a maximum of 8 authorized users. If you want more, please specify so in the command description
+                                </FormLabel>
+                                <Button className="btn btn-primary" 
+                                  onClick={addAuthorizedUserField}
+                                  disabled={commandData.commandAuthorizedUsers.length >= 8}
+                                >
                                 <FontAwesomeIcon icon={faUser} className="mx-1"/>
                                 Add additional authorized users
                                 </Button>
