@@ -22,25 +22,25 @@ import {
 /*
 Imports from Custom classes
 */
-import indexRouter from "./api/routes/botapi.ts";
-import userRouter from "./api/routes/user.ts";
-import apiRouter from "./api/routes/botapi.ts";
-import CustomDiscordClient from "./utils/CustomDiscordClient.ts";
-import CustomEventEmitter from "./utils/CustomEventEmitter.ts";
+import indexRouter from "./api/routes/botapi";
+import userRouter from "./api/routes/user";
+import apiRouter from "./api/routes/botapi";
+import CustomDiscordClient from "./utils/CustomDiscordClient";
+import CustomEventEmitter from "./utils/CustomEventEmitter";
 import { EmbedBuilder } from "@discordjs/builders";
-import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository.ts";
-import CommonClass from "./entity/CommonClass.ts";
+import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository";
+import CommonClass from "./entity/CommonClass";
 import {
   formatDatetimeValue,
   formatTimeValue,
-} from "./utils/NormalizeDatetimeAndTimeValue.ts";
-import IDatabaseResponseObject from "./utils/IDiscordDatabaseResponse.ts";
-import IDiscordEventData from "./utils/IDiscordEventData.ts";
-import DiscordEvent from "./utils/DiscordEvent.ts";
+} from "./utils/NormalizeDatetimeAndTimeValue";
+import IDatabaseResponseObject from "./utils/IDiscordDatabaseResponse";
+import IDiscordEventData from "./utils/IDiscordEventData";
+import DiscordEvent from "./utils/DiscordEvent";
 const server_port: string | undefined = process.env.port;
-import handleButtonInteraction from "./modules/handleButtonInteraction.ts";
-import CommonClassWork from "./entity/CommonClassWork.ts";
-import Logger from "./utils/Logger.ts";
+import handleButtonInteraction from "./modules/handleButtonInteraction";
+import CommonClassWork from "./entity/CommonClassWork";
+import Logger from "./utils/Logger";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
