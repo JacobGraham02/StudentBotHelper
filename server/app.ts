@@ -22,7 +22,7 @@ import {
 /*
 Imports from Custom classes
 */
-import indexRouter from "./api/routes/index.ts";
+import indexRouter from "./api/routes/botapi.ts";
 import userRouter from "./api/routes/user.ts";
 import apiRouter from "./api/routes/botapi.ts";
 import CustomDiscordClient from "./utils/CustomDiscordClient.ts";
