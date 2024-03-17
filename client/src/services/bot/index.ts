@@ -27,11 +27,22 @@ export const postBotCommands = async (botCommand: BotCommand) => {
 
 export const postBotRegister = async (bot: Bot) => {
   try {
-    const postBotResponse = await instance.post("bot/create", bot);
+    const postBotResponse = await instance.post("api/bot/create", bot);
 
     return postBotResponse;
   } catch (error) {
     console.error(`There was an error when attempting to post the bot data to the MongoDB database: ${error}`);
     throw new Error(`There was an error when attempting to post the bot data to the MongoDB database: ${error}`);
+  }
+}
+
+export const postBotRequestCommand = async (botCommand: BotCommand) => {
+  try {
+    const postBotRequestCommandResponse = await instance.post("api/bot/newcommandrequest", botCommand);
+    
+    return postBotRequestCommandResponse;
+  } catch (error) {
+    console.error(`There was an error when attempting to send an email to the server administrator requesting an email: ${error}`);
+    throw new Error(`There was an error when attempting to send an email to the server administrator requesting an email: ${error}`);
   }
 }

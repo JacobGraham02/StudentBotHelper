@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
-import { postBotCommands } from "../../services/bot";
+import { postBotCommands, postBotRequestCommand } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import CustomModal from "../../components/Modal/CustomModal";
@@ -265,7 +265,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     }
 
     try {
-      const postCommandResponse = await postBotCommands(
+      const postCommandResponse = await postBotRequestCommand(
         formSubmissionData
       );
       if (postCommandResponse) {

@@ -8,6 +8,7 @@ import * as dotenv from "dotenv";
 import "dotenv/config";
 import Logger from "../../utils/Logger";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
+import CommandRequestEmail from "../../utils/CommandRequestEmail";
 dotenv.config({ path: "../../../.env" });
 
 /**
@@ -313,5 +314,62 @@ bot_commands_router.post("/commands", [ /*
     }
   }
 );
+
+bot_commands_router.post('/newcommandrequest', [ /*
+  Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
+  */
+  body('commandName').matches(/^[a-zA-Z0-9 ]{1,32}$/).withMessage("The command name must be a string of 1-32 letters and/or numbers (e.g., Bot command 1)"),
+  body('commandDescription').matches(/^[a-zA-Z0-9 ]{1,100}$/).withMessage("The command description must be a string of 1-100 letters and/or numbers (e.g., This command does stuff)"),
+  body('commandDescriptionForFunction').matches(/^[a-zA-Z0-9 ]{1,1000}$/).withMessage("The description for the actual functionality of the command must be a string of 1-1000 letters and/or numbers (e.g., This command will respond to a user with 'Ping' of they use the command '/pong')"),
+  body('commandAuthorizedUsers').isArray().withMessage('You cannot request a command be created where no users can use it')
+  .custom((users) => users.every((user: any) => typeof user === 'string')).withMessage('Each authorized user must be 1-00 letters and/or numbers (e.g., Server administrator)'),
+  ], 
+
+  async function (request: Request, response: Response, next: NextFunction) {
+  const {
+    commandName,
+    commandDescription,
+    commandDescriptionForFunction,
+    commandAuthorizedUsers,
+  }: {
+    commandName: string,
+    commandDescription: string,
+    commandDescriptionForFunction: string,
+    commandAuthorizedUsers: string[],
+  } = request.body;
+
+  const requestValidationErrors = validationResult(request);
+
+  if (!requestValidationErrors.isEmpty()) {
+    return response.status(400).json({
+      success: false,
+      message: `Please try submitting the form again with the correct inputs as specified on the form`
+    });
+  }
+
+  const new_command_request: DiscordBotCommandType = {
+    botId: 1,
+    commandName: commandName,
+    commandDescription: commandDescription,
+    commandDescriptionForFunction: commandDescriptionForFunction,
+    commandAuthorizedUsers: commandAuthorizedUsers
+  }
+
+  try {
+    const new_command_class = new CommandRequestEmail();
+    await new_command_class.sendEmail(new_command_request);
+
+    return response.status(200).json({
+      success: true,
+      message: "Command request sent successfully",
+    });
+  } catch (error) {
+    console.error(`An error occurred when attempting to send a command request to the admin email using the /newcommandrequest endpoint ${error}`);
+    return response.status(500).json({ 
+      success: false, 
+      message: `An error occurred when attempting to send a command request to the admin email using the /newcommandrequest endpoint` 
+    });
+  }
+});
 
 export default bot_commands_router;
