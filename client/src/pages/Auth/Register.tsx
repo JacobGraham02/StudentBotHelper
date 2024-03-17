@@ -120,6 +120,7 @@ const Register = () => {
         id: response.data.body.id,
         email: response.data.body.email,
         username: response.data.body.username,
+        password: response.data.body.password,
         refreshToken: response.data.body.refreshToken,
       };
 

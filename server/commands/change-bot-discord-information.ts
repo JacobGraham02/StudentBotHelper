@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
 import BotRepository from "../database/MongoDB/BotRepository";
-import IDiscordBotInformation from "../database/MongoDB/IDiscordBotInformation";
 
 export default function () {
   const change_bot_discord_information_object: Object = {

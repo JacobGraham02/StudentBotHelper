@@ -7,6 +7,8 @@ const bot_commands_router: Router = express.Router();
 import * as dotenv from "dotenv";
 import "dotenv/config";
 import Logger from "../../utils/Logger";
+import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
+import CommandRequestEmail from "../../utils/CommandRequestEmail";
 dotenv.config({ path: "../../../.env" });
 
 /**
@@ -192,9 +194,17 @@ bot_commands_router.post(
   async function (request: Request, response: Response, next: NextFunction) {}
 );
 
-bot_commands_router.post(
-  "/configs",
-  async function (request: Request, response: Response, next: NextFunction) {
+bot_commands_router.post("/configs", [ /*
+    Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
+    */
+    body('guildId').matches(/^[0-9]{18}$/).withMessage("The Discord guild id must be a string of 18 numbers"),
+    body('commandChannelId').matches(/^[0-9]{18}$/).withMessage("The Discord channel id must be a string of 18 numbers"),
+    body('buttonChannelId').matches(/^[0-9]{18}$/).withMessage("The Discord bot role button channel id must be a string of 18 numbers"),
+    body('botInfoChannelId').matches(/^[0-9]{18}$/).withMessage("The Discord bot info channel id must be a string of 18 numbers"),
+    body('botErrorChannelId').matches(/^[0-9]{18}$/).withMessage("The Discord bot error channel id must be a string of 18 numbers")
+    ], 
+    
+    async function (request: Request, response: Response, next: NextFunction) {
     const {
       guildId,
       commandChannelId,
@@ -208,27 +218,15 @@ bot_commands_router.post(
       botInfoChannelId: string,
       botErrorChannelId: string
     } = request.body;
-
-    /*
-    Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
-    */
-    body(guildId).matches(/^[0-9]{18}$/).withMessage("The Discord guild id must be a string of 18 numbers");
-    body(commandChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord channel id must be a string of 18 numbers");
-    body(buttonChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot role button channel id must be a string of 18 numbers");
-    body(botInfoChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot info channel id must be a string of 18 numbers");
-    body(botErrorChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot error channel id must be a string of 18 numbers");
-
-    (request, response) => {
-      const validationErrors = validationResult(request);
-      
-      if (!validationErrors.isEmpty()) {
-        return response.status(400).json({
-          success: false,
-          message: `Please try submitting the form again with the correct inputs as specified on the form`
-        }); 
-      }
+  
+    const requestValidationErrors = validationResult(request);
+    if (!requestValidationErrors.isEmpty()) {
+      return response.status(400).json({
+        success: false,
+        message: `Please try submitting the form again with the correct inputs as specified on the form`
+      }); 
     }
-
+    
     const config_object = {
       bot_guild_id: guildId,
       bot_commands_channel_id: commandChannelId,
@@ -256,5 +254,122 @@ bot_commands_router.post(
     }
   }
 );
+
+bot_commands_router.post("/commands", [ /*
+    Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
+    */
+    body('commandName').matches(/^[a-zA-Z0-9 ]{1,32}$/).withMessage("The command name must be a string of 1-32 letters and/or numbers (e.g., Bot command 1"),
+    body('commandDescription').matches(/^[a-zA-Z0-9 ]{1,100}$/).withMessage("The command description must be a string of 1-100 letters and/or numbers (e.g., This command does stuff"),
+    body('commandDescriptionForFunction').matches(/^[a-zA-Z0-9 ]{1,1000}$/).withMessage("The description for the actual functionality of the command must be a string of 1-1000 letters and/or numbers (e.g., This command will respond to a user with 'Ping' of they use the command '/pong'"),
+    body('commandAuthorizedUsers').isArray().withMessage('You cannot request a command be created where no users can use it')
+    .custom((users) => users.every((user: any) => typeof user === 'string')).withMessage('Each authorized user must be 1-00 letters and/or numbers (e.g., Server administrator'),
+    ], 
+    
+    async function (request: Request, response: Response, next: NextFunction) {
+    const {
+      commandName,
+      commandDescription,
+      commandDescriptionForFunction,
+      commandAuthorizedUsers,
+    }: {
+      commandName: string,
+      commandDescription: string,
+      commandDescriptionForFunction: string,
+      commandAuthorizedUsers: string[],
+    } = request.body;
+  
+    const requestValidationErrors = validationResult(request);
+
+    if (!requestValidationErrors.isEmpty()) {
+      return response.status(400).json({
+        success: false,
+        message: `Please try submitting the form again with the correct inputs as specified on the form`
+      }); 
+    }
+    
+    const command_object: DiscordBotCommandType = {
+      botId: 1,
+      commandName: commandName,
+      commandDescription: commandDescription,
+      commandDescriptionForFunction: commandDescriptionForFunction,
+      commandAuthorizedUsers: commandAuthorizedUsers
+    };
+
+    try {
+      const bot_database_repository_instance: BotRepository = new BotRepository();
+      const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+      
+      await bot_controller_instance.insertBotCommandDocument(command_object);
+
+      return response.status(200).json({
+        success: true,
+        message: "Bot command inserted successfully",
+      });
+    } catch (error) {
+      console.error(`An error occurred when attempting to insert a new bot command using the /command endpoint: ${error}`);
+      return response.status(500).json({ 
+        success: false, 
+        message: `An internal server error occurred when attempting to insert a new bot command at the /configs endpoint` 
+      });
+    }
+  }
+);
+
+bot_commands_router.post('/newcommandrequest', [ /*
+  Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
+  */
+  body('commandName').matches(/^[a-zA-Z0-9 ]{1,32}$/).withMessage("The command name must be a string of 1-32 letters and/or numbers (e.g., Bot command 1)"),
+  body('commandDescription').matches(/^[a-zA-Z0-9 ]{1,100}$/).withMessage("The command description must be a string of 1-100 letters and/or numbers (e.g., This command does stuff)"),
+  body('commandDescriptionForFunction').matches(/^[a-zA-Z0-9 ]{1,1000}$/).withMessage("The description for the actual functionality of the command must be a string of 1-1000 letters and/or numbers (e.g., This command will respond to a user with 'Ping' of they use the command '/pong')"),
+  body('commandAuthorizedUsers').isArray().withMessage('You cannot request a command be created where no users can use it')
+  .custom((users) => users.every((user: any) => typeof user === 'string')).withMessage('Each authorized user must be 1-00 letters and/or numbers (e.g., Server administrator)'),
+  ], 
+
+  async function (request: Request, response: Response, next: NextFunction) {
+  const {
+    commandName,
+    commandDescription,
+    commandDescriptionForFunction,
+    commandAuthorizedUsers,
+  }: {
+    commandName: string,
+    commandDescription: string,
+    commandDescriptionForFunction: string,
+    commandAuthorizedUsers: string[],
+  } = request.body;
+
+  const requestValidationErrors = validationResult(request);
+
+  if (!requestValidationErrors.isEmpty()) {
+    return response.status(400).json({
+      success: false,
+      message: `Please try submitting the form again with the correct inputs as specified on the form`
+    });
+  }
+
+  const new_command_request: DiscordBotCommandType = {
+    botId: 1,
+    commandName: commandName,
+    commandDescription: commandDescription,
+    commandDescriptionForFunction: commandDescriptionForFunction,
+    commandAuthorizedUsers: commandAuthorizedUsers
+  }
+
+  try {
+    const new_command_class = new CommandRequestEmail();
+    await new_command_class.sendEmail(new_command_request);
+
+    return response.status(200).json({
+      success: true,
+      message: "Command request sent successfully",
+    });
+  } catch (error) {
+    console.error(`An error occurred when attempting to send a command request to the admin email using the /newcommandrequest endpoint ${error}`);
+    return response.status(500).json({ 
+      success: false, 
+      message: `An error occurred when attempting to send a command request to the admin email using the /newcommandrequest endpoint` 
+    });
+  }
+});
 
 export default bot_commands_router;

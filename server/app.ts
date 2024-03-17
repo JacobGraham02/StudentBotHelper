@@ -22,27 +22,32 @@ import {
 /*
 Imports from Custom classes
 */
-import indexRouter from "./api/routes/index.ts";
-import userRouter from "./api/routes/user.ts";
-import apiRouter from "./api/routes/botapi.ts";
-import CustomDiscordClient from "./utils/CustomDiscordClient.ts";
-import CustomEventEmitter from "./utils/CustomEventEmitter.ts";
+import indexRouter from "./api/routes/botapi";
+import userRouter from "./api/routes/user";
+import apiRouter from "./api/routes/botapi";
+import CustomDiscordClient from "./utils/CustomDiscordClient";
+import CustomEventEmitter from "./utils/CustomEventEmitter";
 import { EmbedBuilder } from "@discordjs/builders";
-import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository.ts";
-import CommonClass from "./entity/CommonClass.ts";
+import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository";
+import CommonClass from "./entity/CommonClass";
 import {
   formatDatetimeValue,
   formatTimeValue,
-} from "./utils/NormalizeDatetimeAndTimeValue.ts";
-import IDatabaseResponseObject from "./utils/IDiscordDatabaseResponse.ts";
-import IDiscordEventData from "./utils/IDiscordEventData.ts";
-import DiscordEvent from "./utils/DiscordEvent.ts";
+} from "./utils/NormalizeDatetimeAndTimeValue";
+import IDatabaseResponseObject from "./utils/IDiscordDatabaseResponse";
+import IDiscordEventData from "./utils/IDiscordEventData";
+import DiscordEvent from "./utils/DiscordEvent";
 const server_port: string | undefined = process.env.port;
-import handleButtonInteraction from "./modules/handleButtonInteraction.ts";
-import CommonClassWork from "./entity/CommonClassWork.ts";
-import Logger from "./utils/Logger.ts";
+import handleButtonInteraction from "./modules/handleButtonInteraction";
+import CommonClassWork from "./entity/CommonClassWork";
+import Logger from "./utils/Logger";
+import BotController from "./api/controllers/BotController";
+import BotRepository from "./database/MongoDB/BotRepository";
+import { CommandType } from "./database/MongoDB/types/CommandType";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
+const bot_repository = new BotRepository();
+const bot_controller = new BotController(bot_repository);
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -69,11 +74,11 @@ The string 'commands_folder_path' holds the directory path to the 'dist/commands
 to deploy the commands to the discord bot. Occasionally, TypeScript may generate scripts that end with a .map extension. We must ignore those because they are not
 command files. 
 */
-const commands_folder_path: string = path.join(__dirname, "./commands");
-const filtered_commands_files: string[] = fs
-  .readdirSync(commands_folder_path)
-  .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
-discord_client_instance.discord_commands = new Collection();
+// const commands_folder_path: string = path.join(__dirname, "./commands");
+// const filtered_commands_files: string[] = fs
+//   .readdirSync(commands_folder_path)
+//   .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
+// discord_client_instance.discord_commands = new Collection();
 
 /*
 Get the singleton instance of the custom event emitter class. The event emitter must be a singleton because only one event emitter can exist in Node.js to prevent any problems.
@@ -85,16 +90,34 @@ const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
  * the default exported function is stored in 'command_object', via the .default() operator and then stored in the discord bot commands collection. By setting the collection key
  * to be the name of the command, and the value to be the command data, each command name executed in discord will be associated with some command data.
  */
-async function fetchCommandFiles() {
-  for (const command_file of filtered_commands_files) {
-    const command_file_path = path.join(commands_folder_path, command_file);
-    const command = await import(command_file_path);
-    if (Object.keys(command).length >= 1 && command.constructor === Object) {
-      const command_object = command.default(logger);
-      discord_client_instance.discord_commands.set(
-        command_object.data.name,
-        command_object
-      );
+// async function registerCommandsFromDatabase(commands: CommandType[]) {
+//   for (const command of commands) {
+//       // Assuming each command object has a property 'filePath' containing the path to the command file
+//       const command_file_path = path.join(commands_folder_path, command.filePath);
+
+//       try {
+//           const imported_command = await import(command_file_path);
+//           if (Object.keys(imported_command).length >= 1 && imported_command.constructor === Object) {
+//               const command_object = imported_command.default(logger);
+//               discord_client_instance.discord_commands.set(command_object.data.name, command_object);
+//           }
+//       } catch (error) {
+//           console.error(`Error loading command file '${command_file_path}':`, error);
+//       }
+//   }
+// }
+async function registerCommandsFromDatabase(database_commands: CommandType[]) {
+
+  if (!Array.isArray(database_commands)) {
+    console.error(`The command array returned form the database is not of the the type CommandType[]. Instead, it is: ${typeof database_commands} with value ${database_commands}`);
+    return;
+  }
+
+  for (const command of database_commands) {
+    const command_type = {
+      command_name: command.command_name,
+      command_description: command.command_description,
+      command_function: command.command_function
     }
   }
 }
@@ -104,7 +127,9 @@ async function fetchCommandFiles() {
  * connected to the Discord channel.
  */
 discord_client_instance.on("ready", async () => {
-  fetchCommandFiles();
+  const database_commands = await bot_controller.getAllBotCommandsDocuments();
+  registerCommandsFromDatabase(database_commands);
+  
   if (discord_client_instance.user) {
     console.log(
       `The discord bot is logged in as ${discord_client_instance.user.tag}`
@@ -135,6 +160,27 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
 
   if (!interaction.isCommand()) {
     return;
+  }
+
+  const command_name = interaction.commandName;
+
+  try {
+    const commandData: CommandType | undefined = await bot_controller.getBotCommandDocument(command_name);
+
+    if (!commandData) {
+      await interaction.reply({
+        content: `This command does not exist`,
+        ephemeral: true,
+      });
+      return;
+    }
+  } catch (error: any) {
+    console.error(`There was an error when attempting to execute the command ${command_name}: ${error}`);
+
+    await interaction.reply({
+      content: `There was an error when attempting to execute this command: ${error}`,
+      ephemeral: true
+    });
   }
 
   /*
