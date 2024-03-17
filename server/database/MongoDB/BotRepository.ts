@@ -2,6 +2,7 @@ import { UUID } from 'crypto';
 import DatabaseConnectionManager from './DatabaseConnectionManager';
 import { DiscordBotCommandType } from './types/DiscordBotCommandType';
 import { DiscordBotInformationType } from './types/DiscordBotInformationType';
+import { CommandType } from './types/CommandType';
 
 export default class BotRepository {
 
@@ -81,6 +82,41 @@ export default class BotRepository {
             await this.releaseConnectionSafely(database_connection);
         }
     }
+
+    public async getBotCommandDocument(command_name: string) {
+        const database_connection = await this.database_connection_manager.getConnection();
+
+        try {
+            const commands_collection = database_connection.collection('commands');
+
+            const command: CommandType = await commands_collection.findOne({ command_name: command_name });
+
+            return command;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to retrieve the bot package by name. Please inform the server administrator of this error: ${error}`);
+            throw error;
+        } finally {
+            await this.releaseConnectionSafely(database_connection);
+        }
+    }
+
+    public async getAllBotCommandDocuments() {
+        const database_connection = await this.database_connection_manager.getConnection();
+    
+        try {
+            const commands_collection = database_connection.collection('commands');
+    
+            const commands: CommandType[] = await commands_collection.find().toArray();
+    
+            return commands;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
+            throw error;
+        } finally {
+            await this.releaseConnectionSafely(database_connection);
+        }
+    }
+    
 
     private async releaseConnectionSafely(database_connection: any): Promise<void> {
         if (database_connection) {
