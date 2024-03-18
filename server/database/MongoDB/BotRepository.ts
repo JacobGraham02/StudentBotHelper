@@ -2,7 +2,6 @@ import { UUID } from 'crypto';
 import DatabaseConnectionManager from './DatabaseConnectionManager';
 import { DiscordBotCommandType } from './types/DiscordBotCommandType';
 import { DiscordBotInformationType } from './types/DiscordBotInformationType';
-import { CommandType } from './types/CommandType';
 
 export default class BotRepository {
 
@@ -89,7 +88,7 @@ export default class BotRepository {
         try {
             const commands_collection = database_connection.collection('commands');
 
-            const command: CommandType = await commands_collection.findOne({ command_name: command_name });
+            const command = await commands_collection.findOne({ command_name: command_name });
 
             return command;
         } catch (error: any) {
@@ -104,14 +103,19 @@ export default class BotRepository {
         const database_connection = await this.database_connection_manager.getConnection();
     
         try {
+            let command_objects: any = [];
             const commands_collection = database_connection.collection('commands');
     
-            const commands = await commands_collection.find().toArray();
-    
-            return commands;
+            const commands = await commands_collection.find({ bot_id: 1 }).toArray();
+
+            for (let i = 0; i < commands.length; i++) {
+                command_objects.push(commands[i]);
+            }
+            
+            return command_objects;
         } catch (error: any) {
             console.error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
-            //throw error;
+            throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
         } finally {
             await this.releaseConnectionSafely(database_connection);
         }

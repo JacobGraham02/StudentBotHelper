@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, Router } from "express";
+import express, { Request, Response, NextFunction, Router, json } from "express";
 import { body, validationResult } from 'express-validator';
 import DiscordAPIOperations from "../controllers/BotCommands/DiscordAPIOperations";
 import BotRepository from "../../database/MongoDB/BotRepository";
@@ -379,13 +379,10 @@ bot_commands_router.get('/getcommands', async function (request: Request, respon
     
     const commands = await bot_controller_instance.getAllCommandDocuments();
 
-    return commands;
+    response.json(commands);
   } catch (error) {
     console.error(`An error occurred when attempting to retrieve all bot commands from the database: ${error}`);
-    return response.status(500).json({
-      success: false,
-      message: `An error occurred when attempting to retrieve all bot commands from the database: ${error}`
-    });
+    throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
   }
 });
 

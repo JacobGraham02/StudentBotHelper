@@ -2,7 +2,6 @@ import axios = require("axios");
 import BotRepository from "../../database/MongoDB/BotRepository";
 import { DiscordBotInformationType } from "../../database/MongoDB/types/DiscordBotInformationType";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
-import { CommandType } from "../../database/MongoDB/types/CommandType";
 
 export default class BotController {
 
@@ -32,7 +31,7 @@ export default class BotController {
         }
     }
 
-    async getBotCommandDocument(command_name: string): Promise<CommandType> {
+    async getBotCommandDocument(command_name: string) {
         
         try {
             const bot_command_document = await this.bot_repository.getBotCommandDocument(command_name);
@@ -43,15 +42,15 @@ export default class BotController {
         }
     }
 
-    async getAllCommandDocuments(): Promise<void> {
+    async getAllCommandDocuments() {
 
         try {
             const bot_command_documents = await this.bot_repository.getAllBotCommandDocuments();
 
-            return bot_command_documents;
+            return bot_command_documents
         } catch (error: any) {
             console.error(`There was an error when attempting to fetch all bot comamnds from the MongoDB database: ${error}`);
-            //throw error;
+            throw new Error(`There was an error when attempting to fetch all bot comamnds from the MongoDB database: ${error}`);
         }
     }
 }

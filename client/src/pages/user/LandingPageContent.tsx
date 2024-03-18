@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 import { getAllBotCommands } from "../../services/bot";
@@ -14,7 +14,19 @@ const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
       onConfirm: () => {}  
     });
 
-    getAllBotCommands();
+    const [botCommands, setBotCommands] = useState<any[]>([]); 
+
+    useEffect(() => {
+        const fetchBotCommands = async () => {
+            try {
+                const response = await getAllBotCommands();
+                setBotCommands(response.data); // Set response data directly
+                console.log("Bot commands:", response.data);
+            } catch (error) {
+                throw new Error(`There was an error when attempting to fetch all of the bot commands from the database: ${error}`);
+            }
+        };fetchBotCommands();
+    }, []); // Empty dependency array to only run once when component mounts
     
     return (
         <main id="main" className="text-center">
