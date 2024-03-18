@@ -20,14 +20,21 @@ import IModalContent from "./interfaces/IModalContent";
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [confirmClear, setConfirmClear] = useState(false);
   
     const [showModal, setShowModal] = useState(false);
 
-    const location = useLocation();
+    const { state } = useLocation();
 
-    const { command } = location.state || {}; 
+    if (state) {
+      const stateBotId = state.command_object.bot_id;
+      const stateCommandName = state.command_object.command_name;
+      const stateCommandDescription = state.command_object.command_description;
+      const stateCommandFunction = state.command_object.command_function;
+      const stateUsers = state.command_object.command_users;
+    }
 
     const [modalContent, setModalContent] = useState<IModalContent>({
       title: "",
@@ -128,37 +135,42 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       setShowModal(true);
     }
   
+    // const stateBotId = state.command_object.bot_id;
+    // const stateCommandName = state.command_object.command_name;
+    // const stateCommandDescription = state.command_object.command_description;
+    // const stateCommandFunction = state.command_object.command_function;
+    // const stateUsers = state.command_object.command_users;
     const [commandData, setCommandData] = useState<CommandsForm>(
     {
       commandName: {
-        value: command.command_name || "",
+        value: state ? stateCommandName : "",
         error: "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters (a-z)",
         valid: false,
         touched: false
       },
 
       commandDescription: {
-        value: command.command_description || "",
+        value: state ? stateCommandDescription : "",
         error: "Invalid command description. Please enter a command description whose length is equal to or less than 100 characters (a-z)",
         valid: false,
         touched: false
       },
      
       commandAuthorizedUser: {
-        value: command.command_users || "",
+        value: state ? stateUsers : "",
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
         valid: false,
         touched: false
       },
 
       commandDescriptionForFunction: {
-        value: command.command_function || "",
+        value: state ? stateCommandFunction : "",
         error: "Invalid command function description. Please enter a description that is less than 1000 characters long (a-z)",
         valid: false,
         touched: false
       },
 
-      commandAuthorizedUsers: [""]
+      commandAuthorizedUsers: state ? stateUsers : [""]
     }
   );
 

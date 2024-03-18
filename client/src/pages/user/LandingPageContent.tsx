@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 import { getAllBotCommands } from "../../services/bot";
-import { useNavigate } from "react-router-dom";
+import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
+import ICommandState from "./interfaces/ICommandState";
 
 const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const navigate = useNavigate();
@@ -45,41 +46,27 @@ const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
             try {
                 const response = await getAllBotCommands();
                 setBotCommands(response.data); // Set response data directly
-                console.log("Bot commands size: ", botCommands.length);
-                console.log("Bot commands:", response);
             } catch (error) {
                 throw new Error(`There was an error when attempting to fetch all of the bot commands from the database: ${error}`);
             }
         };
         fetchBotCommands();
     }, []); // Empty dependency array to only run once when component mounts
-
-    // botCommands
-    // [
-    //     {
-    //       _id: "65f7899fb911099617e2a4d7",
-    //       bot_id: 1,
-    //       command_description: 'Test command description',
-    //       command_function: 'I want this command to say the word pong when a user types in the command ping',
-    //       command_name: 'Test command 1',
-    //       command_users: [ 'Auth user 1', 'Auth user 2' ]
-    //     }
-    //   ]
-    const handleClick = (command: any) => {
-        console.log("Clicked command:", command);
-        navigate(`/commands/${command._id}`, { state: { command }});
-    };
-
+    
     return (
         <main id="main" className="text-center">
             <div>
                 <ul> 
                     {currentCommands.map((command, index) => (
                         <li key={index}>
-                            <button onClick={() => handleClick(command)}>
-                                {command.command_name}
-                            </button>
-                        </li>
+                        <NavLink
+                            to="/commands"
+                            state={{ command_object: command}}
+                            className="nav-link"
+                            >
+                            {command.command_name}
+                        </NavLink>
+                    </li>
                     ))}
                 </ul>
             </div>
