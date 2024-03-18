@@ -372,4 +372,21 @@ bot_commands_router.post('/newcommandrequest', [ /*
   }
 });
 
+bot_commands_router.get('/getcommands', async function (request: Request, response: Response, next: NextFunction) {
+  try {
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+    
+    const commands = await bot_controller_instance.getAllCommandDocuments();
+
+    return commands;
+  } catch (error) {
+    console.error(`An error occurred when attempting to retrieve all bot commands from the database: ${error}`);
+    return response.status(500).json({
+      success: false,
+      message: `An error occurred when attempting to retrieve all bot commands from the database: ${error}`
+    });
+  }
+});
+
 export default bot_commands_router;

@@ -43,7 +43,7 @@ export default class BotController {
         }
     }
 
-    async getAllBotCommandsDocuments(): Promise<CommandType[]> {
+    async getAllCommandDocuments(): Promise<void> {
 
         try {
             const bot_command_documents = await this.bot_repository.getAllBotCommandDocuments();
@@ -51,7 +51,7 @@ export default class BotController {
             return bot_command_documents;
         } catch (error: any) {
             console.error(`There was an error when attempting to fetch all bot comamnds from the MongoDB database: ${error}`);
-            throw error;
+            //throw error;
         }
     }
 }

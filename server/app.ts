@@ -106,7 +106,7 @@ const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
 //       }
 //   }
 // }
-async function registerCommandsFromDatabase(database_commands: CommandType[]) {
+async function registerCommandsFromDatabase(database_commands: any) {
 
   if (!Array.isArray(database_commands)) {
     console.error(`The command array returned form the database is not of the the type CommandType[]. Instead, it is: ${typeof database_commands} with value ${database_commands}`);
@@ -127,7 +127,7 @@ async function registerCommandsFromDatabase(database_commands: CommandType[]) {
  * connected to the Discord channel.
  */
 discord_client_instance.on("ready", async () => {
-  const database_commands = await bot_controller.getAllBotCommandsDocuments();
+  const database_commands = await bot_controller.getAllCommandDocuments();
   registerCommandsFromDatabase(database_commands);
   
   if (discord_client_instance.user) {

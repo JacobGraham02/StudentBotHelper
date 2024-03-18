@@ -106,12 +106,12 @@ export default class BotRepository {
         try {
             const commands_collection = database_connection.collection('commands');
     
-            const commands: CommandType[] = await commands_collection.find().toArray();
+            const commands = await commands_collection.find().toArray();
     
             return commands;
         } catch (error: any) {
             console.error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
-            throw error;
+            //throw error;
         } finally {
             await this.releaseConnectionSafely(database_connection);
         }

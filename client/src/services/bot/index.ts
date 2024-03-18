@@ -46,3 +46,13 @@ export const postBotRequestCommand = async (botCommand: BotCommand) => {
     throw new Error(`There was an error when attempting to send an email to the server administrator requesting an email: ${error}`);
   }
 }
+
+export const getAllBotCommands = async () => {
+  try {
+    const allBotCommandDocuments = await instance.get("api/bot/getcommands");
+    return allBotCommandDocuments;
+  } catch (error) {
+    console.error(`There was an error when attempting to get all bot commands: ${error}`);
+    throw new Error(`There was an error when attempting to get all bot commands: ${error}`);
+  }
+}

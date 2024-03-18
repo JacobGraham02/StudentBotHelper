@@ -265,7 +265,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     }
 
     try {
-      const postCommandResponse = await postBotRequestCommand(
+      const postCommandResponse = await postBotCommands(
         formSubmissionData
       );
       if (postCommandResponse) {
