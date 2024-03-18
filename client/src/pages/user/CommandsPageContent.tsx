@@ -9,7 +9,7 @@ import {
   FormLabel,
   Button
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
 import { postBotCommands, postBotRequestCommand } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,6 +24,10 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const [confirmClear, setConfirmClear] = useState(false);
   
     const [showModal, setShowModal] = useState(false);
+
+    const location = useLocation();
+
+    const { command } = location.state || {}; 
 
     const [modalContent, setModalContent] = useState<IModalContent>({
       title: "",
@@ -127,28 +131,28 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const [commandData, setCommandData] = useState<CommandsForm>(
     {
       commandName: {
-        value: "",
+        value: command.command_name || "",
         error: "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters (a-z)",
         valid: false,
         touched: false
       },
 
       commandDescription: {
-        value: "",
+        value: command.command_description || "",
         error: "Invalid command description. Please enter a command description whose length is equal to or less than 100 characters (a-z)",
         valid: false,
         touched: false
       },
      
       commandAuthorizedUser: {
-        value: "",
+        value: command.command_users || "",
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
         valid: false,
         touched: false
       },
 
       commandDescriptionForFunction: {
-        value: "",
+        value: command.command_function || "",
         error: "Invalid command function description. Please enter a description that is less than 1000 characters long (a-z)",
         valid: false,
         touched: false
