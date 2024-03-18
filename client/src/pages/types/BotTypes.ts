@@ -21,6 +21,17 @@ export type BotCommand = {
     commandAuthorizedUsers: string[];
 };
 
+export type LogsForm = {
+  infoLog: {
+    name: string;
+    uri: string;
+  }
+  errorLog: {
+    name: string;
+    uri: string;
+  }
+}
+
 export type CommandsForm = {
     commandName: {
       value: string;

@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 import { getAllBotCommands } from "../../services/bot";
-import { NavLink, NavLinkProps, useNavigate } from "react-router-dom";
-import ICommandState from "./interfaces/ICommandState";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const navigate = useNavigate();

@@ -20,7 +20,7 @@ import IModalContent from "./interfaces/IModalContent";
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const navigate = useNavigate();
-    const location = useLocation();
+    let stateBotId, stateCommandName, stateCommandDescription, stateCommandFunction, stateUsers = undefined;
 
     const [confirmClear, setConfirmClear] = useState(false);
   
@@ -29,11 +29,11 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const { state } = useLocation();
 
     if (state) {
-      const stateBotId = state.command_object.bot_id;
-      const stateCommandName = state.command_object.command_name;
-      const stateCommandDescription = state.command_object.command_description;
-      const stateCommandFunction = state.command_object.command_function;
-      const stateUsers = state.command_object.command_users;
+      stateBotId = state.command_object.bot_id;
+      stateCommandName = state.command_object.command_name;
+      stateCommandDescription = state.command_object.command_description;
+      stateCommandFunction = state.command_object.command_function;
+      stateUsers = state.command_object.command_users;
     }
 
     const [modalContent, setModalContent] = useState<IModalContent>({
@@ -135,11 +135,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       setShowModal(true);
     }
   
-    // const stateBotId = state.command_object.bot_id;
-    // const stateCommandName = state.command_object.command_name;
-    // const stateCommandDescription = state.command_object.command_description;
-    // const stateCommandFunction = state.command_object.command_function;
-    // const stateUsers = state.command_object.command_users;
     const [commandData, setCommandData] = useState<CommandsForm>(
     {
       commandName: {

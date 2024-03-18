@@ -63,3 +63,19 @@ export const getAllBotCommands = async () => {
     }
   }
 }
+
+export const getAllBotLogFiles = async () => {
+  try {
+    const allBotLogFiles = await instance.get("api/bot/getlogs");
+
+    return allBotLogFiles;
+  } catch (error) {
+    if (error.code === 'ECONNABORTED') {
+      console.error(`The request to fetch all bot log files timed out: ${error}.`);
+      throw new Error(`The request to fetch all bot log files timed out. Please try again later: ${error}.`);
+    } else {
+      console.error(`There was an error when attempting to get all bot log files: ${error}`);
+      throw new Error(`There was an error when attempting to get all bot log files: ${error}`);
+    }
+  }
+}

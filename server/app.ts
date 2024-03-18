@@ -2,8 +2,6 @@
 Imports from Node.js and other libraries defined in package.json
 */
 import * as dotenv from "dotenv";
-// import "dotenv/config";
-// dotenv.config({ path: "../.env" });
 dotenv.config();
 import createError from "http-errors";
 import express, { NextFunction } from "express";

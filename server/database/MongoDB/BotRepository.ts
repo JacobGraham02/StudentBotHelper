@@ -2,6 +2,9 @@ import { UUID } from 'crypto';
 import DatabaseConnectionManager from './DatabaseConnectionManager';
 import { DiscordBotCommandType } from './types/DiscordBotCommandType';
 import { DiscordBotInformationType } from './types/DiscordBotInformationType';
+import * as dotenv from "dotenv";
+import { BlobServiceClient, BlobUploadCommonResponse, ContainerClient } from '@azure/storage-blob';
+dotenv.config();
 
 export default class BotRepository {
 
@@ -118,6 +121,111 @@ export default class BotRepository {
             throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
         } finally {
             await this.releaseConnectionSafely(database_connection);
+        }
+    }
+
+    async logFileExists(containerClient: ContainerClient, logFileName: string): Promise<boolean> {
+        const blobClient = containerClient.getBlockBlobClient(logFileName);
+        const exists = await blobClient.exists();
+        return exists;
+    }
+
+    private getCurrentDateISO() {
+        // Get current date
+        const currentDate: Date = new Date();
+
+        // Format current date to YYYY-MM-DD
+        const formattedDate: string = currentDate.toISOString().split('T')[0];
+
+        return formattedDate;
+    }
+
+    public async writeLogToAzureContainer(logName: string, fileContents: string) {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+        const azureContainerName: string | undefined = process.env.azure_container_name_for_logs;
+    
+        if (!storageAccountConnection) {
+            return new Error(`The azure storage account connection string is undefined`);
+        }
+    
+        if (!azureContainerName) {
+            return new Error(`The azure storage container name is undefined`);
+        }
+    
+        // Create BlobServiceClient
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+        // Get container client
+        const containerClient = blobServiceClient.getContainerClient(azureContainerName);
+
+        // Ensure the container exists
+        await this.logFileExists(containerClient, azureContainerName);
+    
+        // Get current date in ISO format
+        const currentDate = this.getCurrentDateISO();
+    
+        // Define blob file name
+        const blobFileName = `${currentDate}-${logName}.log`;
+    
+        try {
+            // Get blob client for the file
+            const blobClient = containerClient.getBlockBlobClient(blobFileName);
+    
+            // Upload file contents to blob
+            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(fileContents, fileContents.length);
+    
+            // Check if upload was successful
+            if (uploadResponse._response.status === 201) {
+                console.log(`Log file '${blobFileName}' uploaded successfully.`);
+            } else {
+                throw new Error(`Failed to upload log file '${blobFileName}'.`);
+            }
+        } catch (error) {
+            console.error(`Error uploading log file '${blobFileName}':`, error);
+            throw error;
+        }
+    }
+    
+    public async readLogFromAzureContainer(logFileName: string): Promise<string | null> {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+        const azureContainerName: string | undefined = process.env.azure_container_name_for_logs;
+    
+        if (!storageAccountConnection) {
+            throw new Error(`The azure storage account connection string is undefined`);
+        }
+    
+        if (!azureContainerName) {
+            throw new Error(`The azure storage container name is undefined`);
+        }
+    
+        // Create BlobServiceClient
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+        // Get container client
+        const containerClient = blobServiceClient.getContainerClient(azureContainerName);
+    
+        try {
+            // Check if log file exists
+            const fileExists = await this.logFileExists(containerClient, logFileName);
+    
+            if (fileExists) {
+                // Get blob client for the file
+                const blobClient = containerClient.getBlockBlobClient(logFileName);
+    
+                // Download blob content
+                const downloadResponse = await blobClient.downloadToBuffer();
+    
+                // Convert buffer to string
+                const fileContents = downloadResponse.toString();
+    
+                return fileContents;
+            } else {
+                console.log(`Log file '${logFileName}' does not exist.`);
+                return null;
+            }
+        } catch (error) {
+            console.error(`Error reading log file '${logFileName}':`, error);
+            throw error;
         }
     }
     
