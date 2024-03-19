@@ -7,7 +7,8 @@ import { getAllBotLogFiles, writeBotLogFile } from "../../services/bot";
 const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const [showModal, setShowModal] = useState(false);
 
-    const [botLogFiles, setBotLogFiles] = useState<any[]>([]);
+    const [botInfoLogFiles, setBotInfoLogFiles] = useState<any[]>([]);
+    const [botErrorLogFiles, setBotErrorLogFiles] = useState<any[]>([]);
 
     const logFileData: any[] = [];
 
@@ -27,14 +28,17 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     useEffect(() => {
         const fetchBotLogs = async () => {
             try {
-                const botLogsResponse = await getAllBotLogFiles(`studentbothelperinfo`);
-                setBotLogFiles(botLogsResponse.data);
+                const botInfoLogsResponse = await getAllBotLogFiles(`studentbothelperinfo`);
+                const botErrorLogsResponse = await getAllBotLogFiles(`studentbothelpererror`);
+                setBotInfoLogFiles(botInfoLogsResponse.data);
+                setBotErrorLogFiles(botErrorLogsResponse.data);
             } catch (error) {
                 throw new Error(`There was an error when attempting to fetch all of the bot commands from the database: ${error}`);
             }
         };
         fetchBotLogs();
-        // writeBotLogFile(`Test log file name`, `Test log file contents`, `studentbothelperinfo`);
+        //writeBotLogFile(`TestLogInfo`, `Test log info file contents`, `studentbothelperinfo`);
+        //writeBotLogFile(`TestLogError`, `Test log error file contents`, `studentbothelpererror`);
     }, []); // Empty dependency array to only run once when component mounts
 
     const [modalContent, setModalContent] = useState<IModalContent>({
@@ -98,14 +102,15 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                 </CustomModal>
                 <section id="information_logs_section">
                     <h2>Command information logs</h2>
+                    <h3>Click on any of the log file names to download them to your computer</h3>
                     <ul>
-                    {botLogFiles.map((logFile, index) => (
+                    {botInfoLogFiles.map((infoLogFile, index) => (
                         <li key={index}>
                         <a href="#" onClick={(e) => {
                             e.preventDefault(); 
-                            downloadLogFileConfirmation(logFile.name, logFile.content);
+                            downloadLogFileConfirmation(infoLogFile.name, infoLogFile.content);
                         }}>
-                            {logFile.name}
+                            {infoLogFile.name}
                         </a>
                         </li>
                     ))}
@@ -113,7 +118,20 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                 </section>
 
                 <section id="error_logs_section">
-
+                    <h2>Command error logs</h2>
+                    <h3>Click on any of the log file names to download them to your computer</h3>
+                    <ul>
+                    {botErrorLogFiles.map((errorLogFile, index) => (
+                        <li key={index}>
+                        <a href="#" onClick={(e) => {
+                            e.preventDefault(); 
+                            downloadLogFileConfirmation(errorLogFile.name, errorLogFile.content);
+                        }}>
+                            {errorLogFile.name}
+                        </a>
+                        </li>
+                    ))}
+                    </ul>
                 </section>
             </main>
         )
