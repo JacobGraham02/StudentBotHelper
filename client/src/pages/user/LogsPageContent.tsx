@@ -7,6 +7,9 @@ import { getAllBotLogFiles, writeBotLogFile } from "../../services/bot";
 const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const [showModal, setShowModal] = useState(false);
 
+    const [downloadFileName, setDownloadFileName] = useState("");
+    const [downloadFileContents, setDownloadFileContents] = useState("");
+
     const [botInfoLogFiles, setBotInfoLogFiles] = useState<any[]>([]);
     const [botErrorLogFiles, setBotErrorLogFiles] = useState<any[]>([]);
 
@@ -37,11 +40,11 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
             }
         };
         fetchBotLogs();
-        //writeBotLogFile(`TestLogInfo`, `Test log info file contents`, `studentbothelperinfo`);
-        //writeBotLogFile(`TestLogError`, `Test log error file contents`, `studentbothelpererror`);
+        writeBotLogFile(`TestLogInfo2`, `Test log info file contents`, `studentbothelperinfo`);
+        writeBotLogFile(`TestLogError2`, `Test log error file contents`, `studentbothelpererror`);
     }, []); // Empty dependency array to only run once when component mounts
 
-    const [modalContent, setModalContent] = useState<IModalContent>({
+    const [downloadFileModalContent, setDownloadFileModalContent] = useState<IModalContent>({
         title: "",
         body: "",
         cancelButtonText: "",
@@ -67,23 +70,15 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
             a.click(); 
             // Revokes the created Blob URL to release browser resources, as it's no longer needed after the download is initiated.
             URL.revokeObjectURL(url); 
+            
+            setShowModal(false);
         }
         handleDownload(); 
     }
 
-    
-    
     const downloadLogFileConfirmation = (logFileName: string, logFileContents: string) => {
-        setModalContent({
-            title: `Download ${logFileName}`,
-            body: `Are you sure you want to download this log file?`,
-            cancelButtonText: `Cancel`,
-            confirmButtonText: `Confirm`,
-            onConfirm: () => {
-                logFileDownload({ fileName: logFileName, fileContents: logFileContents }); 
-                setShowModal(false);
-            }
-        });
+        setDownloadFileName(logFileName);
+        setDownloadFileContents(logFileContents);
         setShowModal(true);
     }
     
@@ -93,13 +88,15 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                 <CustomModal
                     showModal={showModal}
                     setShowModal={setShowModal}
-                    title={modalContent.title}
-                    body={modalContent.body}
-                    cancelButtonText={modalContent.cancelButtonText}
-                    confirmButtonText={modalContent.confirmButtonText!}
-                    onConfirm={modalContent.onConfirm}
+                    title={`Download: ${downloadFileName}`}
+                    body={downloadFileContents}
+                    cancelButtonText="Go back"
+                    confirmButtonText="Download"
+                    onConfirm={() => {logFileDownload({fileName: downloadFileName, fileContents:downloadFileContents})}}
+                    size="lg"
                 >
                 </CustomModal>
+
                 <section id="information_logs_section">
                     <h2>Command information logs</h2>
                     <h3>Click on any of the log file names to download them to your computer</h3>

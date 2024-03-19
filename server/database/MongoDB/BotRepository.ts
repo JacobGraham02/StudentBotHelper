@@ -145,6 +145,13 @@ export default class BotRepository {
         if (!containerName) {
             throw new Error(`The azure storage container name is undefined or invalid`);
         }
+
+        const logFileLineDate = new Date().toISOString();
+
+        const modifiedFileConents = fileContents
+            .split('\n')
+            .map(line => `${logFileLineDate}: ${line}`)
+            .join('\n')
     
         // Create BlobServiceClient
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
@@ -153,13 +160,7 @@ export default class BotRepository {
         const containerClient = blobServiceClient.getContainerClient(containerName);
     
         try {
-            const createContainerResponse = await containerClient.createIfNotExists();
-
-            if (createContainerResponse.succeeded) {
-                console.log(`Container '${containerName}' created successfully.`);
-            } else {
-                console.log(`Container '${containerName}' already exists or operation not succeeded.`);
-            }
+            await containerClient.createIfNotExists();
     
             // Get current date in ISO format
             const currentDate = this.getCurrentDateISO();
@@ -171,7 +172,7 @@ export default class BotRepository {
             const blobClient = containerClient.getBlockBlobClient(blobFileName);
     
             // Upload file contents to blob
-            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
+            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(modifiedFileConents, Buffer.byteLength(modifiedFileConents));
     
             // Check if upload was successful
             if (uploadResponse._response.status === 201) {
@@ -217,8 +218,8 @@ export default class BotRepository {
     
             return logFiles;
         } catch (error) {
-            console.error(`Error reading log files:`, error);
-            throw error;
+            console.error(`An error has occurred when attempting to read log files from Microsoft Azure: ${error}`);
+            throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
         }
     }
     
@@ -229,7 +230,7 @@ export default class BotRepository {
                 await this.database_connection_manager.releaseConnection(database_connection);
             } catch (error) {
                 console.error(`An error has occurred during the execution of releaseConnectionSafely function: ${error}`);
-                throw error;
+                throw new Error(`An error has occurred during the execution of releaseConnectionSafely function: ${error}`);
             }
         }
     }
