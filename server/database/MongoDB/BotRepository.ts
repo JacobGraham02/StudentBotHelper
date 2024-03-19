@@ -4,6 +4,7 @@ import { DiscordBotCommandType } from './types/DiscordBotCommandType';
 import { DiscordBotInformationType } from './types/DiscordBotInformationType';
 import * as dotenv from "dotenv";
 import { BlobServiceClient, BlobUploadCommonResponse } from '@azure/storage-blob';
+import { LogFile } from './types/LogFileType';
 dotenv.config();
 
 export default class BotRepository {
@@ -184,7 +185,7 @@ export default class BotRepository {
         }
     }
     
-    public async readAllLogsFromAzureContainer(containerName: string): Promise<string[]> {
+    public async readAllLogsFromAzureContainer(containerName: string): Promise<LogFile[]> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
@@ -193,7 +194,7 @@ export default class BotRepository {
     
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
         const containerClient = blobServiceClient.getContainerClient(containerName);
-        const logs: string[] = [];
+        const logFiles: LogFile[] = [];
 
         await containerClient.createIfNotExists();
     
@@ -204,11 +205,17 @@ export default class BotRepository {
                     const blobClient = containerClient.getBlockBlobClient(blob.name);
                     const downloadResponse = await blobClient.downloadToBuffer();
                     const logContents = downloadResponse.toString();
-                    logs.push(logContents);
+
+                    const logFile: LogFile = {
+                        name: blob.name,
+                        content: logContents
+                    }
+
+                    logFiles.push(logFile);
                 }
             }
     
-            return logs;
+            return logFiles;
         } catch (error) {
             console.error(`Error reading log files:`, error);
             throw error;

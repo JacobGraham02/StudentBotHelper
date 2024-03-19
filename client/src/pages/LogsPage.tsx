@@ -3,7 +3,7 @@ import LogsPageContent from './user/LogsPageContent';
 
 const LogsPage = () => {
     return (
-        <Layout pageTitle="View bot logs" pageLayoutContent={<LogsPageContent userLoggedIn={false} />}></Layout>
+        <Layout pageTitle="View bot logs" pageLayoutContent={<LogsPageContent userLoggedIn={true} />}></Layout>
     )
 }
 
