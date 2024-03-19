@@ -1,9 +1,9 @@
 import Layout from '../components/Layout/Layout';
-import LogsPageContent from '../components/LogFiles/LogsPageContent';
+import LogsPageContent from './user/LogsPageContent';
 
 const LogsPage = () => {
     return (
-        <Layout pageTitle="Get support" pageLayoutContent={<LogsPageContent isUserLoggedIn={false} />}></Layout>
+        <Layout pageTitle="View bot logs" pageLayoutContent={<LogsPageContent userLoggedIn={true} />}></Layout>
     )
 }
 

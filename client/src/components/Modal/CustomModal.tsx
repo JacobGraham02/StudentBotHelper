@@ -8,13 +8,14 @@ interface CustomModalProps {
   body: React.ReactNode;
   cancelButtonText?: string;
   confirmButtonText: string;
+  size?: 'sm' | 'lg' | 'xl';
   onConfirm: () => void;
 }
 
-const CustomModal: React.FC<CustomModalProps> = ({ showModal, setShowModal, title, body, cancelButtonText, confirmButtonText, onConfirm }) => {
+const CustomModal: React.FC<CustomModalProps> = ({ showModal, setShowModal, title, body, cancelButtonText, confirmButtonText, size, onConfirm }) => {
     if (cancelButtonText) {
         return (
-            <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" keyboard={false}>
+            <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" keyboard={false} size={size}>
             <Modal.Header closeButton>
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>

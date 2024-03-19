@@ -40,6 +40,11 @@ const DefaultLayout = (): ReactElement => {
               Configurations
             </NavLink>
           </li>
+          <li className="nav-item">
+            <NavLink to="/logs" className="nav-link">
+              Log files
+            </NavLink>
+          </li>
         </ul>
       </div>
     );
