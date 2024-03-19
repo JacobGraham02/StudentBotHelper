@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, Router } from "express";
+import express, { Request, Response, NextFunction, Router, json } from "express";
 import { body, validationResult } from 'express-validator';
 import DiscordAPIOperations from "../controllers/BotCommands/DiscordAPIOperations";
 import BotRepository from "../../database/MongoDB/BotRepository";
@@ -369,6 +369,20 @@ bot_commands_router.post('/newcommandrequest', [ /*
       success: false, 
       message: `An error occurred when attempting to send a command request to the admin email using the /newcommandrequest endpoint` 
     });
+  }
+});
+
+bot_commands_router.get('/getcommands', async function (request: Request, response: Response, next: NextFunction) {
+  try {
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+    
+    const commands = await bot_controller_instance.getAllCommandDocuments();
+
+    response.json(commands);
+  } catch (error) {
+    console.error(`An error occurred when attempting to retrieve all bot commands from the database: ${error}`);
+    throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
   }
 });
 

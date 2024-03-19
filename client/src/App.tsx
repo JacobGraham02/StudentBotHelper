@@ -27,6 +27,7 @@ import ConfigurationsOptionsPage from './pages/ConfigurationOptionsPage.js'
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
 import SupportPage from "./components/LoginForm/LoginForm.js";
+import CommandsPageContent from "./pages/user/CommandsPageContent.js";
 
 const GoogleClientID = OAuthCreds.google.clientID;
 
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
       { 
         path: "login", 
         element: <Login /> 
+      },
+      { 
+        path: 'dashboard',
+        element: <LandingPage isUserLoggedIn={false} />
       },
       {
         path: 'commands',

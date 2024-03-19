@@ -2,8 +2,6 @@
 Imports from Node.js and other libraries defined in package.json
 */
 import * as dotenv from "dotenv";
-// import "dotenv/config";
-// dotenv.config({ path: "../.env" });
 dotenv.config();
 import createError from "http-errors";
 import express, { NextFunction } from "express";
@@ -43,7 +41,6 @@ import CommonClassWork from "./entity/CommonClassWork";
 import Logger from "./utils/Logger";
 import BotController from "./api/controllers/BotController";
 import BotRepository from "./database/MongoDB/BotRepository";
-import { CommandType } from "./database/MongoDB/types/CommandType";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const bot_repository = new BotRepository();
@@ -106,10 +103,10 @@ const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
 //       }
 //   }
 // }
-async function registerCommandsFromDatabase(database_commands: CommandType[]) {
+async function registerCommandsFromDatabase(database_commands: any) {
 
   if (!Array.isArray(database_commands)) {
-    console.error(`The command array returned form the database is not of the the type CommandType[]. Instead, it is: ${typeof database_commands} with value ${database_commands}`);
+    console.error(`The command array returned form the database is not an array. Instead, it is: ${typeof database_commands}`);
     return;
   }
 
@@ -127,8 +124,8 @@ async function registerCommandsFromDatabase(database_commands: CommandType[]) {
  * connected to the Discord channel.
  */
 discord_client_instance.on("ready", async () => {
-  const database_commands = await bot_controller.getAllBotCommandsDocuments();
-  registerCommandsFromDatabase(database_commands);
+  // const database_commands = await bot_controller.getAllCommandDocuments();
+  // registerCommandsFromDatabase(database_commands);
   
   if (discord_client_instance.user) {
     console.log(
@@ -165,7 +162,7 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
   const command_name = interaction.commandName;
 
   try {
-    const commandData: CommandType | undefined = await bot_controller.getBotCommandDocument(command_name);
+    const commandData = await bot_controller.getBotCommandDocument(command_name);
 
     if (!commandData) {
       await interaction.reply({

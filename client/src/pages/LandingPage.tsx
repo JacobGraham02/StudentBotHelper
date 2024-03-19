@@ -1,4 +1,4 @@
-import LandingPageContent from '../components/LandingPageContent/LandingPageContent';
+import LandingPageContent from './user/LandingPageContent';
 import Layout from '../components/Layout/Layout';
 
 const LandingPage = ({ isUserLoggedIn }: { isUserLoggedIn: boolean }) => {
