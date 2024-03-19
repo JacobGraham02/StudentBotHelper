@@ -386,4 +386,53 @@ bot_commands_router.get('/getcommands', async function (request: Request, respon
   }
 });
 
+bot_commands_router.get('/getlogs', async function(request: Request, response: Response, next: NextFunction) {
+  try {
+    const containerName = request.query.containerName as string;
+
+    if (!containerName) {
+      return response.status(400).json(`The container name is undefined or null`);
+    }
+
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    const logfiles = await bot_controller_instance.getAllLogFilesFromContainer(containerName);
+
+    response.json(logfiles);
+  } catch (error) {
+    console.error(`An error occurred when attempting to retrieve all bot log files from the container ${request.body.containerName}: ${error}`);
+    throw new Error(`An error occurred when attempting to retrieve all bot log files from the container ${request.body.containerName}: ${error}`);
+  }
+});
+
+bot_commands_router.put('/writelog', async function(request: Request, response: Response, next: NextFunction) {
+  const {
+    logFileName,
+    containerName,
+    fileContents
+  }: {
+    logFileName: string,
+    containerName: string,
+    fileContents: string
+  } = request.body;
+
+  try {
+
+    if (!containerName) {
+      return response.status(400).json(`The container name is undefined or null`);
+    } 
+
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    await bot_controller_instance.writeLogFileToContainer(logFileName, containerName, fileContents);
+
+    response.json(`You have successfully added a log file to the container: ${containerName}`); 
+  } catch (error) {
+    console.error(`There was an error when attempting to write a log file to the specified container: ${error}`);
+    throw new Error(`There was an error when attempting to write a log file to the specified container: ${error}`);
+  }
+});
+
 export default bot_commands_router;

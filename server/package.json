@@ -13,6 +13,7 @@
     "debug": "nodemon --inspect app.ts"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.17.0",
     "@discordjs/builders": "^1.6.4",
     "@discordjs/rest": "^2.0.0",
     "@google/maps": "^1.1.3",

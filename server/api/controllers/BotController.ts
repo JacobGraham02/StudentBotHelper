@@ -53,4 +53,27 @@ export default class BotController {
             throw new Error(`There was an error when attempting to fetch all bot comamnds from the MongoDB database: ${error}`);
         }
     }
+
+    async getAllLogFilesFromContainer(containerName: string) {
+
+        try {
+            const azure_container_logs = await this.bot_repository.readAllLogsFromAzureContainer(containerName);
+
+            return azure_container_logs;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to get all log files from the container ${containerName}: ${error}`);
+            throw new Error(`There was an error when attempting to get all log files from the container ${containerName}: ${error}`);
+        }
+    }
+
+    async writeLogFileToContainer(logFileName: string, containerName: string, fileContents: string, ) {
+
+        try {   
+            await this.bot_repository.writeLogToAzureContainer(logFileName, fileContents, containerName);
+
+        } catch (error: any) {
+            console.error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`);
+            throw new Error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`)
+        }
+    }
 }

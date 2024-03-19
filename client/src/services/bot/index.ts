@@ -64,9 +64,13 @@ export const getAllBotCommands = async () => {
   }
 }
 
-export const getAllBotLogFiles = async () => {
+export const getAllBotLogFiles = async (containerName: string) => {
   try {
-    const allBotLogFiles = await instance.get("api/bot/getlogs");
+    const allBotLogFiles = await instance.get("api/bot/getlogs", {
+      params: {
+        containerName: containerName
+      }
+    });
 
     return allBotLogFiles;
   } catch (error) {
@@ -77,5 +81,22 @@ export const getAllBotLogFiles = async () => {
       console.error(`There was an error when attempting to get all bot log files: ${error}`);
       throw new Error(`There was an error when attempting to get all bot log files: ${error}`);
     }
+  }
+}
+
+export const writeBotLogFile = async (logName: string, fileContents: string, containerName: string) => {
+  const requestObject = {
+    logFileName: logName,
+    containerName: containerName,
+    fileContents: fileContents
+  }
+
+  try {
+    const writeBotLogFile = await instance.put("api/bot/writelog", requestObject);
+
+    return writeBotLogFile;
+  } catch (error) {
+    console.error(`There was an error when attempting to write a log file to the specified container: ${error}`);
+    throw new Error(`There was an error when attempting to write a log file to the specified container: ${error}`);
   }
 }
