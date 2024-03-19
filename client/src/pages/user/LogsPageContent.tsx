@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { LogsForm } from "../types/BotTypes";
 import CustomModal from "../../components/Modal/CustomModal";
-import IModalContent from "./interfaces/IModalContent";
 import { getAllBotLogFiles, writeBotLogFile } from "../../services/bot";
 
 const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
@@ -12,21 +10,6 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
 
     const [botInfoLogFiles, setBotInfoLogFiles] = useState<any[]>([]);
     const [botErrorLogFiles, setBotErrorLogFiles] = useState<any[]>([]);
-
-    const logFileData: any[] = [];
-
-    const [logsData, setLogsData] = useState<LogsForm>(
-        {
-            infoLog: {
-                name: "",
-                uri: ""
-            },
-            errorLog: {
-                name: "",
-                uri: ""
-            }
-        }
-    );
 
     useEffect(() => {
         const fetchBotLogs = async () => {
@@ -40,18 +23,9 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
             }
         };
         fetchBotLogs();
-        writeBotLogFile(`TestLogInfo2`, `Test log info file contents`, `studentbothelperinfo`);
-        writeBotLogFile(`TestLogError2`, `Test log error file contents`, `studentbothelpererror`);
+        // writeBotLogFile(`TestLogInfo2`, `Test log info file contents`, `studentbothelperinfo`);
+        // writeBotLogFile(`TestLogError2`, `Test log error file contents`, `studentbothelpererror`);
     }, []); // Empty dependency array to only run once when component mounts
-
-    const [downloadFileModalContent, setDownloadFileModalContent] = useState<IModalContent>({
-        title: "",
-        body: "",
-        cancelButtonText: "",
-        confirmButtonText: "",
-        onConfirm: () => {} 
-    });
-
 
     const logFileDownload = ({ fileName, fileContents }: { fileName: string, fileContents: string}) => {
         // Encapsulates the download logic within an inner function.
@@ -84,7 +58,7 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     
     if (userLoggedIn) {
         return (
-            <main id="main" className="text-center">
+            <main id="main" className="container text-center">
                 <CustomModal
                     showModal={showModal}
                     setShowModal={setShowModal}
@@ -92,46 +66,45 @@ const LogsPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                     body={downloadFileContents}
                     cancelButtonText="Go back"
                     confirmButtonText="Download"
-                    onConfirm={() => {logFileDownload({fileName: downloadFileName, fileContents:downloadFileContents})}}
-                    size="lg"
-                >
-                </CustomModal>
-
-                <section id="information_logs_section">
-                    <h2>Command information logs</h2>
-                    <h3>Click on any of the log file names to download them to your computer</h3>
-                    <ul>
-                    {botInfoLogFiles.map((infoLogFile, index) => (
-                        <li key={index}>
-                        <a href="#" onClick={(e) => {
-                            e.preventDefault(); 
-                            downloadLogFileConfirmation(infoLogFile.name, infoLogFile.content);
-                        }}>
-                            {infoLogFile.name}
-                        </a>
-                        </li>
-                    ))}
-                    </ul>
-                </section>
-
-                <section id="error_logs_section">
-                    <h2>Command error logs</h2>
-                    <h3>Click on any of the log file names to download them to your computer</h3>
-                    <ul>
-                    {botErrorLogFiles.map((errorLogFile, index) => (
-                        <li key={index}>
-                        <a href="#" onClick={(e) => {
-                            e.preventDefault(); 
-                            downloadLogFileConfirmation(errorLogFile.name, errorLogFile.content);
-                        }}>
-                            {errorLogFile.name}
-                        </a>
-                        </li>
-                    ))}
-                    </ul>
-                </section>
+                    onConfirm={() => {logFileDownload({ fileName: downloadFileName, fileContents: downloadFileContents })}}
+                    size="xl"
+                />
+                <div className="row">
+                    <section className="col-md-6">
+                        <h2>Command information logs</h2>
+                        <h4>View and download your bot log files</h4>
+                        <ul className="list-unstyled">
+                            {botInfoLogFiles.map((infoLogFile, index) => (
+                                <li key={index} className="mb-1">
+                                    <a href="#" className="text-decoration-none" onClick={(e) => {
+                                        e.preventDefault(); 
+                                        downloadLogFileConfirmation(infoLogFile.name, infoLogFile.content);
+                                    }}>
+                                        {infoLogFile.name}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                    <section className="col-md-6">
+                        <h2>Command error logs</h2>
+                        <h4>View and download your bot log files</h4>
+                        <ul className="list-unstyled">
+                            {botErrorLogFiles.map((errorLogFile, index) => (
+                                <li key={index} className="mb-1">
+                                    <a href="#" className="text-decoration-none" onClick={(e) => {
+                                        e.preventDefault(); 
+                                        downloadLogFileConfirmation(errorLogFile.name, errorLogFile.content);
+                                    }}>
+                                        {errorLogFile.name}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                </div>
             </main>
-        )
+        );
     }
 }
 
