@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
-import { getAllBotCommands } from "../../services/bot";
 import { NavLink, useNavigate } from "react-router-dom";
 
 const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
@@ -16,67 +15,9 @@ const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
       confirmButtonText: "",
       onConfirm: () => {}  
     });
-
-    const [botCommands, setBotCommands] = useState<any[]>([]); 
-
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const commandsPerPage = 10;
-    const totalPages = Math.ceil(botCommands.length / commandsPerPage);
-
-    const indexOfLastCommand = currentPage * commandsPerPage;
-    const indexOfFirstCommand = indexOfLastCommand - commandsPerPage;
-    const currentCommands = botCommands.slice(indexOfFirstCommand, indexOfLastCommand);
-
-    const nextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
-
-    const prevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    useEffect(() => {
-        const fetchBotCommands = async () => {
-            try {
-                const response = await getAllBotCommands();
-                setBotCommands(response.data); // Set response data directly
-            } catch (error) {
-                throw new Error(`There was an error when attempting to fetch all of the bot commands from the database: ${error}`);
-            }
-        };
-        fetchBotCommands();
-    }, []); // Empty dependency array to only run once when component mounts
     
     return (
         <main id="main" className="text-center">
-            <div>
-                <ul> 
-                    {currentCommands.map((command, index) => (
-                        <li key={index}>
-                        <NavLink
-                            to="/commands"
-                            state={{ command_object: command}}
-                            className="nav-link"
-                            >
-                            {command.command_name}
-                        </NavLink>
-                    </li>
-                    ))}
-                </ul>
-            </div>
-            <div>
-                <button onClick={prevPage} disabled={currentPage === 1}>
-                    Previous
-                </button>
-                <button onClick={nextPage} disabled={currentPage === totalPages}>
-                    Next
-                </button>
-            </div>
             <CustomModal
                 showModal={showModal}
                 setShowModal={setShowModal}
@@ -86,6 +27,14 @@ const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                 confirmButtonText={modalContent.confirmButtonText!}
                 onConfirm={modalContent.onConfirm}
             />
+            <section id="landing_page_section">
+                <article id="landing_page_article">
+                    <h1 id="landing_page_h1">Welcome back, username!</h1>
+                    <p id="landing_page_welcome_paragraph">
+                    Please use any option from the left-hand navigation menu or click More information for more information about your Discord server bot, and what settings you can create, delete, and modify using this web portal
+                    </p>
+                </article>
+            </section>
         </main>
     );
 }

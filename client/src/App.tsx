@@ -17,19 +17,17 @@ import AuthProvider from "./contexts/AuthContext";
 import DefaultLayout from "./screens/layout/DefaultLayout";
 
 // Pages
-import LoginPage from "./pages/LoginPage";
-import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import CommandsPage from "./pages/CommandsPage.js";
-import ConfigurationsOptionsPage from './pages/ConfigurationOptionsPage.js'
 
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
 import SupportPage from "./components/LoginForm/LoginForm.js";
-import CommandsPageContent from "./pages/user/CommandsPageContent.js";
 import LogsPage from "./pages/LogsPage.js";
 import ConfigurationsPage from "./pages/ConfigurationOptionsPage.js";
+import DashboardPage from "./pages/DashboardPage.js";
+import LandingPage from "./pages/LandingPage.js";
 
 const GoogleClientID = OAuthCreds.google.clientID;
 
@@ -49,10 +47,6 @@ const router = createBrowserRouter([
         path: "oauth/github",
         element: <GitHubOAuthRedirect />,
       },
-      {
-        path: "dashboard",
-        element: <LandingPage isUserLoggedIn={false} />,
-      },
       { 
         path: "register", 
         element: <Register /> 
@@ -63,7 +57,7 @@ const router = createBrowserRouter([
       },
       { 
         path: 'dashboard',
-        element: <LandingPage isUserLoggedIn={false} />
+        element: <DashboardPage isUserLoggedIn={false} />
       },
       {
         path: 'commands',
@@ -83,19 +77,8 @@ const router = createBrowserRouter([
       },
       {
         path: "support",
-        element: <SupportPage isUserLoggedIn={true}/>
+        element: <SupportPage />
       }
-    ],
-  },
-
-  {
-    path: "*",
-    element: <LandingPage isUserLoggedIn={false} />,
-    children: [
-      {
-        path: "*",
-        element: <LandingPage isUserLoggedIn={false} />,
-      },
     ],
   },
 ]);
