@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer id="footer" className="fixed-bottom">
+    <footer id="footer" className="footer mt-auto py-3 bg-light fixed-bottom">
       <p className="bot_repository_link">
         See the Student Bot Helper GitHub repository{' '}
         <a
