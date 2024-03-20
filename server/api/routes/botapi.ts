@@ -9,6 +9,7 @@ import "dotenv/config";
 import Logger from "../../utils/Logger";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
 import CommandRequestEmail from "../../utils/CommandRequestEmail";
+import { UUID } from "crypto";
 dotenv.config({ path: "../../../.env" });
 
 /**
@@ -186,14 +187,6 @@ bot_commands_router.post(
   }
 );
 
-bot_commands_router.post(
-  "/changeDiscordChannelIds",
-  initializeDiscordApiFunctionsMiddleware,
-  ensureDiscordApiOperationsClassNotUndefinedMiddleware,
-  ensureLoggerClassNotUndefinedMiddleware,
-  async function (request: Request, response: Response, next: NextFunction) {}
-);
-
 bot_commands_router.post("/configs", [ /*
     Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
     */
@@ -230,7 +223,7 @@ bot_commands_router.post("/configs", [ /*
     const config_object = {
       bot_guild_id: guildId,
       bot_commands_channel_id: commandChannelId,
-      bot_button_channel_id: buttonChannelId,
+      bot_role_button_channel_id: buttonChannelId,
       bot_command_usage_information_channel_id: botInfoChannelId,
       bot_command_usage_error_channel_id: botErrorChannelId,
     };
@@ -386,6 +379,7 @@ bot_commands_router.get('/getcommands', async function (request: Request, respon
   }
 });
 
+
 bot_commands_router.get('/getlogs', async function(request: Request, response: Response, next: NextFunction) {
   try {
     const containerName = request.query.containerName as string;
@@ -403,6 +397,27 @@ bot_commands_router.get('/getlogs', async function(request: Request, response: R
   } catch (error) {
     console.error(`An error occurred when attempting to retrieve all bot log files from the container ${request.body.containerName}: ${error}`);
     throw new Error(`An error occurred when attempting to retrieve all bot log files from the container ${request.body.containerName}: ${error}`);
+  }
+});
+
+bot_commands_router.get('/bot', async function(request: Request, response: Response, next: NextFunction) {
+  const {
+    bot_id
+  }: {
+    bot_id: UUID
+  } = request.body;
+  
+  try {
+    
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    const bot = await bot_controller_instance.getBotDocument(bot_id);
+
+    response.json(bot);
+  } catch (error) {
+    console.error(`An error occurred when attempting to retrieve the bot document from the database: ${error}`);
+    throw new Error(`An error occurred when attempting to retrieve the bot from the database. Please try again or inform the server administrator of this error: ${error}`);
   }
 });
 
@@ -432,6 +447,34 @@ bot_commands_router.put('/writelog', async function(request: Request, response: 
   } catch (error) {
     console.error(`There was an error when attempting to write a log file to the specified container: ${error}`);
     throw new Error(`There was an error when attempting to write a log file to the specified container: ${error}`);
+  }
+});
+
+bot_commands_router.put('/writecommand', async function(request: Request, response: Response, next: NextFunction) {
+  const {
+    commandFileName,
+    commandFileData,
+    containerName,
+  }: {
+    commandFileName: string,
+    commandFileData: Object,
+    containerName: string
+  } = request.body;
+
+  try {
+    if (!containerName) {
+      return response.status(400).json(`The container name is undefined or null`);
+    }
+
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    await bot_controller_instance.writeCommandFileToContainer(commandFileName, commandFileData, containerName);
+
+    response.json(`You have successfully added the ${commandFileName} file to the container: ${containerName}`); 
+  } catch (error) {
+    console.error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
+    throw new Error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
   }
 });
 

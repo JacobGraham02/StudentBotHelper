@@ -41,9 +41,10 @@ export default class BotRepository {
                 bot_email: discord_bot_information.bot_email,
                 bot_username: discord_bot_information.bot_username,
                 bot_password: discord_bot_information.bot_password,
+                bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
                 bot_commands_channel: discord_bot_information.bot_commands_channel_id,
                 bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
-                bot_command_usage_error_channel: discord_bot_information.bot_command_usage_errors_channel_id
+                bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
             };
 
             await bot_collection.updateOne(
@@ -122,6 +123,21 @@ export default class BotRepository {
             throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
         } finally {
             await this.releaseConnectionSafely(database_connection);
+        }
+    }
+
+    public async getBot(bot_id) {
+        const database_connection = await this.database_connection_manager.getConnection();
+
+        try {
+            const bot_collection = database_connection.collection('bot');
+
+            const bot = await bot_collection.findOne({ bot_id: bot_id });
+
+            return bot;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to get the bot document from the database: ${error}`);
+            throw new Error(`There was an error when attempting to retrieve the bot document from the database. Please try again or inform the server adminstrator of this error: ${error}`);
         }
     }
 
@@ -217,6 +233,82 @@ export default class BotRepository {
             }
     
             return logFiles;
+        } catch (error) {
+            console.error(`An error has occurred when attempting to read log files from Microsoft Azure: ${error}`);
+            throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
+        }
+    }
+
+    public async writeCommandToContainer(commandName: string, commandData: Object, containerName: string): Promise<void> {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+    
+        if (!storageAccountConnection) {
+            throw new Error(`The azure storage account connection string is undefined or invalid`);
+        }
+    
+        if (!containerName) {
+            throw new Error(`The azure storage container name is undefined or invalid`);
+        }
+    
+        // Serialize the function object to a string
+        const fileContents = JSON.stringify(commandData);
+    
+        // Create BlobServiceClient
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+        // Get container client
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+    
+        try {
+            await containerClient.createIfNotExists();
+    
+            // Define blob file name
+            const blobFileName = `${commandName}.ts`;
+    
+            // Get blob client for the file
+            const blobClient = containerClient.getBlockBlobClient(blobFileName);
+    
+            // Upload file contents to blob
+            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
+    
+            // Check if upload was successful
+            if (uploadResponse._response.status === 201) {
+                console.log(`Command file '${blobFileName}' uploaded successfully.`);
+            } else {
+                throw new Error(`Failed to upload command file '${blobFileName}'.`);
+            }
+        } catch (error) {
+            console.error(`Error in creating container or uploading command file '${commandName}':`, error);
+            throw error;
+        }
+    }
+
+    public async readAllCommandsFromContainer(containerName: string) {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+    
+        if (!storageAccountConnection) {
+            throw new Error(`The azure storage account connection string is undefined`);
+        }
+    
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const commandFiles: any[] = [];
+
+        await containerClient.createIfNotExists();
+    
+        try {
+            // List all blobs in the container
+            for await (const blob of containerClient.listBlobsFlat()) {
+                if (blob.name.endsWith('.js')) { 
+                    const blobClient = containerClient.getBlockBlobClient(blob.name);
+                    const downloadResponse = await blobClient.downloadToBuffer();
+                    const commandFileContents = downloadResponse;
+
+                    commandFiles.push(commandFileContents);
+                }
+            }
+    
+            return commandFiles;
         } catch (error) {
             console.error(`An error has occurred when attempting to read log files from Microsoft Azure: ${error}`);
             throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);

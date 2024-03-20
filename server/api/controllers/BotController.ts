@@ -2,6 +2,7 @@ import axios = require("axios");
 import BotRepository from "../../database/MongoDB/BotRepository";
 import { DiscordBotInformationType } from "../../database/MongoDB/types/DiscordBotInformationType";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
+import { UUID } from "crypto";
 
 export default class BotController {
 
@@ -49,8 +50,20 @@ export default class BotController {
 
             return bot_command_documents
         } catch (error: any) {
-            console.error(`There was an error when attempting to fetch all bot comamnds from the MongoDB database: ${error}`);
-            throw new Error(`There was an error when attempting to fetch all bot comamnds from the MongoDB database: ${error}`);
+            console.error(`There was an error when attempting to fetch all bot commands from the MongoDB database: ${error}`);
+            throw new Error(`There was an error when attempting to fetch all bot commands from the MongoDB database: ${error}`);
+        }
+    }
+
+    async getBotDocument(bot_id: UUID) {
+
+        try {
+            const bot_document = await this.bot_repository.getBot(bot_id);
+
+            return bot_document;
+        } catch (error) {
+            console.error(`There was an error when attempting to fetch the bot document from the MongoDB database: ${error}`);
+            throw new Error(`There was an error when attempting to fetch the bot document from the MongoDB database. Please try again or inform the server administrator of this error: ${error}`);
         }
     }
 
@@ -70,10 +83,20 @@ export default class BotController {
 
         try {   
             await this.bot_repository.writeLogToAzureContainer(logFileName, fileContents, containerName);
-
         } catch (error: any) {
             console.error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`);
             throw new Error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`)
+        }
+    }
+
+    async writeCommandFileToContainer(commandName: string, commandFile: Object, containerName: string) {
+        try {
+            const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandName, commandFile, containerName);
+
+            return azure_container_commands;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
+            throw new Error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
         }
     }
 }

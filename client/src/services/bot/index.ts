@@ -3,7 +3,7 @@ import { Bot, BotCommand, BotConfiguration } from "../../pages/types/BotTypes.ts
 
 export const postBotConfigurations = async (botConfiguration: BotConfiguration) => {
   try {
-    const postBotConfigurationResponse = await instance.post("bot/configs", botConfiguration);
+    const postBotConfigurationResponse = await instance.post("api/bot/configs", botConfiguration);
 
     return postBotConfigurationResponse;
 
@@ -98,5 +98,22 @@ export const writeBotLogFile = async (logName: string, fileContents: string, con
   } catch (error) {
     console.error(`There was an error when attempting to write a log file to the specified container: ${error}`);
     throw new Error(`There was an error when attempting to write a log file to the specified container: ${error}`);
+  }
+}
+
+export const writeBotCommandFile = async (commandFileName: string, commandFileData: Object, containerName: string) => {
+  const requestObject = {
+    commandFileName: commandFileName,
+    commandFileData: commandFileData,
+    containerName: containerName
+  }
+
+  try {
+    const writeBotCommandFile = await instance.put("api/bot/writecommand", requestObject);
+
+    return writeBotCommandFile;
+  } catch (error) {
+    console.error(`There were an error when attempting to write a command file to the specified container: ${error}`);
+    throw new Error(`There was an error when attempting to write a command file to the specified container: ${error}`);
   }
 }

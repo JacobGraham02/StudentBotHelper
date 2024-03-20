@@ -91,10 +91,10 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
       setShowModal(true);
     }
 
-    const showErrorSubmissionConfirmation = () => {
+    const showErrorSubmissionConfirmation = (error) => {
       setModalContent({
         title: `Command submission request unsuccessful`,
-        body: `There was an error when attempting to request this command. Please try again or contact the server administrator if you believe this is an error`,
+        body: `There was an error when attempting to request this command. Please try again or contact the server administrator if you believe this is an error: ${error}`,
         confirmButtonText: `Ok`,
         onConfirm: () => {
           setShowModal(false);
@@ -284,7 +284,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         showSuccessSubmissionConfirmation();
       }
     } catch (error) {
-      showErrorSubmissionConfirmation();
+      showErrorSubmissionConfirmation(error);
     }
   };
     if (userLoggedIn) {
