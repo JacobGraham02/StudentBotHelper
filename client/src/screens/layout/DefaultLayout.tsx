@@ -1,14 +1,14 @@
-import React, { ReactElement, useContext } from "react";
+import React, { ReactElement, useContext, useState } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHelperStarterIconSmaller.png"
 
 // Context
 import { AuthContext } from "../../contexts/AuthContext";
-import Footer from "../../components/Footer/Footer";
 
 const DefaultLayout = (): ReactElement => {
   const authCtx = useContext(AuthContext);
   const location = useLocation();
+  const [showSidebar, setShowSidebar] = useState(false);
   let sideBar;
 
   const navLinkStyle = {
@@ -28,9 +28,19 @@ const DefaultLayout = (): ReactElement => {
     color: "red"
   };
 
-  if (authCtx?.userAuthDetails.refreshToken === "") {
+  const hamburgerMenuStyle = {
+    display: 'none', // Initially hidden, will be shown via media query on small screens
+    cursor: 'pointer',
+    padding: '10px',
+  };
+
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar);
+  };
+
+  // if (authCtx?.userAuthDetails.refreshToken === "") {
     sideBar = (
-      <div className="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar full-height-sidebar container-fluid">
+      <div className={`col-md-3 col-lg-2 d-none d-md-block bg-light sidebar full-height-sidebar container-fluid ${showSidebar ? 'd-block' : 'd-none d-md-block'}`}>
         <ul className="nav flex-column flex-fill d-flex flex-column justify-content-center text-center">
           <li className="nav-item">
             <img
@@ -83,49 +93,22 @@ const DefaultLayout = (): ReactElement => {
         </ul>
       </div>
     );
-  }
-  if (authCtx?.userAuthDetails.refreshToken !== "") {
-    sideBar = (
-      <div className="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar full-height-sidebar">
-        {/* Placeholder for an image at the top of the sidebar */}
-        <div className="mb-4 pt-3 text-center">
-          <img
-            src="/path-to-your-image.jpg"
-            alt="Placeholder"
-            style={{ maxWidth: "80%", borderRadius: "50%" }}
-          />
-        </div>
-
-        <ul className="nav flex-column">
-          <li className="nav-item">
-            <NavLink to="/login" className="nav-link">
-              Login
-            </NavLink>
-          </li>
-
-          <li className="nav-item">
-            <NavLink to="/register" className="nav-link">
-              Register
-            </NavLink>
-          </li>
-        </ul>
-      </div>
-    );
-  }
+ 
   return (
     <div className="container-fluid">
       <div className="row">
-        {/* Sidebar */}
+        <div style={hamburgerMenuStyle} onClick={toggleSidebar}>
+          {showSidebar ? 'X' : '☰'} {/* Toggle icon */}
+        </div>
 
         {sideBar}
 
-        {/* Main content */}
         <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
           <Outlet />
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default DefaultLayout;
