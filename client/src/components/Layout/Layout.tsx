@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet";
 import studentBotHelperStarterTabIcon from '../../assets/images/StudentBotHelperStarterIconSmaller.ico';
+import Footer from "../Footer/Footer";
 
 const Layout = ({ pageTitle, pageLayoutContent } : {pageTitle: string, pageLayoutContent: JSX.Element }) => {
   return (
@@ -10,6 +11,7 @@ const Layout = ({ pageTitle, pageLayoutContent } : {pageTitle: string, pageLayou
         <link rel="icon" type="image/x-icon" href={studentBotHelperStarterTabIcon} /> 
       </Helmet>
       {pageLayoutContent}
+      <Footer />
     </>
   );
 };

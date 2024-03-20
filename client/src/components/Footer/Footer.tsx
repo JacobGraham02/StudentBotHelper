@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer id="footer">
+    <footer id="footer" className="fixed-bottom">
       <p className="bot_repository_link">
         See the Student Bot Helper GitHub repository{' '}
         <a
@@ -21,6 +21,8 @@ const Footer = () => {
           wiki
         </a>
       </p>
+
+      <p id="footer_copyright">&copy; 2024 Jacob Graham jakegraham54@gmail.com. All rights reserved. </p>
     </footer>
   );
 };
