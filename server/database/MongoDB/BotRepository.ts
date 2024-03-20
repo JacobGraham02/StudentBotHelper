@@ -126,8 +126,19 @@ export default class BotRepository {
         }
     }
 
-    public async getBotChannelIds() {
+    public async getBot(bot_id) {
+        const database_connection = await this.database_connection_manager.getConnection();
 
+        try {
+            const bot_collection = database_connection.collection('bot');
+
+            const bot = await bot_collection.findOne({ bot_id: bot_id });
+
+            return bot;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to get the bot document from the database: ${error}`);
+            throw new Error(`There was an error when attempting to retrieve the bot document from the database. Please try again or inform the server adminstrator of this error: ${error}`);
+        }
     }
 
     private getCurrentDateISO() {

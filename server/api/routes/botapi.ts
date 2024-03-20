@@ -9,6 +9,7 @@ import "dotenv/config";
 import Logger from "../../utils/Logger";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
 import CommandRequestEmail from "../../utils/CommandRequestEmail";
+import { UUID } from "crypto";
 dotenv.config({ path: "../../../.env" });
 
 /**
@@ -378,6 +379,7 @@ bot_commands_router.get('/getcommands', async function (request: Request, respon
   }
 });
 
+
 bot_commands_router.get('/getlogs', async function(request: Request, response: Response, next: NextFunction) {
   try {
     const containerName = request.query.containerName as string;
@@ -395,6 +397,27 @@ bot_commands_router.get('/getlogs', async function(request: Request, response: R
   } catch (error) {
     console.error(`An error occurred when attempting to retrieve all bot log files from the container ${request.body.containerName}: ${error}`);
     throw new Error(`An error occurred when attempting to retrieve all bot log files from the container ${request.body.containerName}: ${error}`);
+  }
+});
+
+bot_commands_router.get('/bot', async function(request: Request, response: Response, next: NextFunction) {
+  const {
+    bot_id
+  }: {
+    bot_id: UUID
+  } = request.body;
+  
+  try {
+    
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    const bot = await bot_controller_instance.getBotDocument(bot_id);
+
+    response.json(bot);
+  } catch (error) {
+    console.error(`An error occurred when attempting to retrieve the bot document from the database: ${error}`);
+    throw new Error(`An error occurred when attempting to retrieve the bot from the database. Please try again or inform the server administrator of this error: ${error}`);
   }
 });
 
