@@ -8,7 +8,6 @@ import express, { NextFunction } from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import fs from "fs";
 import {
   Collection,
   GatewayIntentBits,
@@ -65,59 +64,43 @@ Variables defined in the application .env file
 */
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
+const discord_token = process.env.discord_bot_token;
+const discord_client_id = process.env.discord_bot_application_id;
 
-/*
-The string 'commands_folder_path' holds the directory path to the 'dist/commands' directory, which contains all of the '.js' command files, excluding the script used
-to deploy the commands to the discord bot. Occasionally, TypeScript may generate scripts that end with a .map extension. We must ignore those because they are not
-command files. 
-*/
-// const commands_folder_path: string = path.join(__dirname, "./commands");
-// const filtered_commands_files: string[] = fs
-//   .readdirSync(commands_folder_path)
-//   .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
-// discord_client_instance.discord_commands = new Collection();
 
+const commands: any[] = [];
 /*
 Get the singleton instance of the custom event emitter class. The event emitter must be a singleton because only one event emitter can exist in Node.js to prevent any problems.
 */
 const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
 
-/**
- * Dynamically load all of the command files into a collection that will be later passed into the discord bot. Because the variable 'command' holds the imported module,
- * the default exported function is stored in 'command_object', via the .default() operator and then stored in the discord bot commands collection. By setting the collection key
- * to be the name of the command, and the value to be the command data, each command name executed in discord will be associated with some command data.
- */
-// async function registerCommandsFromDatabase(commands: CommandType[]) {
-//   for (const command of commands) {
-//       // Assuming each command object has a property 'filePath' containing the path to the command file
-//       const command_file_path = path.join(commands_folder_path, command.filePath);
-
-//       try {
-//           const imported_command = await import(command_file_path);
-//           if (Object.keys(imported_command).length >= 1 && imported_command.constructor === Object) {
-//               const command_object = imported_command.default(logger);
-//               discord_client_instance.discord_commands.set(command_object.data.name, command_object);
-//           }
-//       } catch (error) {
-//           console.error(`Error loading command file '${command_file_path}':`, error);
-//       }
-//   }
-// }
-async function registerCommandsFromDatabase(database_commands: any) {
-
-  if (!Array.isArray(database_commands)) {
-    console.error(`The command array returned form the database is not an array. Instead, it is: ${typeof database_commands}`);
-    return;
-  }
-
-  for (const command of database_commands) {
-    const command_type = {
-      command_name: command.command_name,
-      command_description: command.command_description,
-      command_function: command.command_function
+/*
+  [
+    {
+      _id: new ObjectId("65f7899fb911099617e2a4d7"),
+      bot_id: 1,
+      command_description: 'Test command description',
+      command_function: 'I want this command to say the word pong when a user types in the command ping',
+      command_name: 'Test command 1',
+      command_users: [ 'Auth user 1', 'Auth user 2' ]
     }
-  }
-}
+  ]
+  */
+
+  // for (const command of commands) {
+  //     // Assuming each command object has a property 'filePath' containing the path to the command file
+  //     const command_file_path = path.join(commands_folder_path, command.filePath);
+
+  //     try {
+  //         const imported_command = await import(command_file_path);
+  //         if (Object.keys(imported_command).length >= 1 && imported_command.constructor === Object) {
+  //             const command_object = imported_command.default(logger);
+  //             discord_client_instance.discord_commands.set(command_object.data.name, command_object);
+  //         }
+  //     } catch (error) {
+  //         console.error(`Error loading command file '${command_file_path}':`, error);
+  //     }
+  // }
 
 /**
  * Discord bots throw events when some operation occurs. In this instance, the Discord API throws the 'ready' event via the bot because the bot is ready to be used and is
@@ -151,6 +134,9 @@ discord_client_instance.on("ready", async () => {
  *
  */
 discord_client_instance.on("interactionCreate", async (interaction) => {
+
+  console.log(interaction);
+  
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
   }

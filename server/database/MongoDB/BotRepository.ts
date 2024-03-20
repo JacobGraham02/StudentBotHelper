@@ -238,6 +238,38 @@ export default class BotRepository {
             throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
         }
     }
+
+    public async readAllCommandsFromContainer(containerName: string) {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+    
+        if (!storageAccountConnection) {
+            throw new Error(`The azure storage account connection string is undefined`);
+        }
+    
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const commandFiles: any[] = [];
+
+        await containerClient.createIfNotExists();
+    
+        try {
+            // List all blobs in the container
+            for await (const blob of containerClient.listBlobsFlat()) {
+                if (blob.name.endsWith('.js')) { 
+                    const blobClient = containerClient.getBlockBlobClient(blob.name);
+                    const downloadResponse = await blobClient.downloadToBuffer();
+                    const commandFileContents = downloadResponse;
+
+                    commandFiles.push(commandFileContents);
+                }
+            }
+    
+            return commandFiles;
+        } catch (error) {
+            console.error(`An error has occurred when attempting to read log files from Microsoft Azure: ${error}`);
+            throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
+        }
+    }
     
 
     private async releaseConnectionSafely(database_connection: any): Promise<void> {
