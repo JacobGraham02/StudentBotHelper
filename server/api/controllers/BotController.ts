@@ -83,10 +83,20 @@ export default class BotController {
 
         try {   
             await this.bot_repository.writeLogToAzureContainer(logFileName, fileContents, containerName);
-
         } catch (error: any) {
             console.error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`);
             throw new Error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`)
+        }
+    }
+
+    async writeCommandFileToContainer(commandName: string, commandFile: Object, containerName: string) {
+        try {
+            const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandName, commandFile, containerName);
+
+            return azure_container_commands;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
+            throw new Error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
         }
     }
 }

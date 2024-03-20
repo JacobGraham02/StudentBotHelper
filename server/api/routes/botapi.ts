@@ -450,4 +450,32 @@ bot_commands_router.put('/writelog', async function(request: Request, response: 
   }
 });
 
+bot_commands_router.put('/writecommand', async function(request: Request, response: Response, next: NextFunction) {
+  const {
+    commandFileName,
+    commandFileData,
+    containerName,
+  }: {
+    commandFileName: string,
+    commandFileData: Object,
+    containerName: string
+  } = request.body;
+
+  try {
+    if (!containerName) {
+      return response.status(400).json(`The container name is undefined or null`);
+    }
+
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    await bot_controller_instance.writeCommandFileToContainer(commandFileName, commandFileData, containerName);
+
+    response.json(`You have successfully added the ${commandFileName} file to the container: ${containerName}`); 
+  } catch (error) {
+    console.error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
+    throw new Error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
+  }
+});
+
 export default bot_commands_router;

@@ -239,6 +239,50 @@ export default class BotRepository {
         }
     }
 
+    public async writeCommandToContainer(commandName: string, commandData: Object, containerName: string): Promise<void> {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+    
+        if (!storageAccountConnection) {
+            throw new Error(`The azure storage account connection string is undefined or invalid`);
+        }
+    
+        if (!containerName) {
+            throw new Error(`The azure storage container name is undefined or invalid`);
+        }
+    
+        // Serialize the function object to a string
+        const fileContents = JSON.stringify(commandData);
+    
+        // Create BlobServiceClient
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+        // Get container client
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+    
+        try {
+            await containerClient.createIfNotExists();
+    
+            // Define blob file name
+            const blobFileName = `${commandName}.ts`;
+    
+            // Get blob client for the file
+            const blobClient = containerClient.getBlockBlobClient(blobFileName);
+    
+            // Upload file contents to blob
+            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
+    
+            // Check if upload was successful
+            if (uploadResponse._response.status === 201) {
+                console.log(`Command file '${blobFileName}' uploaded successfully.`);
+            } else {
+                throw new Error(`Failed to upload command file '${blobFileName}'.`);
+            }
+        } catch (error) {
+            console.error(`Error in creating container or uploading command file '${commandName}':`, error);
+            throw error;
+        }
+    }
+
     public async readAllCommandsFromContainer(containerName: string) {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
