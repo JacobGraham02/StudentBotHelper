@@ -186,14 +186,6 @@ bot_commands_router.post(
   }
 );
 
-bot_commands_router.post(
-  "/changeDiscordChannelIds",
-  initializeDiscordApiFunctionsMiddleware,
-  ensureDiscordApiOperationsClassNotUndefinedMiddleware,
-  ensureLoggerClassNotUndefinedMiddleware,
-  async function (request: Request, response: Response, next: NextFunction) {}
-);
-
 bot_commands_router.post("/configs", [ /*
     Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
     */
@@ -230,7 +222,7 @@ bot_commands_router.post("/configs", [ /*
     const config_object = {
       bot_guild_id: guildId,
       bot_commands_channel_id: commandChannelId,
-      bot_button_channel_id: buttonChannelId,
+      bot_role_button_channel_id: buttonChannelId,
       bot_command_usage_information_channel_id: botInfoChannelId,
       bot_command_usage_error_channel_id: botErrorChannelId,
     };

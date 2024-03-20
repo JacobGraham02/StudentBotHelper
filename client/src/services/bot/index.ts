@@ -3,7 +3,7 @@ import { Bot, BotCommand, BotConfiguration } from "../../pages/types/BotTypes.ts
 
 export const postBotConfigurations = async (botConfiguration: BotConfiguration) => {
   try {
-    const postBotConfigurationResponse = await instance.post("bot/configs", botConfiguration);
+    const postBotConfigurationResponse = await instance.post("api/bot/configs", botConfiguration);
 
     return postBotConfigurationResponse;
 

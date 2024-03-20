@@ -93,6 +93,30 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
     });
     setShowModal(true);
   }
+
+  const showSuccessSubmissionConfirmation = () => {
+    setModalContent({
+      title: `Channel id modifications successful`,
+      body: `You have successfully changed the Discord bot channel ids`,
+      confirmButtonText: `Ok`,
+      onConfirm: () => {
+        setShowModal(false);
+      }
+    });
+    setShowModal(true);
+  }
+
+  const showErrorSubmissionConfirmation = (error) => {
+    setModalContent({
+      title: `Channel id modifications unsuccessful`,
+      body: `There was an error attempting to change the channel ids. Please try again or inform the server administrator if you believe this is an error: ${error}`,
+      confirmButtonText: `Ok`,
+      onConfirm: () => {
+        setShowModal(false);
+      }
+    });
+    setShowModal(true);
+  }
     
   const [configurationData, setConfigurationData] = useState<ConfigurationForm>(
     {
@@ -182,7 +206,7 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
     }));
   };
 
-  const onSubmitHandler = (formSubmitEvent: any) => {
+  const onSubmitHandler = async (formSubmitEvent: any) => {
     formSubmitEvent.preventDefault();
 
     const allFieldsValid = Object.values(configurationData).every(field => field.valid);
@@ -192,13 +216,25 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       return;
     }
 
-    const configurationResponse = postBotConfigurations({
+    const commandChannelIds = {
       guildId: configurationData.guildId.value,
       commandChannelId: configurationData.commandChannelId.value,
       buttonChannelId: configurationData.buttonChannelId.value,
       botInfoChannelId: configurationData.botInfoChannelId.value,
-      botErrorChannelId: configurationData.botErrorChannelId.value,
-    });
+      botErrorChannelId: configurationData.botErrorChannelId.value
+    }
+
+    try {
+      const postChannelIdsResponse = await postBotConfigurations(
+        commandChannelIds
+      );
+      if (postChannelIdsResponse) {
+        onClearHandler();
+        showSuccessSubmissionConfirmation();
+      }
+    } catch (error) {
+      showErrorSubmissionConfirmation
+    }
   };
 
   if (userLoggedIn) {

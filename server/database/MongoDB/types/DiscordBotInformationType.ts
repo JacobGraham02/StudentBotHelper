@@ -13,5 +13,6 @@ export type DiscordBotInformationType = {
   bot_database_responses_channel_id?: string;
   bot_github_commits_channel_id?: string;
   bot_command_usage_information_channel_id?: string;
-  bot_command_usage_errors_channel_id?: string;
+  bot_command_usage_error_channel_id?: string;
+  bot_role_button_channel_id?: string;
 }

@@ -41,9 +41,10 @@ export default class BotRepository {
                 bot_email: discord_bot_information.bot_email,
                 bot_username: discord_bot_information.bot_username,
                 bot_password: discord_bot_information.bot_password,
+                bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
                 bot_commands_channel: discord_bot_information.bot_commands_channel_id,
                 bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
-                bot_command_usage_error_channel: discord_bot_information.bot_command_usage_errors_channel_id
+                bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
             };
 
             await bot_collection.updateOne(
@@ -123,6 +124,10 @@ export default class BotRepository {
         } finally {
             await this.releaseConnectionSafely(database_connection);
         }
+    }
+
+    public async getBotChannelIds() {
+
     }
 
     private getCurrentDateISO() {
