@@ -153,9 +153,22 @@ class UserController {
         throw new Error("duplicate");
       }
 
-      const userId = await this.user.createUser(fullName, email, password);
+      const newUser = await this.user.createUser(fullName, email, password);
 
-      return { userId, fullName, email };
+      let username = null;
+
+      if (newUser.oauthUserInfo !== null) {
+        const oAuthObj = JSON.parse(newUser.oauthUserInfo);
+
+        username = oAuthObj?.username || oAuthObj?.name;
+      }
+
+      return {
+        token: newUser.refresh_token,
+        email: newUser.email,
+        role: newUser.roleId,
+        name: newUser.fullName || username,
+      };
     } catch (error: any) {
       console.error("Error creating user:", error);
       throw error;
@@ -179,13 +192,22 @@ class UserController {
         return { error: "Invalid email or password" };
       }
 
+      let username = null;
+
+      if (user.oauthUserInfo && user.oauthUserInfo !== null) {
+        const oAuthObj = JSON.parse(user.oauthUserInfo);
+
+        username = oAuthObj?.username || oAuthObj?.name;
+      }
+
       // Generate JWT token
       const token = jwt.sign(
         {
           id: user.id,
-          full_name: user.full_name,
+          refreshToken: user.refresh_token,
+          name: user.fullName || username,
           email: user.email,
-          role_id: user.role_id,
+          role: user.role_id,
         },
         "very super secret token",
         { expiresIn: "1h" }
@@ -194,12 +216,11 @@ class UserController {
       // Return success response with token
       return {
         message: "Login successful",
-        token: token,
         user: {
-          id: user.id,
-          full_name: user.full_name,
+          token: token,
+          name: user.full_name || username,
           email: user.email,
-          role_id: user.role_id,
+          role: user.role_id,
         },
       };
     } catch (error) {

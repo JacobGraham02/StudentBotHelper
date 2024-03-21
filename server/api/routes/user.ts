@@ -103,7 +103,6 @@ userRouter.post("/register", async (req, res) => {
 
     return res.status(201).json({
       message: "User registered successfully",
-      user: userProfile,
     });
   } catch (error: any) {
     if (error.message.includes("duplicate")) {
@@ -130,10 +129,9 @@ userRouter.post("/login", async (req, res) => {
   try {
     const loginResult = await userController.loginUser(email, password);
 
-    if (loginResult && loginResult.token) {
+    if (loginResult && loginResult.user?.token) {
       return res.status(200).json({
         message: "Login successful",
-        token: loginResult.token,
         user: loginResult.user,
       });
     } else {

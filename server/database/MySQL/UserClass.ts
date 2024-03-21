@@ -68,7 +68,7 @@ export default class User {
           roleId,
         ]
       );
-      return rows.insertId;
+      return { fullName, email, oauthUserInfo, refresh_token, roleId };
     } catch (error) {
       console.error(error);
       throw new Error("Authentication failed");
@@ -83,25 +83,45 @@ export default class User {
         [email]
       );
       const user = users[0];
+
+      let username = null;
+
+      console.log(user);
+
+      if (user.oauthUserInfo !== null) {
+        const oAuthObj = JSON.parse(user.oauthUserInfo);
+
+        username = oAuthObj?.username || oAuthObj?.name;
+      }
+
       if (user && (await bcrypt.compare(password, user.password_hash))) {
         // Generate JWT token
         const token = jwt.sign(
           {
             id: user.id,
-            full_name: user.fullName,
+            token: user.refresh_token,
+            name: user.fullName || username,
             email: user.email,
-            role_id: user.role_id,
+            role: user.role_id,
           },
           "very super secret token",
           { expiresIn: "1h" }
         );
 
-        return {
-          access_token: token,
+        console.log({
+          token: token,
           expires_in: "1 hour",
-          full_name: user.full_name,
+          name: user.full_name,
           email: user.email,
-          role_id: user.role_id,
+          role: user.role_id,
+        });
+
+        return {
+          token: token,
+          expires_in: "1 hour",
+          name: user.full_name,
+          email: user.email,
+          role: user.role_id,
         };
       }
     } catch (error) {
