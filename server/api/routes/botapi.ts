@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction, Router } from "express";
-import { body, validationResult } from 'express-validator';
+import { body, validationResult } from "express-validator";
 import DiscordAPIOperations from "../controllers/BotCommands/DiscordAPIOperations";
 import BotRepository from "../../database/MongoDB/BotRepository";
 import BotController from "../controllers/BotController";
@@ -202,32 +202,48 @@ bot_commands_router.post(
       botInfoChannelId,
       botErrorChannelId,
     }: {
-      guildId: string,
-      commandChannelId: string,
-      buttonChannelId: string,
-      botInfoChannelId: string,
-      botErrorChannelId: string
+      guildId: string;
+      commandChannelId: string;
+      buttonChannelId: string;
+      botInfoChannelId: string;
+      botErrorChannelId: string;
     } = request.body;
 
     /*
     Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
     */
-    body(guildId).matches(/^[0-9]{18}$/).withMessage("The Discord guild id must be a string of 18 numbers");
-    body(commandChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord channel id must be a string of 18 numbers");
-    body(buttonChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot role button channel id must be a string of 18 numbers");
-    body(botInfoChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot info channel id must be a string of 18 numbers");
-    body(botErrorChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot error channel id must be a string of 18 numbers");
+    body(guildId)
+      .matches(/^[0-9]{18}$/)
+      .withMessage("The Discord guild id must be a string of 18 numbers");
+    body(commandChannelId)
+      .matches(/^[0-9]{18}$/)
+      .withMessage("The Discord channel id must be a string of 18 numbers");
+    body(buttonChannelId)
+      .matches(/^[0-9]{18}$/)
+      .withMessage(
+        "The Discord bot role button channel id must be a string of 18 numbers"
+      );
+    body(botInfoChannelId)
+      .matches(/^[0-9]{18}$/)
+      .withMessage(
+        "The Discord bot info channel id must be a string of 18 numbers"
+      );
+    body(botErrorChannelId)
+      .matches(/^[0-9]{18}$/)
+      .withMessage(
+        "The Discord bot error channel id must be a string of 18 numbers"
+      );
 
     (request, response) => {
       const validationErrors = validationResult(request);
-      
+
       if (!validationErrors.isEmpty()) {
         return response.status(400).json({
           success: false,
-          message: `Please try submitting the form again with the correct inputs as specified on the form`
-        }); 
+          message: `Please try submitting the form again with the correct inputs as specified on the form`,
+        });
       }
-    }
+    };
 
     const config_object = {
       bot_guild_id: guildId,
@@ -238,9 +254,12 @@ bot_commands_router.post(
     };
 
     try {
-      const bot_database_repository_instance: BotRepository = new BotRepository();
-      const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
-      
+      const bot_database_repository_instance: BotRepository =
+        new BotRepository();
+      const bot_controller_instance: BotController = new BotController(
+        bot_database_repository_instance
+      );
+
       await bot_controller_instance.insertBotDocumentIntoMongoDB(config_object);
 
       return response.status(200).json({
@@ -248,10 +267,12 @@ bot_commands_router.post(
         message: "Bot configuration values updated successfully",
       });
     } catch (error) {
-      console.error(`An error occurred when attempting to update the bot configuration values in the /configs endpoint: ${error}`);
-      return response.status(500).json({ 
-        success: false, 
-        message: `An internal server error occurred when attempting to update the bot configuration values in the /configs endpoint` 
+      console.error(
+        `An error occurred when attempting to update the bot configuration values in the /configs endpoint: ${error}`
+      );
+      return response.status(500).json({
+        success: false,
+        message: `An internal server error occurred when attempting to update the bot configuration values in the /configs endpoint`,
       });
     }
   }

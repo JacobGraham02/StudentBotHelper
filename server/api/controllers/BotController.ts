@@ -9,9 +9,7 @@ export default class BotController {
     this.bot_repository = bot_repository_database_instance;
   }
 
-  async insertBotDocumentIntoMongoDB(
-    bot_document_information: IDiscordBotInformation
-  ) {
+  async insertBotDocumentIntoMongoDB(bot_document_information: any) {
     try {
       await this.bot_repository.createBot(bot_document_information);
     } catch (error: any) {
