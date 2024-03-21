@@ -7,7 +7,7 @@ const LandingPage = () => {
   return (
     <Layout
       pageTitle="Welcome to Student Bot Helper!"
-      pageLayoutContent={<LandingPageContent />}
+      pageLayoutContent={<LandingPageContent userLoggedIn={false} />}
     ></Layout>
   );
 };
