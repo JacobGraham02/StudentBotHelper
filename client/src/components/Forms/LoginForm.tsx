@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import GitHubLoginButton from "../Buttons/OAuth/GitHubLoginButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -88,19 +89,27 @@ const LoginForm = ({
                 Please provide a valid password (longer than 8 characters).
               </Form.Control.Feedback>
             </Form.Group>
+            <Container>
+              <Row className="justify-content-center my-3">
+                <Col xs="auto">
+                  <Link to="/register" className="btn btn-link">
+                    Create an account instead.
+                  </Link>
+                </Col>
+              </Row>
 
-            <Container
-              className="d-flex justify-content-center align-items-center"
-              style={{ height: "40px", width: "240px" }}
-            >
-              <Button
-                className="d-flex align-items-center justify-content-center w-100"
-                variant="primary"
-                type="submit"
-              >
-                <FontAwesomeIcon icon={faRightToBracket} className="me-2" />
-                Login
-              </Button>
+              <Row className="justify-content-center">
+                <Col xs={12} md={8} lg={6}>
+                  <Button
+                    className="d-flex align-items-center justify-content-center w-100"
+                    variant="primary"
+                    type="submit"
+                  >
+                    <FontAwesomeIcon icon={faRightToBracket} className="me-2" />
+                    Login
+                  </Button>
+                </Col>
+              </Row>
             </Container>
           </Form>
         </Col>

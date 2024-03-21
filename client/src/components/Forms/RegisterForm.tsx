@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import GitHubLoginButton from "../Buttons/OAuth/GitHubLoginButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -136,18 +137,27 @@ const RegisterForm = ({
               </Form.Control.Feedback>
             </Form.Group>
 
-            <Container
-              className="d-flex justify-content-center align-items-center"
-              style={{ height: "40px", width: "240px" }}
-            >
-              <Button
-                className="d-flex align-items-center justify-content-center w-100"
-                variant="primary"
-                type="submit"
-              >
-                <FontAwesomeIcon icon={faUserPlus} className="me-2" />
-                Register
-              </Button>
+            <Container>
+              <Row className="justify-content-center my-3">
+                <Col xs="auto">
+                  <Link to="/login" className="btn btn-link">
+                    Already have an account?
+                  </Link>
+                </Col>
+              </Row>
+
+              <Row className="justify-content-center">
+                <Col xs={12} md={8} lg={6}>
+                  <Button
+                    className="d-flex align-items-center justify-content-center w-100"
+                    variant="primary"
+                    type="submit"
+                  >
+                    <FontAwesomeIcon icon={faUserPlus} className="me-2" />
+                    Register
+                  </Button>
+                </Col>
+              </Row>
             </Container>
           </Form>
         </Col>
