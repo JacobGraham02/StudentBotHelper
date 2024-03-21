@@ -12,24 +12,25 @@ export default class BotController {
   }
 
   async insertBotDocumentIntoMongoDB(bot_document_information: any) {
-    try {
-      await this.bot_repository.createBot(bot_document_information);
-    } catch (error: any) {
-      console.error(
-        `There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`
-      );
-      throw error;
-    }
-
-    async insertBotDocumentIntoMongoDB(bot_document_information: DiscordBotInformationType) {
-
         try {
-            await this.bot_repository.createBot(bot_document_information);
+        await this.bot_repository.createBot(bot_document_information);
         } catch (error: any) {
-            console.error(`There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`);
-            throw error;
+        console.error(
+            `There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`
+        );
+        throw error;
         }
     }
+
+    // async insertBotDocumentIntoMongoDB(bot_document_information: DiscordBotInformationType) {
+
+    //     try {
+    //         await this.bot_repository.createBot(bot_document_information);
+    //     } catch (error: any) {
+    //         console.error(`There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`);
+    //         throw error;
+    //     }
+    // }
 
     async insertBotCommandDocument(bot_command_information: DiscordBotCommandType) {
 
@@ -92,20 +93,22 @@ export default class BotController {
 
         try {   
             await this.bot_repository.writeLogToAzureContainer(logFileName, fileContents, containerName);
+    
         } catch (error: any) {
             console.error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`);
             throw new Error(`There was an error when attempting to write a log file to a container: ${containerName}: ${error}`)
         }
     }
-
-    async writeCommandFileToContainer(commandName: string, commandFile: Object, containerName: string) {
-        try {
-            const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandName, commandFile, containerName);
-
-            return azure_container_commands;
-        } catch (error: any) {
-            console.error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
-            throw new Error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
-        }
-    }
+    
+    // async writeCommandFileToContainer(commandName: string, commandFile: Object, containerName: string) {
+    //     try {
+    //         const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandName, commandFile, containerName);
+    
+    //         return azure_container_commands;
+    //     } catch (error: any) {
+    //         console.error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
+    //         throw new Error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
+    //     }
+    // }
 }
+
