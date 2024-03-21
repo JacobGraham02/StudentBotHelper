@@ -27,14 +27,13 @@ import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import CommandsPage from "./pages/bot/CommandsPage.js";
 import ConfigurationsOptionsPage from "./pages/bot/ConfigurationOptionsPage.js";
-import CommandsPage from "./pages/CommandsPage.js";
 
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
 import SupportPage from "./components/LoginForm/LoginForm.js";
 import Dashboard from "./pages/Dashboard.js";
 import LogsPage from "./pages/LogsPage.js";
-import ConfigurationsPage from "./pages/ConfigurationOptionsPage.js";
+import ConfigurationsPage from "./pages/bot/ConfigurationOptionsPage.js";
 import DashboardPage from "./pages/DashboardPage.js";
 import LandingPage from "./pages/LandingPage.js";
 
@@ -60,9 +59,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: (
-          <ProtectedRoute>
             <Dashboard />
-          </ProtectedRoute>
         ),
       },
       {
@@ -84,8 +81,6 @@ const router = createBrowserRouter([
             <CommandsPage />
           </ProtectedRoute>
         ),
-        path: 'logs',
-        element: <LogsPage />
       },
       {
         path: 'configurations',
@@ -101,10 +96,8 @@ const router = createBrowserRouter([
       },
       {
         path: "support",
-        element: <SupportPage isUserLoggedIn={false} />,
+        element: <SupportPage />,
       },
-        element: <SupportPage />
-      }
     ],
   },
 ]);

@@ -1,8 +1,5 @@
-import React, { useContext } from "react";
-import { Outlet, NavLink } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import styles from "../../assets/css/Sidebar.module.css";
-import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHelperStarterIconSmaller.png";
 import React, { ReactElement, useContext, useState } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHelperStarterIconSmaller.png"
@@ -129,22 +126,9 @@ const DefaultLayout = () => {
       </>
     );
 
- 
-  return (
-    <div className="container-fluid">
-      <div className="row">
-        <div style={hamburgerMenuStyle} onClick={toggleSidebar}>
-          {showSidebar ? 'X' : '☰'} {/* Toggle icon */}
-        </div>
-
-        {sideBar}
-
-        <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-          <Outlet />
-        </div>
-      </div>
-    </div>
-  );
+    return sidebar;
+  }
 }
+    
 
 export default DefaultLayout;
