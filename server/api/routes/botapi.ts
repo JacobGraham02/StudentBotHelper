@@ -1,5 +1,8 @@
 import express, { Request, Response, NextFunction, Router } from "express";
+import { body, validationResult } from 'express-validator';
 import DiscordAPIOperations from "../controllers/BotCommands/DiscordAPIOperations";
+import BotRepository from "../../database/MongoDB/BotRepository";
+import BotController from "../controllers/BotController";
 const bot_commands_router: Router = express.Router();
 import * as dotenv from "dotenv";
 import "dotenv/config";
@@ -127,13 +130,6 @@ bot_commands_router.post(
   }
 );
 
-bot_commands_router.post(
-  "/testroute",
-  function (request: Request, response: Response, next: NextFunction) {
-    response.status(200).json({ content: `This is the test API route page` });
-  }
-);
-
 /**
  * When the API endpoint '/registerCommands' is triggered, this routing function will do the following:
  *  1. Use middleware to determine if both the Logger and DiscordAPIOperations classes are truthy
@@ -205,28 +201,58 @@ bot_commands_router.post(
       buttonChannelId,
       botInfoChannelId,
       botErrorChannelId,
+    }: {
+      guildId: string,
+      commandChannelId: string,
+      buttonChannelId: string,
+      botInfoChannelId: string,
+      botErrorChannelId: string
     } = request.body;
 
-    const configObj = {
-      guildId: guildId,
-      commandChannelId: commandChannelId,
-      buttonChannelId: buttonChannelId,
-      botInfoChannelId: botInfoChannelId,
-      botErrorChannelId: botErrorChannelId,
+    /*
+    Express-validator server-side validation chains for input fields by the user. Middleware is then used to handle the request after validation
+    */
+    body(guildId).matches(/^[0-9]{18}$/).withMessage("The Discord guild id must be a string of 18 numbers");
+    body(commandChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord channel id must be a string of 18 numbers");
+    body(buttonChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot role button channel id must be a string of 18 numbers");
+    body(botInfoChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot info channel id must be a string of 18 numbers");
+    body(botErrorChannelId).matches(/^[0-9]{18}$/).withMessage("The Discord bot error channel id must be a string of 18 numbers");
+
+    (request, response) => {
+      const validationErrors = validationResult(request);
+      
+      if (!validationErrors.isEmpty()) {
+        return response.status(400).json({
+          success: false,
+          message: `Please try submitting the form again with the correct inputs as specified on the form`
+        }); 
+      }
+    }
+
+    const config_object = {
+      bot_guild_id: guildId,
+      bot_commands_channel_id: commandChannelId,
+      bot_button_channel_id: buttonChannelId,
+      bot_command_usage_information_channel_id: botInfoChannelId,
+      bot_command_usage_error_channel_id: botErrorChannelId,
     };
 
-    console.log(configObj);
     try {
-      // Your logic here
-      console.log(`This is the guild ID: ${request.body.guildId}`);
+      const bot_database_repository_instance: BotRepository = new BotRepository();
+      const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+      
+      await bot_controller_instance.insertBotDocumentIntoMongoDB(config_object);
 
-      // Pass to the controller to handle the functionality.
       return response.status(200).json({
-        message: "Guild configuration updated successfully",
+        success: true,
+        message: "Bot configuration values updated successfully",
       });
     } catch (error) {
-      console.error("Error handling /configs route:", error);
-      return response.status(500).json({ message: "Internal server error" });
+      console.error(`An error occurred when attempting to update the bot configuration values in the /configs endpoint: ${error}`);
+      return response.status(500).json({ 
+        success: false, 
+        message: `An internal server error occurred when attempting to update the bot configuration values in the /configs endpoint` 
+      });
     }
   }
 );

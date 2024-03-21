@@ -1,10 +1,24 @@
+import axios = require("axios");
+import BotRepository from "../../database/MongoDB/BotRepository";
+import IDiscordBotInformation from "../../database/MongoDB/IDiscordBotInformation";
 
+export default class BotController {
+  bot_repository: BotRepository;
 
+  constructor(bot_repository_database_instance: BotRepository) {
+    this.bot_repository = bot_repository_database_instance;
+  }
 
-// API 
-
-
-// https://discord.com/developers/docs/interactions/application-commands#authorizing-your-application
-
-
-// https://discord.com/api/v10/applications/<my_application_id>/guilds/<guild_id>/commands
+  async insertBotDocumentIntoMongoDB(
+    bot_document_information: IDiscordBotInformation
+  ) {
+    try {
+      await this.bot_repository.createBot(bot_document_information);
+    } catch (error: any) {
+      console.error(
+        `There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`
+      );
+      throw error;
+    }
+  }
+}
