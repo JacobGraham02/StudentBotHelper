@@ -6,7 +6,6 @@ const BASE_URL = config.server.BASE_URL;
 
 export const instance = axios.create({
   baseURL: BASE_URL,
-  timeout: 2000,
   headers: {
     // Authorization: `Bearer ${API_KEY}`,
     Accept: "application/json",

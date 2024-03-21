@@ -7,6 +7,9 @@ import {
 import "./assets/styles.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 // Config
 import { OAuthCreds } from "../config.js";
 // Context
@@ -15,6 +18,9 @@ import AuthProvider from "./contexts/AuthContext";
 // Layouts
 // import Layout from "./components/Layout/Layout";
 import DefaultLayout from "./screens/layout/DefaultLayout";
+
+// Utils
+import { ProtectedRoute } from "./utils/ProtectedRoute.js";
 
 // Pages
 import LoginPage from "./pages/LoginPage";
@@ -27,6 +33,7 @@ import ConfigurationsOptionsPage from "./pages/bot/ConfigurationOptionsPage.js";
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
 import SupportPage from "./components/LoginForm/LoginForm.js";
+import Dashboard from "./pages/Dashboard.js";
 
 const GoogleClientID = OAuthCreds.google.clientID;
 
@@ -47,8 +54,12 @@ const router = createBrowserRouter([
         element: <GitHubOAuthRedirect />,
       },
       {
-        path: "dashboard",
-        element: <LandingPage isUserLoggedIn={false} />,
+        path: "/",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "register",
@@ -60,19 +71,23 @@ const router = createBrowserRouter([
       },
       {
         path: "commands",
-        element: <CommandsPage />,
+        element: (
+          <ProtectedRoute>
+            <CommandsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "configurations",
-        element: <ConfigurationsOptionsPage />,
-      },
-      {
-        path: "home",
-        element: <LandingPage isUserLoggedIn={false} />,
+        element: (
+          <ProtectedRoute>
+            <ConfigurationsOptionsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "support",
-        element: <SupportPage isUserLoggedIn={true} />,
+        element: <SupportPage isUserLoggedIn={false} />,
       },
     ],
   },
@@ -90,7 +105,12 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </>
+  );
 }
 
 export default App;

@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
 
@@ -27,10 +28,10 @@ const Login = () => {
   });
 
   useEffect(() => {
-    if (authCtx?.userAuthDetails.refreshToken != "") {
+    if (authCtx?.userAuthDetails.token != "") {
       navigate("/");
     }
-  }, [authCtx?.userAuthDetails.refreshToken]);
+  }, [authCtx?.userAuthDetails.token]);
 
   const onChangeHandler = (field: string, value: string) => {
     let isValid = true; // Default to true, adjust based on validation
@@ -92,36 +93,35 @@ const Login = () => {
     setLoginForm(updatedFormState);
 
     if (formIsValid) {
-      console.log("Form is valid. Submitting data...", loginForm);
-      // Handle form submission, e.g., sending data to a server
-
       const loginData = {
         email: loginForm.email.value,
         password: loginForm.password.value,
       };
-      const response = await loginUser(loginData);
 
-      const userData = {
-        id: response.data.body.id,
-        email: response.data.body.email,
-        username: response.data.body.username,
-        refreshToken: response.data.body.refreshToken,
-      };
+      try {
+        const response = await loginUser(loginData);
 
-      // {
-      //     "message": "Login successful",
-      //     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg4NzA3NGMyLTJkOGMtNGJhZC04YTExLWJjYTE5YzQ1ZjU4NSIsImZ1bGxfbmFtZSI6IkpvaG4gRG9lIiwiZW1haWwiOiJqb2hudGVzdEB0ZXN0LmNvbSIsInJvbGVfaWQiOjEsImlhdCI6MTcxMTAwMDczNiwiZXhwIjoxNzExMDA0MzM2fQ.n5XNhlf7Re8fU2zhNox3QRIynoV-7OGFFwalVB6wY7Q",
-      //     "user": {
-      //         "id": "887074c2-2d8c-4bad-8a11-bca19c45f585",
-      //         "full_name": "John Doe",
-      //         "email": "johntest@test.com",
-      //         "role_id": 1
-      //     }
-      // }
+        const userData = {
+          token: response.user.token,
+          name: response.user.name,
+          email: response.user.email,
+          role: response.user.role,
+        };
 
-      authCtx?.login(userData);
+        // Log the user in
+        authCtx?.login(userData);
+        toast.success("Login successful!");
+      } catch (error) {
+        const statusCode = error.response?.status || 500;
+        if (statusCode === 401) {
+          toast.error("Invalid credentials. Please try again.");
+        } else {
+          toast.error("An unexpected error occurred. Please try again later.");
+        }
+      }
     } else {
       console.log("Form is invalid. Please correct the errors.");
+      toast.warn("Form is invalid. Please correct the errors and try again.");
     }
   };
 
