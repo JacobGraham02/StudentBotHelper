@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
 
@@ -27,10 +28,10 @@ const Login = () => {
   });
 
   useEffect(() => {
-    if (authCtx?.userAuthDetails.refreshToken != "") {
+    if (authCtx?.userAuthDetails.token != "") {
       navigate("/");
     }
-  }, [authCtx?.userAuthDetails.refreshToken]);
+  }, [authCtx?.userAuthDetails.token]);
 
   const onChangeHandler = (field: string, value: string) => {
     let isValid = true; // Default to true, adjust based on validation
@@ -92,21 +93,35 @@ const Login = () => {
     setLoginForm(updatedFormState);
 
     if (formIsValid) {
-      console.log("Form is valid. Submitting data...", loginForm);
-      // Handle form submission, e.g., sending data to a server
-
-      const response = await loginUser(loginForm);
-
-      const userData = {
-        id: response.data.body.id,
-        email: response.data.body.email,
-        username: response.data.body.username,
-        refreshToken: response.data.body.refreshToken,
+      const loginData = {
+        email: loginForm.email.value,
+        password: loginForm.password.value,
       };
 
-      authCtx?.login(userData);
+      try {
+        const response = await loginUser(loginData);
+
+        const userData = {
+          token: response.user.token,
+          name: response.user.name,
+          email: response.user.email,
+          role: response.user.role,
+        };
+
+        // Log the user in
+        authCtx?.login(userData);
+        toast.success("Login successful!");
+      } catch (error) {
+        const statusCode = error.response?.status || 500;
+        if (statusCode === 401) {
+          toast.error("Invalid credentials. Please try again.");
+        } else {
+          toast.error("An unexpected error occurred. Please try again later.");
+        }
+      }
     } else {
       console.log("Form is invalid. Please correct the errors.");
+      toast.warn("Form is invalid. Please correct the errors and try again.");
     }
   };
 

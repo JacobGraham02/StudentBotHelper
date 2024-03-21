@@ -205,11 +205,11 @@ bot_commands_router.post("/configs", [ /*
       botInfoChannelId,
       botErrorChannelId,
     }: {
-      guildId: string,
-      commandChannelId: string,
-      buttonChannelId: string,
-      botInfoChannelId: string,
-      botErrorChannelId: string
+      guildId: string;
+      commandChannelId: string;
+      buttonChannelId: string;
+      botInfoChannelId: string;
+      botErrorChannelId: string;
     } = request.body;
   
     const requestValidationErrors = validationResult(request);
@@ -229,9 +229,12 @@ bot_commands_router.post("/configs", [ /*
     };
 
     try {
-      const bot_database_repository_instance: BotRepository = new BotRepository();
-      const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
-      
+      const bot_database_repository_instance: BotRepository =
+        new BotRepository();
+      const bot_controller_instance: BotController = new BotController(
+        bot_database_repository_instance
+      );
+
       await bot_controller_instance.insertBotDocumentIntoMongoDB(config_object);
 
       return response.status(200).json({
@@ -239,10 +242,12 @@ bot_commands_router.post("/configs", [ /*
         message: "Bot configuration values updated successfully",
       });
     } catch (error) {
-      console.error(`An error occurred when attempting to update the bot configuration values in the /configs endpoint: ${error}`);
-      return response.status(500).json({ 
-        success: false, 
-        message: `An internal server error occurred when attempting to update the bot configuration values in the /configs endpoint` 
+      console.error(
+        `An error occurred when attempting to update the bot configuration values in the /configs endpoint: ${error}`
+      );
+      return response.status(500).json({
+        success: false,
+        message: `An internal server error occurred when attempting to update the bot configuration values in the /configs endpoint`,
       });
     }
   }

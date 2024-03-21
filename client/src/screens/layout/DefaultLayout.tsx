@@ -1,3 +1,8 @@
+import React, { useContext } from "react";
+import { Outlet, NavLink } from "react-router-dom";
+import { Dropdown } from "react-bootstrap";
+import styles from "../../assets/css/Sidebar.module.css";
+import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHelperStarterIconSmaller.png";
 import React, { ReactElement, useContext, useState } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHelperStarterIconSmaller.png"
@@ -5,94 +10,125 @@ import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHe
 // Context
 import { AuthContext } from "../../contexts/AuthContext";
 
-const DefaultLayout = (): ReactElement => {
+const DefaultLayout = () => {
   const authCtx = useContext(AuthContext);
-  const location = useLocation();
-  const [showSidebar, setShowSidebar] = useState(false);
-  let sideBar;
+  let sidebar;
 
-  const navLinkStyle = {
-    fontWeight: "bold"
-  };
-
-  const navLinkHoverStyle = {
-    transition: "all 0.3s ease",
-    ":hover": {
-      fontSize: "1.2em",
-      color: "blue"
-    }
-  };
-
-  const navLinkActiveStyle = {
-    fontWeight: "bold",
-    color: "red"
-  };
-
-  const hamburgerMenuStyle = {
-    display: 'none', // Initially hidden, will be shown via media query on small screens
-    cursor: 'pointer',
-    padding: '10px',
-  };
-
-  const toggleSidebar = () => {
-    setShowSidebar(!showSidebar);
-  };
-
-  // if (authCtx?.userAuthDetails.refreshToken === "") {
-    sideBar = (
-      <div className={`col-md-3 col-lg-2 d-none d-md-block bg-light sidebar full-height-sidebar container-fluid ${showSidebar ? 'd-block' : 'd-none d-md-block'}`}>
-        <ul className="nav flex-column flex-fill d-flex flex-column justify-content-center text-center">
+  if (authCtx?.isLoggedIn()) {
+    sidebar = (
+      <>
+        <ul
+          className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start"
+          id="menu"
+        >
           <li className="nav-item">
+            <NavLink to="/" className="nav-link align-middle px-0 text-black">
+              <i className="fs-4 bi-house"></i>
+              <span className="ms-1 d-none d-sm-inline">Home</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/dashboard"
+              className="nav-link px-0 align-middle text-black"
+            >
+              <i className="fs-4 bi-speedometer2"></i>{" "}
+              <span className="ms-1 d-none d-sm-inline">Dashboard</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/commands"
+              className="nav-link px-0 align-middle text-black"
+            >
+              <i className="fs-4 bi-terminal"></i>
+              <span className="ms-1 d-none d-sm-inline">Commands</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/configurations"
+              className="nav-link px-0 align-middle text-black"
+            >
+              <i className="fs-4 bi-cogs"></i>
+              <span className="ms-1 d-none d-sm-inline">Configurations</span>
+            </NavLink>
+          </li>
+
+          {authCtx?.userAuthDetails.role === 4 && (
+            <li>
+              <NavLink
+                to="/users"
+                className="nav-link px-0 align-middle text-black"
+              >
+                <i className="fs-4 bi-terminal"></i>
+                <span className="ms-1 d-none d-sm-inline">Users</span>
+              </NavLink>
+            </li>
+          )}
+        </ul>
+        <hr />
+        <Dropdown
+          as="li"
+          className="nav-item mt-auto mb-4"
+          style={{ listStyleType: "none" }}
+        >
+          <Dropdown.Toggle
+            as="a"
+            className={`d-flex align-items-center text-black text-decoration-none ${styles.profileDropdownToggle}`}
+            id="dropdownUser1"
+          >
             <img
-              id="defaultLayoutSidebarImage"
-              src={StudentBotHelperStarterIconSmaller}
-              alt="An image icon of our bot icon"
-              className="p-3"
+              src="http://localhost:8080/images/users/profile/default.png"
+              alt="Profile"
+              className={styles.profileImage}
             />
-          </li>
+            <span className="ms-2 d-none d-sm-inline text-black-50">
+              {authCtx.userAuthDetails.name}
+            </span>
+          </Dropdown.Toggle>
+          <Dropdown.Menu className="dropdown-menu-dark text-small shadow">
+            <Dropdown.Item as={NavLink} to="/profile">
+              Profile
+            </Dropdown.Item>
+            <Dropdown.Item as={NavLink} to="/settings">
+              Settings
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={authCtx.logout}>Logout</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </>
+    );
+  } else {
+    sidebar = (
+      <>
+        <ul
+          className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start"
+          id="menu"
+        >
           <li className="nav-item">
-            <NavLink to="/home" 
-            className={`nav-link ${location.pathname === "/home" ? "active" : ""}`} 
-            style={{ ...navLinkStyle, ...navLinkHoverStyle, ...(location.pathname === "/home" && navLinkActiveStyle) }}
-          >
-            <p id="home_link">Home</p>
+            <NavLink
+              to="/login"
+              className="nav-link align-middle px-0 text-black"
+            >
+              {/* <i className="fs-4 bi-house"></i> */}
+              <span className="ms-1 d-none d-sm-inline">Login</span>
             </NavLink>
           </li>
-          <li className="nav-item">
-            <NavLink to="/dashboard" 
-            className={`nav-link ${location.pathname === "/dashboard" ? "active" : ""}`} 
-            style={{ ...navLinkStyle, ...navLinkHoverStyle, ...(location.pathname === "/dashboard" && navLinkActiveStyle) }}
-          >
-              <p id="dashboard_link">Dashboard</p>
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to="/commands" 
-              className={`nav-link ${location.pathname === "/commands" ? "active" : ""}`} 
-              style={{ ...navLinkStyle, ...navLinkHoverStyle, ...(location.pathname === "/commands" && navLinkActiveStyle) }}
-          >
-              <p id="commands_link">Commands</p>
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to="/configurations" 
-              className={`nav-link ${location.pathname === "/configurations" ? "active" : ""}`} 
-              style={{ ...navLinkStyle, ...navLinkHoverStyle, ...(location.pathname === "/configurations" && navLinkActiveStyle) }}
-          >
-              <p id="configurations_link">Configurations</p>
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to="/logs" 
-              className={`nav-link ${location.pathname === "/logs" ? "active" : ""}`} 
-              style={{ ...navLinkStyle, ...navLinkHoverStyle, ...(location.pathname === "/logs" && navLinkActiveStyle) }}
-          >
-              <p id="log_files_link">Log files</p>
+          <li>
+            <NavLink
+              to="/register"
+              className="nav-link px-0 align-middle text-black"
+            >
+              {/* <i className="fs-4 bi-speedometer2"></i>{" "} */}
+              <span className="ms-1 d-none d-sm-inline">Register</span>
             </NavLink>
           </li>
         </ul>
-      </div>
+      </>
     );
+
  
   return (
     <div className="container-fluid">

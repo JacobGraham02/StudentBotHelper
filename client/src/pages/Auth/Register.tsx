@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Container } from "react-bootstrap";
 
 import RegisterForm from "../../components/Forms/RegisterForm";
@@ -37,10 +38,10 @@ const Register = () => {
   });
 
   useEffect(() => {
-    if (authCtx?.userAuthDetails.refreshToken != "") {
+    if (authCtx?.userAuthDetails.token != "") {
       navigate("/");
     }
-  }, [authCtx?.userAuthDetails.refreshToken]);
+  }, [authCtx?.userAuthDetails.token]);
 
   const onChangeHandler = (field: string, value: string) => {
     let isValid = true; // Default to true, adjust based on validation
@@ -95,40 +96,92 @@ const Register = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     let formIsValid = true;
-    const updatedFormState = {};
+    // Initialize updatedFormState with the current state
+    const updatedFormState = { ...registerForm };
 
+    // Check if the form is valid
     for (const field in registerForm) {
       if (!registerForm[field].valid) {
         formIsValid = false;
+        updatedFormState[field].touched = true; // Mark as touched to show validation feedback
       }
-
-      updatedFormState[field] = {
-        ...registerForm[field],
-        touched: true,
-      };
     }
 
+    // Update the form state to trigger validation feedback
     setRegisterForm(updatedFormState);
 
     if (formIsValid) {
-      console.log("Form is valid. Submitting data...", registerForm);
-      // Handle form submission, e.g., sending data to a server
+      try {
+        // Attempt to register the user
+        const userInfo = {
+          fullName: registerForm.fullName.value,
+          email: registerForm.email.value,
+          password: registerForm.password.value,
+          confirmPassword: registerForm.confirmPassword.value,
+        };
 
-      const response = await registerUser(registerForm);
+        await registerUser(userInfo);
 
-      const userData = {
-        id: response.data.body.id,
-        email: response.data.body.email,
-        username: response.data.body.username,
-        password: response.data.body.password,
-        refreshToken: response.data.body.refreshToken,
-      };
+        toast.success("Registration successful!");
 
-      authCtx?.login(userData);
+        // redirect to login page.
+        navigate("/login");
+      } catch (error) {
+        // Display an error toast if registration fails
+        const errorMessage =
+          error.response?.data?.message ||
+          "Registration failed. Please try again.";
+        console.error(error);
+        toast.error(errorMessage);
+      }
     } else {
-      console.log("Form is invalid. Please correct the errors.");
+      toast.error("Form is invalid. Please correct the errors and try again.");
     }
   };
+
+  // const onSubmitHandler = async (e) => {
+  //   e.preventDefault();
+  //   let formIsValid = true;
+  //   const updatedFormState = {};
+
+  //   for (const field in registerForm) {
+  //     if (!registerForm[field].valid) {
+  //       formIsValid = false;
+  //     }
+
+  //     updatedFormState[field] = {
+  //       ...registerForm[field],
+  //       touched: true,
+  //     };
+  //   }
+
+  //   setRegisterForm(updatedFormState);
+
+  //   if (formIsValid) {
+  //     console.log("Form is valid. Submitting data...", registerForm);
+  //     // Handle form submission, e.g., sending data to a server
+
+  //     const userInfo = {
+  //       fullName: registerForm.fullName.value,
+  //       email: registerForm.email.value,
+  //       password: registerForm.password.value,
+  //       confirmPassword: registerForm.confirmPassword.value,
+  //     };
+
+  //     const response = await registerUser(userInfo);
+
+  //     const userData = {
+  //       id: response.data.body.id,
+  //       email: response.data.body.email,
+  //       username: response.data.body.username,
+  //       refreshToken: response.data.body.refreshToken,
+  //     };
+
+  //     authCtx?.login(userData);
+  //   } else {
+  //     console.log("Form is invalid. Please correct the errors.");
+  //   }
+  // };
 
   return (
     <>
