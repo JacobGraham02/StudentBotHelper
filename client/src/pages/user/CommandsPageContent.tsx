@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -9,59 +9,163 @@ import {
   FormLabel,
   Button
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
-import { postBotConfigurations } from "../../services/bot";
+import { postBotCommands, postBotRequestCommand } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBackwardFast } from "@fortawesome/free-solid-svg-icons/faBackwardFast";
-import { faBell, faEraser, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faArrowUpRightFromSquare, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import CustomModal from "../../components/Modal/CustomModal";
+import IModalContent from "./interfaces/IModalContent";
 
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const navigate = useNavigate();
+    let stateBotId, stateCommandName, stateCommandDescription, stateCommandFunction, stateUsers = undefined;
+
+    const [confirmClear, setConfirmClear] = useState(false);
+  
+    const [showModal, setShowModal] = useState(false);
+
+    const { state } = useLocation();
+
+    if (state) {
+      stateBotId = state.command_object.bot_id;
+      stateCommandName = state.command_object.command_name;
+      stateCommandDescription = state.command_object.command_description;
+      stateCommandFunction = state.command_object.command_function;
+      stateUsers = state.command_object.command_users;
+    }
+
+    const [modalContent, setModalContent] = useState<IModalContent>({
+      title: "",
+      body: "",
+      cancelButtonText: "",
+      confirmButtonText: "",
+      onConfirm: () => {}  
+    });
+
+    useEffect(() => {
+      if (confirmClear) {
+        onClearHandler();
+        setConfirmClear(false);
+        setShowModal(false);
+      }
+    }, [confirmClear]);
+
+    const showCancelConfirmation = () => {
+      setModalContent({
+        title: `Cancel confirmation`,
+        body: `Are you sure you want to cancel? Confirming will bring you to the last page you were on`,
+        cancelButtonText: `Cancel`,
+        confirmButtonText: `Confirm`,
+        onConfirm: () => {
+          navigate(-1)
+        }
+      });
+      setShowModal(true);
+    }
+  
+    const showClearConfirmation = () => {
+      setModalContent({
+        title: `Clear input fields confirmation`,
+        body: `Are you sure you want to clear the input fields on this form?`,
+        cancelButtonText: `No`,
+        confirmButtonText: `Yes`,
+        onConfirm: () => {
+          onClearHandler();
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+
+    const showSuccessSubmissionConfirmation = () => {
+      setModalContent({
+        title: `Command submission request successful`,
+        body: `The server administrator will be in contact with you within 24 hours`,
+        confirmButtonText: `Ok`,
+        onConfirm: () => {
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+
+    const showErrorSubmissionConfirmation = (error) => {
+      setModalContent({
+        title: `Command submission request unsuccessful`,
+        body: `There was an error when attempting to request this command. Please try again or contact the server administrator if you believe this is an error: ${error}`,
+        confirmButtonText: `Ok`,
+        onConfirm: () => {
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
+
+    const submitFormConfirmation = (formSubmitEvent: any) => {
+      setModalContent({
+        title: `Submit new command request confirmation`,
+        body: `Are you sure you want to request this command?`,
+        cancelButtonText: `No`,
+        confirmButtonText: `Yes`,
+        onConfirm: () => {
+          const submittedFormInvalid = onSubmitHandler(formSubmitEvent);
+
+          if (!submittedFormInvalid) {
+            setShowModal(true);
+          } 
+          if (typeof submittedFormInvalid === 'undefined') {
+            setShowModal(false);
+          }
+        }
+      });
+      setShowModal(true);
+    }
+
+    const formHasErrorsConfirmation = () => {
+      setModalContent({
+        title: `Submission errors`,
+        body: `There were some errors in the form fields! Please fix the errors in the input fields indicated on the form.`,
+        confirmButtonText: `Ok`,
+        onConfirm: () => {
+          setShowModal(false);
+        }
+      });
+      setShowModal(true);
+    }
   
     const [commandData, setCommandData] = useState<CommandsForm>(
     {
       commandName: {
-        value: "",
+        value: state ? stateCommandName : "",
         error: "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters (a-z)",
         valid: false,
         touched: false
       },
 
       commandDescription: {
-        value: "",
+        value: state ? stateCommandDescription : "",
         error: "Invalid command description. Please enter a command description whose length is equal to or less than 100 characters (a-z)",
-        valid: false,
-        touched: false
-      },
-
-      commandOptions: { 
-        value: [{
-          command_option_name: "",
-          command_option_description: "",
-          command_option_required: false
-        }], 
-        error: "Invalid command option. Please enter valid configuration options",
         valid: false,
         touched: false
       },
      
       commandAuthorizedUser: {
-        value: "",
+        value: state ? stateUsers : "",
         error: "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
         valid: false,
         touched: false
       },
 
       commandDescriptionForFunction: {
-        value: "",
-        error: "Invalid command function description. Please enter a description so the admins can create a command for you (a-z)",
+        value: state ? stateCommandFunction : "",
+        error: "Invalid command function description. Please enter a description that is less than 1000 characters long (a-z)",
         valid: false,
         touched: false
       },
 
-      commandAuthorizedUsers: [""]
+      commandAuthorizedUsers: state ? stateUsers : [""]
     }
   );
 
@@ -99,7 +203,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     });
   };
 
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeHandler = (event: any) => {
     const { name, value } = event.target;
     setCommandData(prevState => ({
       ...prevState,
@@ -138,21 +242,49 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
 
   const addAuthorizedUserField = () => {
-    setCommandData(prevState => ({
-      ...prevState,
-      commandAuthorizedUsers: [...prevState.commandAuthorizedUsers, ""]
-    }));
+    setCommandData(prevState => {
+      // Check if the current number of authorized user fields is less than 8
+      if (prevState.commandAuthorizedUsers.length < 8) {
+        // Add a new authorized user field if less than 8 fields exist
+        return {
+          ...prevState,
+          commandAuthorizedUsers: [...prevState.commandAuthorizedUsers, ""]
+        };
+      } else {
+        // Do not add a new field if 8 fields already exist
+        return prevState;
+      }
+    });
   };
+  
 
-  const onSubmitHandler = (e: any) => {
-    e.preventDefault();
-    const allFieldsValid = Object.values(commandData).every(field =>
-      Array.isArray(field) ? field.every(user => validateField("commandAuthorizedUser", user)) : field.valid
-    );
+  const onSubmitHandler = async (formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
+    formSubmitEvent.preventDefault();
+
+    const allFieldsValid: boolean = commandData.commandAuthorizedUsers.every(user => validateField("commandAuthorizedUser", user));
 
     if (!allFieldsValid) {
-      alert("Please correct the form errors shown on screen before submitting");
-      return;
+      formHasErrorsConfirmation();
+      return false;
+    }
+
+    const formSubmissionData = {
+      commandName: commandData.commandName.value,
+      commandDescription: commandData.commandDescription.value,
+      commandDescriptionForFunction: commandData.commandDescriptionForFunction.value,
+      commandAuthorizedUsers: commandData.commandAuthorizedUsers
+    }
+
+    try {
+      const postCommandResponse = await postBotCommands(
+        formSubmissionData
+      );
+      if (postCommandResponse) {
+        onClearHandler();
+        showSuccessSubmissionConfirmation();
+      }
+    } catch (error) {
+      showErrorSubmissionConfirmation(error);
     }
   };
     if (userLoggedIn) {
@@ -164,8 +296,20 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
         e.target.style.height = 'inherit'; // Reset the height, allowing the TextArea to shrink if necessary
         e.target.style.height = `${e.target.scrollHeight}px`; // Set the height to scroll height to remove the scroll bar
       }
+      
         return (
             <main id="main" className="text-center">
+              <CustomModal
+                showModal={showModal}
+                setShowModal={setShowModal}
+                title={modalContent.title}
+                body={modalContent.body}
+                cancelButtonText={modalContent.cancelButtonText}
+                confirmButtonText={modalContent.confirmButtonText!}
+                onConfirm={modalContent.onConfirm}
+              >
+              </CustomModal>
+
                 <aside id="bot_command_options_page_content">
                     <h1 id="bot_command_options_page_title">
                         Request bot command
@@ -178,14 +322,14 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                 <Container>
                   <Row className="my-1 justify-content-between mt-5">
                     <Col xs="auto">
-                      <Button className="btn btn-danger" onClick={() => navigate(-1)}>
-                        <FontAwesomeIcon icon={faBackwardFast} className="mx-1"/>
+                      <Button className="btn btn-danger" onClick={() => showCancelConfirmation()}>
+                        <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
                         Cancel
                       </Button>
                     </Col>
 
                     <Col xs="auto">
-                      <Button className="btn btn-secondary" onClick={onClearHandler}>
+                      <Button className="btn btn-secondary" onClick={() => showClearConfirmation()}>
                         <FontAwesomeIcon icon={faEraser} className="mx-1"/>
                         Reset
                       </Button>
@@ -280,7 +424,6 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                           value={commandData.commandDescriptionForFunction.value}
                                           name="commandDescriptionForFunction"
                                           placeholder="1-1000 letters and/or numbers (e.g., I want the command that will respond to a user with 'Ping' if they use the command '/pong')"
-                                          pattern="[a-zA-Z0-9 ]{1,1000}"
                                           title="Please enter 1-32 letters and/or numbers (e.g., Bot role 2)"
                                           required
                                           isInvalid={
@@ -340,8 +483,16 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
                             
                             <Row className="my-1 justify-content-center mt-5">
-                              <Col xs={6} md={3}>
-                                <Button className="btn btn-primary" onClick={addAuthorizedUserField}>
+                              <Col xs={12} md={6}>
+                                <FormLabel 
+                                  className="command_authorized_user_label"
+                                >
+                                  You can add a maximum of 8 authorized users. If you want more, please specify so in the command description
+                                </FormLabel>
+                                <Button className="btn btn-primary" 
+                                  onClick={addAuthorizedUserField}
+                                  disabled={commandData.commandAuthorizedUsers.length >= 8}
+                                >
                                 <FontAwesomeIcon icon={faUser} className="mx-1"/>
                                 Add additional authorized users
                                 </Button>
@@ -351,8 +502,8 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
 
                             <Row className="my-1 justify-content-center mt-5">
                               <Col xs={6} md={3}>
-                                <Button className="btn btn-info mx-1" onClick={onSubmitHandler}>
-                                  <FontAwesomeIcon icon={faBell} className="mx-1"/>
+                                <Button className="btn btn-info mx-1" onClick={(formSubmitEvent) => submitFormConfirmation(formSubmitEvent)}>
+                                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="mx-1"/>
                                   Request command
                                 </Button>
                               </Col>

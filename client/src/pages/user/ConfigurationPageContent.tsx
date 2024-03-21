@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ConfigurationForm } from "../types/BotTypes";
 import {
   Container,
@@ -13,42 +13,140 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { postBotConfigurations } from "../../services/bot/index";
+import { faArrowUpRightFromSquare, faEraser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import CustomModal from "../../components/Modal/CustomModal";
+import IModalContent from "./interfaces/IModalContent";
 
-const ConfigurationPageContent = ({
-  userLoggedIn,
-}: {
-  userLoggedIn: boolean;
-}) => {
+const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
   const navigate = useNavigate();
+
+  const [confirmClear, setConfirmClear] = useState(false);
+  
+  const [showModal, setShowModal] = useState(false);
+
+  const [modalContent, setModalContent] = useState<IModalContent>({
+    title: "",
+    body: "",
+    cancelButtonText: "",
+    confirmButtonText: "",
+    onConfirm: () => {}  
+  });
+
+  useEffect(() => {
+    if (confirmClear) {
+      onClearHandler();
+      setConfirmClear(false);
+      setShowModal(false);
+    }
+  }, [confirmClear]);
+
+  const showCancelConfirmation = () => {
+    setModalContent({
+      title: `Cancel confirmation`,
+      body: `Are you sure you want to cancel? Confirming will bring you to the last page you were on`,
+      cancelButtonText: `Cancel`,
+      confirmButtonText: `Confirm`,
+      onConfirm: () => {
+        navigate(-1);
+      }
+    });
+    setShowModal(true);
+  }
+
+  const showClearConfirmation = () => {
+    setModalContent({
+      title: `Clear input fields confirmation`,
+      body: `Are you sure you want to clear the input fields on this form?`,
+      cancelButtonText: `No`,
+      confirmButtonText: `Yes`,
+      onConfirm: () => {
+        onClearHandler();
+        setShowModal(false);
+      }
+    });
+    setShowModal(true);
+  }
+
+  const submitFormConfirmation = (formSubmitEvent: any) => {
+    setModalContent({
+      title: `Submit new bot configuration confirmation`,
+      body: `Are you sure you want to submit configuration changes?`,
+      cancelButtonText: `No`,
+      confirmButtonText: `Yes`,
+      onConfirm: () => {
+        onSubmitHandler(formSubmitEvent);
+      }
+    });
+    setShowModal(true);
+  }
+
+  const formHasErrorsConfirmation = (formSubmitEvent: any) => {
+    setModalContent({
+      title: `Submission errors`,
+      body: `There were some errors in the form fields! Please fix the errors in the input fields indicated on the form.`,
+      confirmButtonText: `Ok`,
+      onConfirm: () => {
+        onSubmitHandler(formSubmitEvent);
+        setShowModal(false);
+      }
+    });
+    setShowModal(true);
+  }
+
+  const showSuccessSubmissionConfirmation = () => {
+    setModalContent({
+      title: `Channel id modifications successful`,
+      body: `You have successfully changed the Discord bot channel ids`,
+      confirmButtonText: `Ok`,
+      onConfirm: () => {
+        setShowModal(false);
+      }
+    });
+    setShowModal(true);
+  }
+
+  const showErrorSubmissionConfirmation = (error) => {
+    setModalContent({
+      title: `Channel id modifications unsuccessful`,
+      body: `There was an error attempting to change the channel ids. Please try again or inform the server administrator if you believe this is an error: ${error}`,
+      confirmButtonText: `Ok`,
+      onConfirm: () => {
+        setShowModal(false);
+      }
+    });
+    setShowModal(true);
+  }
+    
   const [configurationData, setConfigurationData] = useState<ConfigurationForm>(
     {
       guildId: {
         value: "",
-        error: "Invalid guild id. Please input a string of 18 numbers",
+        error: "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       commandChannelId: {
         value: "",
-        error: "Invalid bot command channel id. Please input a string of 18 numbers",
+        error: "Invalid bot command channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       buttonChannelId: {
         value: "",
-        error: "Invalid bot role button channel id. Please input a string of 18 numbers",
+        error: "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botInfoChannelId: {
         value: "",
-        error: "Invalid info channel id. Please input a string of 18 numbers",
+        error: "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botErrorChannelId: {
         value: "",
-        error: "Invalid error channel id. Please input a string of 18 numbers",
+        error: "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
@@ -59,31 +157,31 @@ const ConfigurationPageContent = ({
     setConfigurationData({
       guildId: {
         value: "",
-        error: "Invalid guild id",
+        error: "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       commandChannelId: {
         value: "",
-        error: "Invalid command channel id",
+        error: "Invalid command channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       buttonChannelId: {
         value: "",
-        error: "Invalid bot role button channel id",
+        error: "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botInfoChannelId: {
         value: "",
-        error: "Invalid info channel id",
+        error: "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botErrorChannelId: {
         value: "",
-        error: "Invalid error channel id",
+        error: "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
@@ -108,28 +206,50 @@ const ConfigurationPageContent = ({
     }));
   };
 
-  const onSubmitHandler = (e: any) => {
-    e.preventDefault();
+  const onSubmitHandler = async (formSubmitEvent: any) => {
+    formSubmitEvent.preventDefault();
 
     const allFieldsValid = Object.values(configurationData).every(field => field.valid);
 
     if (!allFieldsValid) {
-      alert("Please correct the form errors shown on screen before submitting");
+      formHasErrorsConfirmation(formSubmitEvent)
       return;
     }
 
-    const configurationResponse = postBotConfigurations({
+    const commandChannelIds = {
       guildId: configurationData.guildId.value,
       commandChannelId: configurationData.commandChannelId.value,
       buttonChannelId: configurationData.buttonChannelId.value,
       botInfoChannelId: configurationData.botInfoChannelId.value,
-      botErrorChannelId: configurationData.botErrorChannelId.value,
-    });
+      botErrorChannelId: configurationData.botErrorChannelId.value
+    }
+
+    try {
+      const postChannelIdsResponse = await postBotConfigurations(
+        commandChannelIds
+      );
+      if (postChannelIdsResponse) {
+        onClearHandler();
+        showSuccessSubmissionConfirmation();
+      }
+    } catch (error) {
+      showErrorSubmissionConfirmation
+    }
   };
 
   if (userLoggedIn) {
     return (
-      <main id="main">
+      <main id="main" className="text-center">
+          <CustomModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            title={modalContent.title}
+            body={modalContent.body}
+            cancelButtonText={modalContent.cancelButtonText}
+            confirmButtonText={modalContent.confirmButtonText!}
+            onConfirm={modalContent.onConfirm}
+          ></CustomModal>
+
         <aside id="bot_configuration_options_page_content">
           <h1 id="bot_onfiguration_options_page_title">
             Bot configuration options
@@ -139,10 +259,28 @@ const ConfigurationPageContent = ({
           Modify the configuration options for your Discord bot below:
         </p>
 
+        <Container>
+          <Row className="my-1 justify-content-between mt-5">
+            <Col xs="auto">
+              <Button className="btn btn-danger" onClick={() => showCancelConfirmation()}>
+                <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
+                Cancel
+              </Button>
+            </Col>
+
+            <Col xs="auto">
+              <Button className="btn btn-secondary" onClick={() => showClearConfirmation()}>
+                <FontAwesomeIcon icon={faEraser} className="mx-1"/>
+                Reset
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+
         <section className="bot_configuration_options_form_section">
           <Container>
             <Form>
-              <Row className="my-2">
+              <Row className="my-2 text-start">
                 <Col xs={12} md={6} className="my-2">
                   <FormGroup>
                     <FormLabel
@@ -210,7 +348,7 @@ const ConfigurationPageContent = ({
                 </Col>
               </Row>
 
-              <Row className="my-2">
+              <Row className="my-2 text-start">
                 <Col xs={12} md={6} className="my-2">
                   <FormGroup>
                     <FormLabel
@@ -278,7 +416,7 @@ const ConfigurationPageContent = ({
                 </Col>
               </Row>
 
-              <Row className="my-2">
+              <Row className="my-2 text-start">
                 <Col xs={12} md={6} className="my-2">
                   <FormGroup>
                     <FormLabel
@@ -312,20 +450,10 @@ const ConfigurationPageContent = ({
                   </FormGroup>
                 </Col>
               </Row>
-
-              <Row className="my-1">
-                <Col xs={3}>
-                  <Button className="btn btn-danger" onClick={() => navigate(-1)}>
-                    Cancel
-                  </Button>
-                </Col>
-                <Col xs={4}>
-                  <Button className="btn btn-secondary" onClick={onClearHandler}>
-                    Reset inputs
-                  </Button>
-                </Col>
-                <Col xs={5}>
-                  <Button className="btn btn-info" onClick={onSubmitHandler}>
+              <Row className="my-1 justify-content-center mt-5">
+                <Col xs={6} md={3}>
+                  <Button className="btn btn-info" onClick={(formSubmitEvent) => {submitFormConfirmation(formSubmitEvent)}}>
+                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="mx-1"/>
                     Submit changes
                   </Button>
                 </Col>

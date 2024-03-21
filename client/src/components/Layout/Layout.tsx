@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet";
-import studentBotHelperStarterTabIcon from "../../assets/images/StudentBotHelperStarterIconSmaller.ico";
+import studentBotHelperStarterTabIcon from '../../assets/images/StudentBotHelperStarterIconSmaller.ico';
+import Footer from "../Footer/Footer";
 
 const Layout = ({
   pageTitle,
@@ -22,7 +23,7 @@ const Layout = ({
         />
       </Helmet>
       {pageLayoutContent}
-      {children}
+      <Footer />
     </>
   );
 };

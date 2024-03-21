@@ -3,6 +3,9 @@ import { Outlet, NavLink } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import styles from "../../assets/css/Sidebar.module.css";
 import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHelperStarterIconSmaller.png";
+import React, { ReactElement, useContext, useState } from "react";
+import { Outlet, NavLink, useLocation } from "react-router-dom";
+import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHelperStarterIconSmaller.png"
 
 // Context
 import { AuthContext } from "../../contexts/AuthContext";
@@ -125,33 +128,23 @@ const DefaultLayout = () => {
         </ul>
       </>
     );
-  }
 
+ 
   return (
     <div className="container-fluid">
-      <div className="row flex-nowrap">
-        <div className="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-light">
-          <div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-black min-vh-100">
-            <a
-              href="/"
-              className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-black text-decoration-none"
-            >
-              <img
-                src={StudentBotHelperStarterIconSmaller}
-                alt="Logo"
-                className={styles.profileImage}
-              />
-              <span className="fs-5 d-none d-sm-inline">Menu</span>
-            </a>
-            {sidebar}
-          </div>
+      <div className="row">
+        <div style={hamburgerMenuStyle} onClick={toggleSidebar}>
+          {showSidebar ? 'X' : '☰'} {/* Toggle icon */}
         </div>
-        <div className="col py-3">
+
+        {sideBar}
+
+        <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
           <Outlet />
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default DefaultLayout;

@@ -1,5 +1,7 @@
-import LandingPageContent from "../components/LandingPageContent/LandingPageContent";
-import Layout from "../components/Layout/Layout";
+
+import LandingPageContent from './user/LandingPageContent';
+import Layout from '../components/Layout/Layout';
+
 
 const LandingPage = () => {
   return (
