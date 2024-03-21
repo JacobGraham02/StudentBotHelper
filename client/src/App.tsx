@@ -21,8 +21,8 @@ import LoginPage from "./pages/LoginPage";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
-import CommandsPage from "./pages/CommandsPage.js";
-import ConfigurationsOptionsPage from './pages/ConfigurationOptionsPage.js'
+import CommandsPage from "./pages/bot/CommandsPage.js";
+import ConfigurationsOptionsPage from "./pages/bot/ConfigurationOptionsPage.js";
 
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
@@ -49,26 +49,26 @@ const router = createBrowserRouter([
         path: "dashboard",
         element: <LandingPage isUserLoggedIn={false} />,
       },
-      { 
-        path: "register", 
-        element: <Register /> 
-      },
-      { 
-        path: "login", 
-        element: <Login /> 
+      {
+        path: "register",
+        element: <Register />,
       },
       {
-        path: 'commands',
-        element: <CommandsPage />
+        path: "login",
+        element: <Login />,
       },
       {
-        path: 'configurations',
-        element: <ConfigurationsOptionsPage />
+        path: "commands",
+        element: <CommandsPage />,
+      },
+      {
+        path: "configurations",
+        element: <ConfigurationsOptionsPage />,
       },
       {
         path: "home",
-        element: <LandingPage isUserLoggedIn={false}/>
-      }
+        element: <LandingPage isUserLoggedIn={false} />,
+      },
     ],
   },
 
