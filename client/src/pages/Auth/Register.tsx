@@ -114,7 +114,14 @@ const Register = () => {
       console.log("Form is valid. Submitting data...", registerForm);
       // Handle form submission, e.g., sending data to a server
 
-      const response = await registerUser(registerForm);
+      const userInfo = {
+        fullName: registerForm.fullName.value,
+        email: registerForm.email.value,
+        password: registerForm.password.value,
+        confirmPassword: registerForm.confirmPassword.value,
+      };
+
+      const response = await registerUser(userInfo);
 
       const userData = {
         id: response.data.body.id,

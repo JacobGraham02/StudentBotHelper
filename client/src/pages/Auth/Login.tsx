@@ -95,7 +95,11 @@ const Login = () => {
       console.log("Form is valid. Submitting data...", loginForm);
       // Handle form submission, e.g., sending data to a server
 
-      const response = await loginUser(loginForm);
+      const loginData = {
+        email: loginForm.email.value,
+        password: loginForm.password.value,
+      };
+      const response = await loginUser(loginData);
 
       const userData = {
         id: response.data.body.id,
@@ -103,6 +107,17 @@ const Login = () => {
         username: response.data.body.username,
         refreshToken: response.data.body.refreshToken,
       };
+
+      // {
+      //     "message": "Login successful",
+      //     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg4NzA3NGMyLTJkOGMtNGJhZC04YTExLWJjYTE5YzQ1ZjU4NSIsImZ1bGxfbmFtZSI6IkpvaG4gRG9lIiwiZW1haWwiOiJqb2hudGVzdEB0ZXN0LmNvbSIsInJvbGVfaWQiOjEsImlhdCI6MTcxMTAwMDczNiwiZXhwIjoxNzExMDA0MzM2fQ.n5XNhlf7Re8fU2zhNox3QRIynoV-7OGFFwalVB6wY7Q",
+      //     "user": {
+      //         "id": "887074c2-2d8c-4bad-8a11-bca19c45f585",
+      //         "full_name": "John Doe",
+      //         "email": "johntest@test.com",
+      //         "role_id": 1
+      //     }
+      // }
 
       authCtx?.login(userData);
     } else {
