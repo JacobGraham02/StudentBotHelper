@@ -11,23 +11,13 @@ export default class BotController {
     this.bot_repository = bot_repository_database_instance;
   }
 
-  async insertBotDocumentIntoMongoDB(bot_document_information: any) {
-    try {
-      await this.bot_repository.createBot(bot_document_information);
-    } catch (error: any) {
-      console.error(
-        `There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`
-      );
-      throw error;
-    }
-
     async insertBotDocumentIntoMongoDB(bot_document_information: DiscordBotInformationType) {
 
         try {
             await this.bot_repository.createBot(bot_document_information);
         } catch (error: any) {
             console.error(`There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`);
-            throw error;
+            throw new Error(`There was an error when attempting to insert the bot document into MongoDB by using the repository function 'createBot': ${error}`);
         }
     }
 
@@ -37,7 +27,7 @@ export default class BotController {
             await this.bot_repository.createBotCommand(bot_command_information);
         } catch (error: any) {
             console.error(`There was an error when attempting to insert the bot command into MongoDB by using the repository function 'createBotCommand': ${error}`);
-            throw error;
+            throw new Error(`There was an error when attempting to insert the bot command into MongoDB by using the repository function 'createBotCommand': ${error}`);
         }
     }
 
@@ -48,7 +38,7 @@ export default class BotController {
             return bot_command_document;
         } catch (error: any) {
             console.error(`There was an error when attempting to get a bot command from the MongoDB database: ${error}`);
-            throw error;
+            throw new Error(`There was an error when attempting to get a bot command from the MongoDB database: ${error}`);
         }
     }
 

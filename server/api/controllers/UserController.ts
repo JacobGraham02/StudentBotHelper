@@ -1,5 +1,7 @@
 import { access } from "fs";
 import User from "../../database/MySQL/UserClass";
+import IUserProfileOptions from "../../database/MySQL/IUserProfileOptions";
+import UserClass from "../../database/MySQL/UserClass";
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
@@ -17,8 +19,10 @@ const credentials = {
 
 class UserController {
   user;
+  user_repository: UserClass;
   constructor() {
     this.user = new User();
+    this.user_repository = new UserClass();
   }
 
   // Access the request token from GitHub
@@ -217,6 +221,7 @@ class UserController {
       return {
         message: "Login successful",
         user: {
+          id: user.id,
           token: token,
           name: user.full_name || username,
           email: user.email,
@@ -226,6 +231,18 @@ class UserController {
     } catch (error) {
       console.error("Login error:", error);
       return { error: "An error occurred during login." };
+    }
+  }
+
+  async changeUserProfileData(newProfileData: IUserProfileOptions) {
+
+    try {
+        const modify_user_response = await this.user_repository.changeUserNameAndEmail(newProfileData);
+
+        return modify_user_response;
+    } catch (error) {
+        console.error(`There was an error when attempting to modify the user profile name: ${error}`);
+        throw new Error(`There was an error when attempting to modify the user profile name: ${error}`);
     }
   }
 }
