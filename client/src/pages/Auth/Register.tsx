@@ -139,50 +139,6 @@ const Register = () => {
     }
   };
 
-  // const onSubmitHandler = async (e) => {
-  //   e.preventDefault();
-  //   let formIsValid = true;
-  //   const updatedFormState = {};
-
-  //   for (const field in registerForm) {
-  //     if (!registerForm[field].valid) {
-  //       formIsValid = false;
-  //     }
-
-  //     updatedFormState[field] = {
-  //       ...registerForm[field],
-  //       touched: true,
-  //     };
-  //   }
-
-  //   setRegisterForm(updatedFormState);
-
-  //   if (formIsValid) {
-  //     console.log("Form is valid. Submitting data...", registerForm);
-  //     // Handle form submission, e.g., sending data to a server
-
-  //     const userInfo = {
-  //       fullName: registerForm.fullName.value,
-  //       email: registerForm.email.value,
-  //       password: registerForm.password.value,
-  //       confirmPassword: registerForm.confirmPassword.value,
-  //     };
-
-  //     const response = await registerUser(userInfo);
-
-  //     const userData = {
-  //       id: response.data.body.id,
-  //       email: response.data.body.email,
-  //       username: response.data.body.username,
-  //       refreshToken: response.data.body.refreshToken,
-  //     };
-
-  //     authCtx?.login(userData);
-  //   } else {
-  //     console.log("Form is invalid. Please correct the errors.");
-  //   }
-  // };
-
   return (
     <>
       <Container className="text-center my-5">

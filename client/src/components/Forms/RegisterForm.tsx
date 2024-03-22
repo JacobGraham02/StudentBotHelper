@@ -69,19 +69,20 @@ const RegisterForm = ({
         <Col md={6}>
           <Form onSubmit={onSubmitHandler}>
             <Form.Group className="mb-3" controlId="formFullName">
-              <Form.Label>Full Name</Form.Label>
+              <Form.Label>Full name</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter full name"
+                placeholder="Enter your full name (e.g., John Doe)"
                 value={registerDetails.fullName.value}
                 onChange={(e) => handleChange("fullName", e.target.value)}
+                pattern="/^[A-Za-z\s'-]+$/"
                 isInvalid={
                   !registerDetails.fullName.valid &&
                   registerDetails.fullName.touched
                 }
               />
               <Form.Control.Feedback type="invalid">
-                Please provide a valid full name.
+                Please provide a valid full name
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -89,9 +90,10 @@ const RegisterForm = ({
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter email"
+                placeholder="Enter your email (e.g., johnsmith2@gmail.com)"
                 value={registerDetails.email.value}
                 onChange={(e) => handleChange("email", e.target.value)}
+                pattern="/^[^\s@]+@[^\s@]+\.[^\s@]+$/"
                 isInvalid={
                   !registerDetails.email.valid && registerDetails.email.touched
                 }
@@ -105,7 +107,7 @@ const RegisterForm = ({
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Password"
+                placeholder="Password (e.g., BbewFV9H4wv9qqBQTvsoQciP)"
                 value={registerDetails.password.value}
                 onChange={(e) => handleChange("password", e.target.value)}
                 isInvalid={
@@ -119,10 +121,10 @@ const RegisterForm = ({
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formConfirmPassword">
-              <Form.Label>Confirm Password</Form.Label>
+              <Form.Label>Confirm password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Confirm Password"
+                placeholder="Confirm password (must be the same as the password you wrote above)"
                 value={registerDetails.confirmPassword.value}
                 onChange={(e) =>
                   handleChange("confirmPassword", e.target.value)
@@ -133,7 +135,7 @@ const RegisterForm = ({
                 }
               />
               <Form.Control.Feedback type="invalid">
-                Passwords must match.
+                Password and confirmation password must match
               </Form.Control.Feedback>
             </Form.Group>
 

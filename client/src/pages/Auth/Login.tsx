@@ -102,6 +102,7 @@ const Login = () => {
         const response = await loginUser(loginData);
 
         const userData = {
+          id: response.user.id,
           token: response.user.token,
           name: response.user.name,
           email: response.user.email,
