@@ -5,6 +5,9 @@ USE discord_student_helper_bot;
 SELECT * FROM common_class;
 SELECT * FROM common_class_work;
 SELECT * FROM student;
+SELECT * FROM Users;
+SELECT * FROM Roles;
+
 DELETE FROM common_class;
 DELETE FROM common_class_work;
 DELETE FROM student;

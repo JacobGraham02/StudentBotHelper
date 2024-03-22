@@ -18,11 +18,16 @@ userRouter.get(
   }
 );
 
-userRouter.post('/register', [ 
+userRouter.post('/registerMongoDb', [ 
     body('fullName').trim().matches(/^[A-Za-z\s'-]+$/).withMessage(`The bot full name must only contain letters, spaces, apostrophes, and hyphens`).isLength({min:1}).withMessage(`The length of the bot full name must be greater than or equal to 1`),
     body('email').trim().matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/).withMessage(`Your account email must match the pattern shown on screen`),
     body('password').trim().isLength({min: 8}).withMessage(`Your account password must be at least 8 characters long`),
-    body('confirmPassword').trim().matches('password').withMessage(`The confirmation password must be the same as your account password. This is to ensure you entered the password correctly`)
+    body('confirmPassword').trim().custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error(`The confirmation password must be the same as your account password. This is to ensure you entered the password correctly`)
+      }
+      return true;
+    })
   ], 
   async function(request: Request, response: Response, next: NextFunction) {
     const {
@@ -37,11 +42,15 @@ userRouter.post('/register', [
       confirmPassword: string
     } = request.body;
 
+    console.log(password);
+    console.log(confirmPassword);
     const requestValidationErrors = validationResult(request);
     if (!requestValidationErrors.isEmpty()) {
+      const errors = requestValidationErrors.array().map(error => error.msg);
       return response.status(400).json({
         success: false,
-        message: `Please try submitting the form again with the correct inputs as specified on the form`
+        message: `Please try submitting the form again with the correct inputs as specified on the form`,
+        errors: errors
       });
     }
 

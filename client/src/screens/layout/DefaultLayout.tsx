@@ -6,7 +6,7 @@ import StudentBotHelperStarterIconSmaller from "../../assets/images/StudentBotHe
 
 // Context
 import { AuthContext } from "../../contexts/AuthContext";
-import { faFolder, faGear, faHouse, faTableColumns, faTerminal, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faFolder, faGear, faHouse, faPerson, faRightToBracket, faTableColumns, faTerminal, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const DefaultLayout = () => {
@@ -155,18 +155,20 @@ const DefaultLayout = () => {
           <li className="nav-item">
             <NavLink
               to="/login"
-              className="nav-link align-middle px-0 text-black"
+              className={`nav-link ${location.pathname === '/login' ? "active" : ""}`}
+              style={{ ...(location.pathname === "/login" && navLinkActiveStyle) }}
             >
-              {/* <i className="fs-4 bi-house"></i> */}
+              <FontAwesomeIcon icon={faRightToBracket} />
               <span className="ms-1 d-none d-sm-inline">Login</span>
             </NavLink>
           </li>
           <li>
             <NavLink
               to="/register"
-              className="nav-link px-0 align-middle text-black"
+              className={`nav-link ${location.pathname === '/register' ? "active" : ""}`}
+              style={{ ...(location.pathname === "/register" && navLinkActiveStyle) }}
             >
-              {/* <i className="fs-4 bi-speedometer2"></i>{" "} */}
+              <FontAwesomeIcon icon={faPerson} />
               <span className="ms-1 d-none d-sm-inline">Register</span>
             </NavLink>
           </li>
@@ -174,7 +176,7 @@ const DefaultLayout = () => {
     </div>
   );
 
-  if (!authCtx?.isLoggedIn()) {
+  if (authCtx?.isLoggedIn()) {
     sideBar = {...sideBarLoggedIn}
       
   } else {

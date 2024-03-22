@@ -9,24 +9,24 @@ export default class User {
   database;
 
   constructor() {
-    // const database_config = {
-    //   admin_username: process.env.mysql_server_admin_username!,
-    //   admin_password: process.env.mysql_server_admin_password!,
-    //   host_uri: process.env.mysql_server_admin_hostname!,
-    //   name: process.env.mysql_server_admin_database_name!,
-    //   port: process.env.mysql_server_admin_connection_port!,
-    //   ssl_certificate_path:
-    //     process.env.mysql_server_admin_path_to_ssl_certificate!,
-    // };
-
     const database_config = {
-      admin_username: "studentbot",
-      admin_password: "studentbot123",
-      host_uri: "localhost",
-      name: "student_bot",
-      port: "3307",
-      ssl_certificate_path: "",
+      admin_username: process.env.mysql_server_admin_username!,
+      admin_password: process.env.mysql_server_admin_password!,
+      host_uri: process.env.mysql_server_admin_hostname!,
+      name: process.env.mysql_server_admin_database_name!,
+      port: process.env.mysql_server_admin_connection_port!,
+      ssl_certificate_path:
+        process.env.mysql_server_admin_path_to_ssl_certificate!,
     };
+
+    // const database_config = {
+    //   admin_username: "studentbot",
+    //   admin_password: "studentbot123",
+    //   host_uri: "localhost",
+    //   name: "student_bot",
+    //   port: "3307",
+    //   ssl_certificate_path: "",
+    // };
     this.database_manager = new DatabaseConnectionManager(database_config);
   }
 
