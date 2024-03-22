@@ -49,7 +49,7 @@ export const postBotRequestCommand = async (botCommand: BotCommand) => {
 
 export const getAllBotCommands = async () => {
   try {
-    const allBotCommandDocuments = await instance.get("api/bot/getcommands");
+    const allBotCommandDocuments = await instance.get("bot/getcommands");
 
     return allBotCommandDocuments;
 
@@ -66,7 +66,7 @@ export const getAllBotCommands = async () => {
 
 export const getAllBotLogFiles = async (containerName: string) => {
   try {
-    const allBotLogFiles = await instance.get("api/bot/getlogs", {
+    const allBotLogFiles = await instance.get("bot/getlogs", {
       params: {
         containerName: containerName
       }
