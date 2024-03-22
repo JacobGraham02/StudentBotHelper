@@ -54,14 +54,14 @@ const router = createBrowserRouter([
         path: "oauth/github",
         element: <GitHubOAuthRedirect />,
       },
-      // {
-      //   path: "/",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Dashboard />
-      //     </ProtectedRoute>
-      //   ),
-      // },
+      {
+        path: "/",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "register", 
         element: <Register /> 

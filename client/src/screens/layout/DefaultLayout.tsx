@@ -130,9 +130,9 @@ const DefaultLayout = () => {
                 <Dropdown.Item as={NavLink} to="/profile">
                   Profile
                 </Dropdown.Item>
-                <Dropdown.Item as={NavLink} to="/settings">
+                {/* <Dropdown.Item as={NavLink} to="/settings">
                   Settings
-                </Dropdown.Item>
+                </Dropdown.Item> */}
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={authCtx!.logout}>Logout</Dropdown.Item>
               </Dropdown.Menu>
