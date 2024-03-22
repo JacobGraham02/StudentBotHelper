@@ -35,6 +35,7 @@ import Dashboard from "./pages/Dashboard.js";
 import LogsPage from "./pages/LogsPage.js";
 import DashboardPage from "./pages/DashboardPage.js";
 import LandingPage from "./pages/LandingPage.js";
+import ProfilePage from "./pages/ProfilePage.js";
 
 const GoogleClientID = OAuthCreds.google.clientID;
 
@@ -66,9 +67,13 @@ const router = createBrowserRouter([
         path: "register", 
         element: <Register /> 
       },
+      {
+        path: "profile", 
+        element: <ProfilePage isUserLoggedIn={true} /> 
+      },
       { 
         path: "dashboard",
-        element: <DashboardPage isUserLoggedIn={false} />
+        element: <DashboardPage isUserLoggedIn={true} />
       },
       {
         path: "login",

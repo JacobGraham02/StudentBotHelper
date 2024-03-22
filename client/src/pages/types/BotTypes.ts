@@ -65,6 +65,21 @@ export type RegexPatterns = {
   [key: string]: RegExp;
 }
 
+export type ProfileInfoForm = {
+  name: {
+    value: string;
+    valid: boolean;
+    touched: boolean;
+    error: string;
+  };
+  email: {
+    value: string;
+    valid: boolean;
+    touched: boolean;
+    error: string;
+  }
+}
+
 export type ConfigurationForm = {
     guildId: {
       value: string;

@@ -93,7 +93,7 @@ const RegisterForm = ({
                 placeholder="Enter your email (e.g., johnsmith2@gmail.com)"
                 value={registerDetails.email.value}
                 onChange={(e) => handleChange("email", e.target.value)}
-                pattern="/^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                pattern="/^[^\s@]+@[^\s@]+\.[^\s@]+$/"
                 isInvalid={
                   !registerDetails.email.valid && registerDetails.email.touched
                 }
