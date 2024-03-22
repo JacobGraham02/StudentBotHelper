@@ -1,9 +1,10 @@
 import { instance } from "../index.ts";
 import { Bot, BotCommand, BotConfiguration } from "../../pages/types/BotTypes.ts";
+import { UserInfo } from "../../pages/types/UserTypes.ts";
 
 export const postBotConfigurations = async (botConfiguration: BotConfiguration) => {
   try {
-    const postBotConfigurationResponse = await instance.post("api/bot/configs", botConfiguration);
+    const postBotConfigurationResponse = await instance.post("bot/configs", botConfiguration);
 
     return postBotConfigurationResponse;
 
@@ -15,7 +16,7 @@ export const postBotConfigurations = async (botConfiguration: BotConfiguration) 
 
 export const postBotCommands = async (botCommand: BotCommand) => {
   try {
-      const postBotCommandsResponse = await instance.post("api/bot/commands", botCommand);
+      const postBotCommandsResponse = await instance.post("bot/commands", botCommand);
     
       return postBotCommandsResponse;
 
@@ -27,7 +28,7 @@ export const postBotCommands = async (botCommand: BotCommand) => {
 
 export const postBotRegister = async (bot: Bot) => {
   try {
-    const postBotResponse = await instance.post("api/bot/create", bot);
+    const postBotResponse = await instance.post("bot/create", bot);
 
     return postBotResponse;
   } catch (error) {
@@ -38,7 +39,7 @@ export const postBotRegister = async (bot: Bot) => {
 
 export const postBotRequestCommand = async (botCommand: BotCommand) => {
   try {
-    const postBotRequestCommandResponse = await instance.post("api/bot/newcommandrequest", botCommand);
+    const postBotRequestCommandResponse = await instance.post("bot/newcommandrequest", botCommand);
     
     return postBotRequestCommandResponse;
   } catch (error) {
@@ -46,6 +47,18 @@ export const postBotRequestCommand = async (botCommand: BotCommand) => {
     throw new Error(`There was an error when attempting to send an email to the server administrator requesting an email: ${error}`);
   }
 }
+
+export const postChangeUserOptions = async (userOptions: UserInfo) => {
+  try {
+    const postBotRequestCommandResponse = await instance.post("user/changeuserdata", userOptions);
+    
+    return postBotRequestCommandResponse;
+  } catch (error) {
+    console.error(`There was an error when attempting to change the user profile data: ${error}`);
+    throw new Error(`There was an error when attempting to change the user profile data: ${error}`);
+  }
+}
+
 
 export const getAllBotCommands = async () => {
   try {
@@ -92,7 +105,7 @@ export const writeBotLogFile = async (logName: string, fileContents: string, con
   }
 
   try {
-    const writeBotLogFile = await instance.put("api/bot/writelog", requestObject);
+    const writeBotLogFile = await instance.put("bot/writelog", requestObject);
 
     return writeBotLogFile;
   } catch (error) {
@@ -109,7 +122,7 @@ export const writeBotCommandFile = async (commandFileName: string, commandFileDa
   }
 
   try {
-    const writeBotCommandFile = await instance.put("api/bot/writecommand", requestObject);
+    const writeBotCommandFile = await instance.put("bot/writecommand", requestObject);
 
     return writeBotCommandFile;
   } catch (error) {

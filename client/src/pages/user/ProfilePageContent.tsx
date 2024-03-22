@@ -4,7 +4,10 @@ import IModalContent from "./interfaces/IModalContent";
 import { Form, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import { ProfileInfoForm } from "../types/BotTypes";
-import { Container, Row, Col, FormGroup, FormLabel, FormControl } from "react-bootstrap";
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, Button } from "react-bootstrap";
+import { faXmark, faEraser, faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { postChangeUserOptions } from "../../services/bot";
 
 const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const navigate = useNavigate();
@@ -12,7 +15,6 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const authCtx = useContext(AuthContext);
 
     let name: string = "";
-    let email: string = "";
 
     const [showModal, setShowModal] = useState(false);
 
@@ -33,9 +35,6 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
         if (authCtx?.userAuthDetails.name) {
             name = authCtx.userAuthDetails.name;
         } 
-        if (authCtx?.userAuthDetails.email) {
-            email = authCtx.userAuthDetails.email;
-        }
     }); 
 
     const [profileData, setProfileData] = useState<ProfileInfoForm>(
@@ -96,6 +95,111 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
             }
         }));
     };    
+
+    const showCancelConfirmation = () => {
+    setModalContent({
+      title: `Cancel confirmation`,
+      body: `Are you sure you want to cancel? Confirming will bring you to the last page you were on`,
+      cancelButtonText: `Cancel`,
+      confirmButtonText: `Confirm`,
+      onConfirm: () => {
+        navigate(-1);
+      }
+    });
+        setShowModal(true);
+    }
+
+    const showClearConfirmation = () => {
+        setModalContent({
+        title: `Clear input fields confirmation`,
+        body: `Are you sure you want to clear the input fields on this form?`,
+        cancelButtonText: `No`,
+        confirmButtonText: `Yes`,
+        onConfirm: () => {
+            onClearHandler();
+            setShowModal(false);
+        }
+        });
+        setShowModal(true);
+    }
+
+    const submitFormConfirmation = (formSubmitEvent: any) => {
+        setModalContent({
+        title: `Submit new bot configuration confirmation`,
+        body: `Are you sure you want to submit configuration changes?`,
+        cancelButtonText: `No`,
+        confirmButtonText: `Yes`,
+        onConfirm: () => {
+            onSubmitHandler(formSubmitEvent);
+        }
+        });
+        setShowModal(true);
+    }
+
+    const formHasErrorsConfirmation = (formSubmitEvent: any) => {
+        setModalContent({
+          title: `Submission errors`,
+          body: `There were some errors in the form fields! Please fix the errors in the input fields indicated on the form.`,
+          confirmButtonText: `Ok`,
+          onConfirm: () => {
+            onSubmitHandler(formSubmitEvent);
+            setShowModal(false);
+          }
+        });
+        setShowModal(true);
+    }
+
+    const showSuccessSubmissionConfirmation = () => {
+        setModalContent({
+          title: `Channel id modifications successful`,
+          body: `You have successfully changed the Discord bot channel ids`,
+          confirmButtonText: `Ok`,
+          onConfirm: () => {
+            setShowModal(false);
+          }
+        });
+        setShowModal(true);
+    }
+    
+      const showErrorSubmissionConfirmation = (error) => {
+        setModalContent({
+          title: `Channel id modifications unsuccessful`,
+          body: `There was an error attempting to change the channel ids. Please try again or inform the server administrator if you believe this is an error: ${error}`,
+          confirmButtonText: `Ok`,
+          onConfirm: () => {
+            setShowModal(false);
+          }
+        });
+        setShowModal(true);
+    }
+
+    const onSubmitHandler = async (formSubmitEvent: any) => {
+        formSubmitEvent.preventDefault();
+    
+        const allFieldsValid = Object.values(profileData).every(field => field.valid);
+    
+        if (!allFieldsValid) {
+          formHasErrorsConfirmation(formSubmitEvent)
+          return;
+        }
+    
+        const newProfileData = {
+            name: profileData.name.value,
+            email: profileData.email.value
+        }
+    
+        try {
+          const postChannelIdsResponse = await postChangeUserOptions(
+            newProfileData
+          );
+          if (postChannelIdsResponse) {
+            onClearHandler();
+            showSuccessSubmissionConfirmation();
+          }
+        } catch (error) {
+          showErrorSubmissionConfirmation
+        }
+      };
     
     return (
         <main id="main" className="text-center">
@@ -117,6 +221,24 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                     Modify your profile options below:
                 </p>
             </aside>
+
+            <Container>
+                <Row className="my-1 justify-content-between mt-5">
+                    <Col xs="auto">
+                    <Button className="btn btn-danger" onClick={() => showCancelConfirmation()}>
+                        <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
+                        Cancel
+                    </Button>
+                    </Col>
+
+                    <Col xs="auto">
+                    <Button className="btn btn-secondary" onClick={() => showClearConfirmation()}>
+                        <FontAwesomeIcon icon={faEraser} className="mx-1"/>
+                        Reset
+                    </Button>
+                    </Col>
+                </Row>
+            </Container>
     
             <section className="user_profile_section">
                 <Container>
@@ -137,7 +259,7 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                                         value={profileData.name.value}
                                         name="name"
                                         placeholder="A real name (e.g., Jacob Graham)"
-                                        pattern="/^[A-Za-z\s'-]+$/"
+                                        pattern="^[A-Za-z\\s'-]+$"
                                         title="Please enter a valid real name: (e.g., Jacob Graham)"
                                         required
                                         isInvalid={
@@ -154,38 +276,13 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
                                         )}
                                 </FormGroup>
                             </Col>
-    
-                            <Col xs={12} md={6} className="my-2">
-                                <FormGroup>
-                                    <FormLabel
-                                        className="profile_email_input_label"
-                                        htmlFor="email"
-                                    >
-                                        Email
-                                    </FormLabel>
-                                    <FormControl
-                                        className="profile_email_input"
-                                        type="text"
-                                        name="email"
-                                        placeholder="A real email address: (e.g., johndoe82@gmail.com)"
-                                        pattern="/^[^\s@]+@[^\s@]+\.[^\s@]+$/"
-                                        title="Please enter a valid email address: (e.g., johndoe82@gmail.com)"
-                                        required
-                                        onChange={onChangeHandler}
-                                        value={profileData.email.value}
-                                        isInvalid={
-                                            profileData.email.touched &&
-                                            !profileData.email.valid &&
-                                            profileData.email.value.length > 0
-                                        }
-                                    />
-                                    {profileData.email.error &&
-                                        profileData.email.valid === false && (
-                                            <FormControl.Feedback type="invalid">
-                                                {profileData.email.error}
-                                            </FormControl.Feedback>
-                                        )}
-                                </FormGroup>
+                        </Row>
+                        <Row className="my-1 justify-content-center mt-5">
+                            <Col xs={6} md={3}>
+                            <Button className="btn btn-info" onClick={(formSubmitEvent) => {submitFormConfirmation(formSubmitEvent)}}>
+                                <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="mx-1"/>
+                                Submit changes  
+                            </Button>
                             </Col>
                         </Row>
                     </Form>

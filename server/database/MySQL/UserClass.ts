@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 
 import DatabaseConnectionManager from "./DatabaseConnectionManager";
+import IUserProfileOptions from "./IUserProfileOptions";
 
 export default class User {
   database_manager: DatabaseConnectionManager;
@@ -86,8 +87,6 @@ export default class User {
 
       let username = null;
 
-      console.log(user);
-
       if (user.oauthUserInfo !== null) {
         const oAuthObj = JSON.parse(user.oauthUserInfo);
 
@@ -160,6 +159,34 @@ export default class User {
     } catch (error) {
       console.error("Error finding user by oauth_user_id:", error);
       throw new Error("Failed to find user by oauth_user_id");
+    }
+  }
+
+    async changeUserNameAndEmail(userProfileOptions: IUserProfileOptions) {
+      try {
+        await this.init();
+
+        // Check if the user with the provided email exists
+        const existingUser = await this.findUserByEmail(userProfileOptions.email);
+        if (!existingUser) {
+            throw new Error('User not found');
+        }
+
+        // Update user information
+        const [result] = await this.database.query(
+            'UPDATE Users SET full_name = ?, email = ? WHERE email = ?',
+            [userProfileOptions.name, userProfileOptions.email]
+        );
+
+        // Check if the update was successful
+        if (result.affectedRows === 1) {
+            return { success: true, message: 'User information updated successfully' };
+        } else {
+            throw new Error('Failed to update user information');
+        }
+    } catch (error) {
+        console.error('Error updating user information:', error);
+        throw error;
     }
   }
 }

@@ -2,6 +2,7 @@ import React, { useEffect, createContext, useReducer } from "react";
 import Cookies from "js-cookie";
 
 type UserAuthDetails = {
+  id: any;
   token: string;
   name: string;
   email: string;
@@ -20,13 +21,14 @@ type AuthContextType = {
 };
 
 const initialState: UserAuthDetails = {
+  id: "",
   token: "",
   name: "",
   email: "",
   role: 0,
 };
 
-type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" };
+type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" } | { type: "UPDATE_NAME"; payload: string };
 
 // Create reducer for CRUD actions
 const authReducer = (
@@ -37,7 +39,9 @@ const authReducer = (
     case "LOGIN":
       return { ...action.payload };
     case "LOGOUT":
-      return { token: "", name: "", email: "", role: 0 };
+      return { id: "", token: "", name: "", email: "", role: 0 };
+    case "UPDATE_NAME":
+      return { ...state, name: action.payload }
     default:
       return state;
   }
@@ -64,6 +68,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: "LOGIN", payload: userDetails });
     setAuthCookies(userDetails);
   };
+  
+  const updateName = (name: string) => {
+    dispatch({ type: "UPDATE_NAME", payload: name});
+  };
 
   const logout = () => {
     dispatch({ type: "LOGOUT" });
@@ -81,7 +89,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ userAuthDetails, login, logout, isLoggedIn }}
+      value={{ userAuthDetails, login, logout, isLoggedIn, updateName }}
     >
       {children}
     </AuthContext.Provider>

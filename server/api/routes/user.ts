@@ -4,6 +4,8 @@ import BotRepository from "../../database/MongoDB/BotRepository";
 import BotController from "../controllers/BotController";
 import { body, validationResult } from "express-validator";
 import { randomUUID } from "crypto";
+import IUserProfileOptions from "../../database/MySQL/IUserProfileOptions";
+import UserClass from "../../database/MySQL/UserClass";
 
 const userRouter: Router = express.Router();
 const userController = new UserController();
@@ -76,6 +78,50 @@ userRouter.post('/registerMongoDb', [
     return response.status(500).json({ 
       success: false, 
       message: `An internal server error occurred when attempting to register a bot document with the /register endpoint` 
+    });
+  }
+});
+
+userRouter.post('/changeuserdata', [ 
+  body('name').trim().matches(/^[A-Za-z\s'-]+$/).withMessage(`Your profile name must only contain letters, spaces, apostrophes, and hyphens`).isLength({min:1}).withMessage(`The length of the bot full name must be greater than or equal to 1`),
+  body('email').trim().matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/).withMessage(`Your profile email must be a valid email address (e.g., johndoe02@gmail.com)`)
+], 
+async function(request: Request, response: Response, next: NextFunction) {
+  const {
+    name,
+    email
+  }: {
+    name: string,
+    email: string
+  } = request.body;
+
+  const requestValidationErrors = validationResult(request);
+  if (!requestValidationErrors.isEmpty()) {
+    return response.status(400).json({
+      success: false,
+      message: `Please try submitting the form again with the correct inputs as specified on the form`,
+    });
+  }
+
+  const newProfileData: IUserProfileOptions = {
+    name: name,
+    email: email
+  }
+
+  try {
+    const user_controller_instance = new UserClass();
+
+    await user_controller_instance.changeUserNameAndEmail(newProfileData);
+
+    return response.status(200).json({
+      success: true,
+      message: "Your profile name was successfully changed",
+    });
+  } catch (error) {
+    console.error(`An error occurred when attempting to change a profile username document: ${error}`);
+    return response.status(500).json({ 
+      success: false, 
+      message: `An internal server error occurred when attempting to change your profile username: ${error}` 
     });
   }
 });
