@@ -8,6 +8,7 @@ import express, { NextFunction } from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import fs from "fs";
 import {
   Collection,
   GatewayIntentBits,
@@ -67,6 +68,11 @@ const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
 const discord_token = process.env.discord_bot_token;
 const discord_client_id = process.env.discord_bot_application_id;
 
+const commands_folder_path: string = path.join(__dirname, "./commands");
+const filtered_commands_files: string[] = fs
+  .readdirSync(commands_folder_path)
+  .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
+discord_client_instance.discord_commands = new Collection();
 
 const commands: any[] = [];
 /*
@@ -86,29 +92,49 @@ const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
     }
   ]
   */
+async function fetchCommandFiles() {
+  for (const command_file of filtered_commands_files) {
+    const command_file_path = path.join(commands_folder_path, command_file);
+    const command = await import(command_file_path);
+    if (Object.keys(command).length >= 1 && command.constructor === Object) {
+      const command_object = command.default(logger);
 
-  // for (const command of commands) {
-  //     // Assuming each command object has a property 'filePath' containing the path to the command file
-  //     const command_file_path = path.join(commands_folder_path, command.filePath);
+      if (command_object.data.name === 'hello-world') {
+        const containerName = 'studentbotcommands'
+        testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
+        testReadCommandsFromContainer(command_file_path, containerName);
+      }
 
-  //     try {
-  //         const imported_command = await import(command_file_path);
-  //         if (Object.keys(imported_command).length >= 1 && imported_command.constructor === Object) {
-  //             const command_object = imported_command.default(logger);
-  //             discord_client_instance.discord_commands.set(command_object.data.name, command_object);
-  //         }
-  //     } catch (error) {
-  //         console.error(`Error loading command file '${command_file_path}':`, error);
-  //     }
-  // }
+      discord_client_instance.discord_commands.set(
+        command_object.data.name,
+        command_object
+      );
+    }
+  }
+}
 
+async function testWriteCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
+  try {
+      await bot_repository.writeCommandToContainer(filePath, fileName, containerName);
+      console.log(`Command file '${fileName}' written to the container '${containerName}' successfully.`);
+  } catch (error) {
+      console.error(`Error writing command file '${fileName}' to the container '${containerName}':`, error);
+  }
+}
+
+async function testReadCommandsFromContainer(filePath: string, containerName: string) {
+  try {
+    await bot_repository.downloadAllCommandsFromContainer(filePath, containerName);
+  } catch (error) {
+    console.error(`There was an error when attempting to download all command files from Azure blob storage: ${error}`);
+  }
+}
 /**
  * Discord bots throw events when some operation occurs. In this instance, the Discord API throws the 'ready' event via the bot because the bot is ready to be used and is
  * connected to the Discord channel.
  */
 discord_client_instance.on("ready", async () => {
-  // const database_commands = await bot_controller.getAllCommandDocuments();
-  // registerCommandsFromDatabase(database_commands);
+  fetchCommandFiles();
   
   if (discord_client_instance.user) {
     console.log(
@@ -144,28 +170,7 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) {
     return;
   }
-
-  const command_name = interaction.commandName;
-
-  try {
-    const commandData = await bot_controller.getBotCommandDocument(command_name);
-
-    if (!commandData) {
-      await interaction.reply({
-        content: `This command does not exist`,
-        ephemeral: true,
-      });
-      return;
-    }
-  } catch (error: any) {
-    console.error(`There was an error when attempting to execute the command ${command_name}: ${error}`);
-
-    await interaction.reply({
-      content: `There was an error when attempting to execute this command: ${error}`,
-      ephemeral: true
-    });
-  }
-
+  
   /*
   The command variable stores the command object value stored in the discord bot collection. For example, if you request the '/help' command, the command variable will be 
   filled with the object data from the /help command. 

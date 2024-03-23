@@ -178,25 +178,6 @@ header * {
 }
 
 @media screen and (min-width: 1199px) {
-  /* Editing will revert shortly. */
-  /* body {
-    margin: 0;
-    padding: 0;
-    display: grid;
-    font-family: "Bacasime Antique", serif;
-    height: 100vh;
-    max-height: 100vh;
-    width: 100vw;
-    max-width: 100vw;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-areas: 
-    "header main main main main main" 
-    "header main main main main main" 
-    "header main main main main main" 
-    "header main main main main main" 
-    "header main main main main main" 
-    "header footer footer footer footer footer";
-  } */
   #root {
     display: inherit;
     margin: inherit;
@@ -250,7 +231,6 @@ header * {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid yellow;
     flex-direction: column;
   }
   #header .menu-icon {

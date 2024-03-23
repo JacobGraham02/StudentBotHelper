@@ -5,6 +5,9 @@ import { DiscordBotInformationType } from './types/DiscordBotInformationType';
 import * as dotenv from "dotenv";
 import { BlobServiceClient, BlobUploadCommonResponse } from '@azure/storage-blob';
 import { LogFile } from './types/LogFileType';
+import { promises as fs} from 'fs';
+import { mkdir } from 'fs/promises';
+import path from 'path';
 dotenv.config();
 
 export default class BotRepository {
@@ -104,27 +107,38 @@ export default class BotRepository {
         }
     }
 
-    public async getAllBotCommandDocuments() {
-        const database_connection = await this.database_connection_manager.getConnection();
-    
-        try {
-            let command_objects: any = [];
-            const commands_collection = database_connection.collection('commands');
-    
-            const commands = await commands_collection.find({ bot_id: 1 }).toArray();
 
-            for (let i = 0; i < commands.length; i++) {
-                command_objects.push(commands[i]);
+    public async getAllBotCommandFiles() {
+        const commands_directory = path.join(__dirname, "../../../dist/commands");
+
+        let commandObjects: any[] = [];
+        try {
+            const commandFiles: string[] = await fs.readdir(commands_directory);
+            const jsCommandFiles = commandFiles.filter(file => file.endsWith('.js'));
+
+            for (const file of jsCommandFiles) {
+                const filePath = path.join(commands_directory, file);
+
+                try {
+                    const commandModule = await import(filePath);
+                    const command = commandModule.default();
+
+                    commandObjects.push({
+                        data: command.data, // Or serialize if necessary
+                        authorization_role_name: command.authorization_role_name,
+                        execute: command.execute.toString() // This retains the function reference
+                    });
+                } catch(fileFetchError) {
+                    console.error(`Error processing file ${filePath}: ${fileFetchError}`);
+                }
             }
-            
-            return command_objects;
-        } catch (error: any) {
-            console.error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
-            throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
-        } finally {
-            await this.releaseConnectionSafely(database_connection);
+        } catch (error) {
+            console.error(`There was an error when attempting to retrieve the bot commands: ${error}`);
+            throw error;
         }
+        return commandObjects;
     }
+    
 
     public async getBot(bot_id) {
         const database_connection = await this.database_connection_manager.getConnection();
@@ -238,8 +252,8 @@ export default class BotRepository {
             throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
         }
     }
-
-    public async writeCommandToContainer(commandName: string, commandData: Object, containerName: string): Promise<void> {
+    
+    public async writeCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
@@ -250,8 +264,8 @@ export default class BotRepository {
             throw new Error(`The azure storage container name is undefined or invalid`);
         }
     
-        // Serialize the function object to a string
-        const fileContents = JSON.stringify(commandData);
+        // Read the file contents
+        const fileContents = await fs.readFile(filePath, { encoding: 'utf8' });
     
         // Create BlobServiceClient
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
@@ -262,14 +276,14 @@ export default class BotRepository {
         try {
             await containerClient.createIfNotExists();
     
-            // Define blob file name
-            const blobFileName = `${commandName}.ts`;
+            // Define blob file name, ensuring it matches the desired extension
+            const blobFileName = `${fileName}.js`;
     
             // Get blob client for the file
             const blobClient = containerClient.getBlockBlobClient(blobFileName);
     
-            // Upload file contents to blob
-            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
+            // Upload the file contents to blob
+            const uploadResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
     
             // Check if upload was successful
             if (uploadResponse._response.status === 201) {
@@ -278,43 +292,46 @@ export default class BotRepository {
                 throw new Error(`Failed to upload command file '${blobFileName}'.`);
             }
         } catch (error) {
-            console.error(`Error in creating container or uploading command file '${commandName}':`, error);
+            console.error(`Error in creating container or uploading command file:`, error);
             throw error;
         }
     }
 
-    public async readAllCommandsFromContainer(containerName: string) {
+    public async downloadAllCommandsFromContainer(filePath: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
-            throw new Error(`The azure storage account connection string is undefined`);
+            throw new Error(`The Azure storage account connection string is undefined or invalid.`);
         }
     
+        if (!containerName) {
+            throw new Error(`The Azure storage container name is undefined or invalid.`);
+        }
+    
+        // Create BlobServiceClient
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+        // Get container client
         const containerClient = blobServiceClient.getContainerClient(containerName);
-        const commandFiles: any[] = [];
-
-        await containerClient.createIfNotExists();
     
         try {
-            // List all blobs in the container
-            for await (const blob of containerClient.listBlobsFlat()) {
-                if (blob.name.endsWith('.js')) { 
-                    const blobClient = containerClient.getBlockBlobClient(blob.name);
-                    const downloadResponse = await blobClient.downloadToBuffer();
-                    const commandFileContents = downloadResponse;
-
-                    commandFiles.push(commandFileContents);
-                }
-            }
+            // Ensure the local directory exists
+            await mkdir(filePath, { recursive: true });
     
-            return commandFiles;
+            // List all blobs in the container and download each one
+            for await (const blob of containerClient.listBlobsFlat()) {
+                const localFilePath = `${filePath}/${blob.name}`;
+                const blobClient = containerClient.getBlobClient(blob.name);
+                
+                // Download the blob's contents and save to a local file
+                await blobClient.downloadToFile(localFilePath);
+                console.log(`Blog files were downloaded`);
+            }
         } catch (error) {
-            console.error(`An error has occurred when attempting to read log files from Microsoft Azure: ${error}`);
-            throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
+            console.error(`Error downloading commands from container:`, error);
+            throw error;
         }
     }
-    
 
     private async releaseConnectionSafely(database_connection: any): Promise<void> {
         if (database_connection) {
