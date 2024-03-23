@@ -8,6 +8,7 @@ import express, { NextFunction } from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import fs from "fs";
 import {
   Collection,
   GatewayIntentBits,
@@ -40,6 +41,7 @@ import CommonClassWork from "./entity/CommonClassWork";
 import Logger from "./utils/Logger";
 import BotController from "./api/controllers/BotController";
 import BotRepository from "./database/MongoDB/BotRepository";
+import ICommandFileStructure from "./api/interface/ICommandFileStructure";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const bot_repository = new BotRepository();
@@ -67,6 +69,11 @@ const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
 const discord_token = process.env.discord_bot_token;
 const discord_client_id = process.env.discord_bot_application_id;
 
+const commands_folder_path: string = path.join(__dirname, "./commands");
+const filtered_commands_files: string[] = fs
+  .readdirSync(commands_folder_path)
+  .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
+discord_client_instance.discord_commands = new Collection();
 
 const commands: any[] = [];
 /*
@@ -86,29 +93,49 @@ const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
     }
   ]
   */
+async function fetchCommandFiles() {
+  for (const command_file of filtered_commands_files) {
+    const command_file_path = path.join(commands_folder_path, command_file);
+    const command = await import(command_file_path);
+    if (Object.keys(command).length >= 1 && command.constructor === Object) {
+      const command_object = command.default(logger);
+      // console.log(command_object.data.name);
+      // console.log(command_object.authorization_role_name);
+      // console.log(command_object.execute);
 
-  // for (const command of commands) {
-  //     // Assuming each command object has a property 'filePath' containing the path to the command file
-  //     const command_file_path = path.join(commands_folder_path, command.filePath);
+      if (command_object.data.name === 'hello-world') {
+        const commandObject = {
+          data: command_object.data,
+          authorization_role_name: command_object.authorization_role_name,
+          execute: command_object.execute
+        }
+        const containerName = 'studentbotcommands'
+        testWriteCommandToContainer(commandObject, containerName);
+      }
 
-  //     try {
-  //         const imported_command = await import(command_file_path);
-  //         if (Object.keys(imported_command).length >= 1 && imported_command.constructor === Object) {
-  //             const command_object = imported_command.default(logger);
-  //             discord_client_instance.discord_commands.set(command_object.data.name, command_object);
-  //         }
-  //     } catch (error) {
-  //         console.error(`Error loading command file '${command_file_path}':`, error);
-  //     }
-  // }
+      discord_client_instance.discord_commands.set(
+        command_object.data.name,
+        command_object
+      );
+    }
+  }
+}
+
+async function testWriteCommandToContainer(commandFileData: ICommandFileStructure, containerName: string): Promise<void> {
+  try {
+      await bot_repository.writeCommandToContainer(commandFileData, containerName);
+      console.log(`Command file '${commandFileData.data.name}' written to the container '${containerName}' successfully.`);
+  } catch (error) {
+      console.error(`Error writing command file '${commandFileData.data.name}' to the container '${containerName}':`, error);
+  }
+}
 
 /**
  * Discord bots throw events when some operation occurs. In this instance, the Discord API throws the 'ready' event via the bot because the bot is ready to be used and is
  * connected to the Discord channel.
  */
 discord_client_instance.on("ready", async () => {
-  // const database_commands = await bot_controller.getAllCommandDocuments();
-  // registerCommandsFromDatabase(database_commands);
+  fetchCommandFiles();
   
   if (discord_client_instance.user) {
     console.log(

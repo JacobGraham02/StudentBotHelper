@@ -6,6 +6,7 @@ import * as dotenv from "dotenv";
 import { BlobServiceClient, BlobUploadCommonResponse } from '@azure/storage-blob';
 import { LogFile } from './types/LogFileType';
 import ICommandFileStructure from '../../api/interface/ICommandFileStructure';
+import serializeJavascript from 'serialize-javascript';
 dotenv.config();
 
 export default class BotRepository {
@@ -240,50 +241,6 @@ export default class BotRepository {
         }
     }
 
-    public async writeCommandToContainer(commandFileData: ICommandFileStructure, containerName: string): Promise<void> {
-        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
-    
-        if (!storageAccountConnection) {
-            throw new Error(`The azure storage account connection string is undefined or invalid`);
-        }
-    
-        if (!containerName) {
-            throw new Error(`The azure storage container name is undefined or invalid`);
-        }
-    
-        // Serialize the function object to a string
-        const fileContents = JSON.stringify(commandFileData);
-    
-        // Create BlobServiceClient
-        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
-    
-        // Get container client
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-    
-        try {
-            await containerClient.createIfNotExists();
-    
-            // Define blob file name
-            const blobFileName = `${commandFileData.data.name}.ts`;
-    
-            // Get blob client for the file
-            const blobClient = containerClient.getBlockBlobClient(blobFileName);
-    
-            // Upload file contents to blob
-            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
-    
-            // Check if upload was successful
-            if (uploadResponse._response.status === 201) {
-                console.log(`Command file '${blobFileName}' uploaded successfully.`);
-            } else {
-                throw new Error(`Failed to upload command file '${blobFileName}'.`);
-            }
-        } catch (error) {
-            console.error(`Error in creating container or uploading command file '${commandFileData.data.name}':`, error);
-            throw error;
-        }
-    }
-
     public async readAllCommandsFromContainer(containerName: string) {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
@@ -316,6 +273,86 @@ export default class BotRepository {
         }
     }
     
+    public async writeCommandToContainer(commandFileData: ICommandFileStructure, containerName: string): Promise<void> {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+    
+        if (!storageAccountConnection) {
+            throw new Error(`The azure storage account connection string is undefined or invalid`);
+        }
+    
+        if (!containerName) {
+            throw new Error(`The azure storage container name is undefined or invalid`);
+        }
+    
+        // Serialize the function object to a string
+        const serializedFileContents = serializeJavascript(commandFileData);
+    
+        // Create BlobServiceClient
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+        // Get container client
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+    
+        try {
+            await containerClient.createIfNotExists();
+    
+            // Define blob file name
+            const blobFileName = `${commandFileData.data.name}.js`; // Change file extension to .js
+    
+            // Get blob client for the file
+            const blobClient = containerClient.getBlockBlobClient(blobFileName);
+    
+            // Upload serialized file contents to blob
+            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(serializedFileContents, Buffer.byteLength(serializedFileContents));
+    
+            // Check if upload was successful
+            if (uploadResponse._response.status === 201) {
+                console.log(`Command file '${blobFileName}' uploaded successfully.`);
+            } else {
+                throw new Error(`Failed to upload command file '${blobFileName}'.`);
+            }
+        } catch (error) {
+            console.error(`Error in creating container or uploading command file '${commandFileData.data.name}':`, error);
+            throw error;
+        }
+    }
+    
+    public async fetchCommandFromContainer(containerName: string, fileName: string): Promise<ICommandFileStructure | undefined> {
+        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
+    
+        if (!storageAccountConnection) {
+            throw new Error(`The azure storage account connection string is undefined or invalid`);
+        }
+    
+        if (!containerName) {
+            throw new Error(`The azure storage container name is undefined or invalid`);
+        }
+    
+        try {
+            // Create BlobServiceClient
+            const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+            // Get container client
+            const containerClient = blobServiceClient.getContainerClient(containerName);
+    
+            // Define blob file name
+            const blobFileName = `${fileName}.js`; // Change file extension to .js
+    
+            // Get blob client for the file
+            const blobClient = containerClient.getBlockBlobClient(blobFileName);
+    
+            // Download blob content
+            const blobDownloadResponse = await blobClient.downloadToBuffer();
+    
+            // Deserialize the downloaded content
+
+            
+            // return deserializedFileContents as ICommandFileStructure;
+        } catch (error) {
+            console.error(`Error in fetching command file '${fileName}':`, error);
+            throw error;
+        }
+    }
 
     private async releaseConnectionSafely(database_connection: any): Promise<void> {
         if (database_connection) {
