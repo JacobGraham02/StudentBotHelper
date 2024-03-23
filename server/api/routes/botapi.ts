@@ -10,6 +10,7 @@ import Logger from "../../utils/Logger";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
 import CommandRequestEmail from "../../utils/CommandRequestEmail";
 import { UUID } from "crypto";
+import ICommandFileStructure from "../interface/ICommandFileStructure";
 dotenv.config({ path: "../../../.env" });
 
 /**
@@ -457,12 +458,10 @@ bot_commands_router.put('/writelog', async function(request: Request, response: 
 
 bot_commands_router.put('/writecommand', async function(request: Request, response: Response, next: NextFunction) {
   const {
-    commandFileName,
     commandFileData,
     containerName,
   }: {
-    commandFileName: string,
-    commandFileData: Object,
+    commandFileData: ICommandFileStructure,
     containerName: string
   } = request.body;
 
@@ -474,12 +473,12 @@ bot_commands_router.put('/writecommand', async function(request: Request, respon
     const bot_database_repository_instance: BotRepository = new BotRepository();
     const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
 
-    await bot_controller_instance.writeCommandFileToContainer(commandFileName, commandFileData, containerName);
+    await bot_controller_instance.writeCommandFileToContainer(commandFileData, containerName);
 
-    response.json(`You have successfully added the ${commandFileName} file to the container: ${containerName}`); 
+    response.json(`You have successfully added the command file to the container: ${containerName}`); 
   } catch (error) {
-    console.error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
-    throw new Error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
+    console.error(`There was an error when attempting to write the command file to the specified container: ${error}`);
+    throw new Error(`There was an error when attempting to write the command file to the specified container: ${error}`);
   }
 });
 

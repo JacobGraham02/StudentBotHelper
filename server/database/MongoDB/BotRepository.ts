@@ -5,6 +5,7 @@ import { DiscordBotInformationType } from './types/DiscordBotInformationType';
 import * as dotenv from "dotenv";
 import { BlobServiceClient, BlobUploadCommonResponse } from '@azure/storage-blob';
 import { LogFile } from './types/LogFileType';
+import ICommandFileStructure from '../../api/interface/ICommandFileStructure';
 dotenv.config();
 
 export default class BotRepository {
@@ -239,7 +240,7 @@ export default class BotRepository {
         }
     }
 
-    public async writeCommandToContainer(commandName: string, commandData: Object, containerName: string): Promise<void> {
+    public async writeCommandToContainer(commandFileData: ICommandFileStructure, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
@@ -251,7 +252,7 @@ export default class BotRepository {
         }
     
         // Serialize the function object to a string
-        const fileContents = JSON.stringify(commandData);
+        const fileContents = JSON.stringify(commandFileData);
     
         // Create BlobServiceClient
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
@@ -263,7 +264,7 @@ export default class BotRepository {
             await containerClient.createIfNotExists();
     
             // Define blob file name
-            const blobFileName = `${commandName}.ts`;
+            const blobFileName = `${commandFileData.data.name}.ts`;
     
             // Get blob client for the file
             const blobClient = containerClient.getBlockBlobClient(blobFileName);
@@ -278,7 +279,7 @@ export default class BotRepository {
                 throw new Error(`Failed to upload command file '${blobFileName}'.`);
             }
         } catch (error) {
-            console.error(`Error in creating container or uploading command file '${commandName}':`, error);
+            console.error(`Error in creating container or uploading command file '${commandFileData.data.name}':`, error);
             throw error;
         }
     }

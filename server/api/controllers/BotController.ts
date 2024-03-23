@@ -3,6 +3,7 @@ import BotRepository from "../../database/MongoDB/BotRepository";
 import { DiscordBotInformationType } from "../../database/MongoDB/types/DiscordBotInformationType";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
 import { UUID } from "crypto";
+import ICommandFileStructure from "../interface/ICommandFileStructure";
 
 export default class BotController {
   bot_repository: BotRepository;
@@ -88,9 +89,9 @@ export default class BotController {
         }
     }
 
-    async writeCommandFileToContainer(commandName: string, commandFile: Object, containerName: string) {
+    async writeCommandFileToContainer(commandFile: ICommandFileStructure, containerName: string) {
         try {
-            const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandName, commandFile, containerName);
+            const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandFile, containerName);
 
             return azure_container_commands;
         } catch (error: any) {
