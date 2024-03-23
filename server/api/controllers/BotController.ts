@@ -31,17 +31,6 @@ export default class BotController {
         }
     }
 
-    async getBotCommandDocument(command_name: string) {
-        
-        try {
-            const bot_command_document = await this.bot_repository.getBotCommandDocument(command_name);
-            return bot_command_document;
-        } catch (error: any) {
-            console.error(`There was an error when attempting to get a bot command from the MongoDB database: ${error}`);
-            throw new Error(`There was an error when attempting to get a bot command from the MongoDB database: ${error}`);
-        }
-    }
-
     async getAllCommandDocuments() {
 
         try {

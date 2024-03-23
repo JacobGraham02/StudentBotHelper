@@ -99,11 +99,6 @@ async function fetchCommandFiles() {
     if (Object.keys(command).length >= 1 && command.constructor === Object) {
       const command_object = command.default(logger);
 
-      // console.log(command_file_path);
-      // console.log(command_object.data.name);
-      // console.log(command_object.authorization_role_name);
-      // console.log(command_object.execute);
-
       if (command_object.data.name === 'hello-world') {
         const containerName = 'studentbotcommands'
         testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
@@ -175,28 +170,7 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) {
     return;
   }
-
-  const command_name = interaction.commandName;
-
-  try {
-    const commandData = await bot_controller.getBotCommandDocument(command_name);
-
-    if (!commandData) {
-      await interaction.reply({
-        content: `This command does not exist`,
-        ephemeral: true,
-      });
-      return;
-    }
-  } catch (error: any) {
-    console.error(`There was an error when attempting to execute the command ${command_name}: ${error}`);
-
-    await interaction.reply({
-      content: `There was an error when attempting to execute this command: ${error}`,
-      ephemeral: true
-    });
-  }
-
+  
   /*
   The command variable stores the command object value stored in the discord bot collection. For example, if you request the '/help' command, the command variable will be 
   filled with the object data from the /help command. 
