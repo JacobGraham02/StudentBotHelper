@@ -31,15 +31,18 @@ export default class BotController {
         }
     }
 
-    async getAllCommandDocuments() {
+    async getAllCommandFiles() {
 
         try {
-            const bot_command_documents = await this.bot_repository.getAllBotCommandDocuments();
+            const bot_command_documents = await this.bot_repository.getAllBotCommandFiles();
+
+            console.log(`Bot command documents is: `);
+            console.log(bot_command_documents);
 
             return bot_command_documents
         } catch (error: any) {
-            console.error(`There was an error when attempting to fetch all bot commands from the MongoDB database: ${error}`);
-            throw new Error(`There was an error when attempting to fetch all bot commands from the MongoDB database: ${error}`);
+            console.error(`There was an error when attempting to fetch all bot commands: ${error}`);
+            throw new Error(`There was an error when attempting to fetch all bot commands: ${error}`);
         }
     }
 

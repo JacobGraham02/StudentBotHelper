@@ -7,6 +7,7 @@ import { BlobServiceClient, BlobUploadCommonResponse } from '@azure/storage-blob
 import { LogFile } from './types/LogFileType';
 import { promises as fs} from 'fs';
 import { mkdir } from 'fs/promises';
+import path from 'path';
 dotenv.config();
 
 export default class BotRepository {
@@ -106,25 +107,36 @@ export default class BotRepository {
         }
     }
 
-    public async getAllBotCommandDocuments() {
-        const database_connection = await this.database_connection_manager.getConnection();
-    
-        try {
-            let command_objects: any = [];
-            const commands_collection = database_connection.collection('commands');
-    
-            const commands = await commands_collection.find({ bot_id: 1 }).toArray();
 
-            for (let i = 0; i < commands.length; i++) {
-                command_objects.push(commands[i]);
+    public async getAllBotCommandFiles() {
+        const commands_directory = path.join(__dirname, "../../../dist/commands");
+
+        try {
+            let commandObjects: any = [];
+            const commandFiles: string[] = await fs.readdir(commands_directory);
+            const jsCommandFiles = commandFiles.filter(file => file.endsWith('.js'));
+        
+            for (const file of jsCommandFiles) {
+                const filePath = path.join(commands_directory, file);
+                
+                // Check if file exists
+                try {
+                    await fs.stat(filePath);
+                } catch(fileFetchError) {
+                    console.error(`File does not exist: ${filePath}`);
+                    continue;
+                }
+        
+                const command = await import(filePath);
+                const commandObject = command.default();
+                const commandObjectExecuteFunction = commandObject.execute;
+                commandObjects.push({ data: commandObject.data, authorization_role_name: commandObject.authorization_role_name, execute: commandObjectExecuteFunction });
             }
-            
-            return command_objects;
-        } catch (error: any) {
-            console.error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
-            throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
-        } finally {
-            await this.releaseConnectionSafely(database_connection);
+
+            return commandObjects;
+        } catch (error) {
+          console.error(`There was an error when attempting to retrieve the bot commands: ${error}`);
+          throw new Error(`There was an error when attempting to retrieve the bot commands: ${error}`);
         }
     }
 
