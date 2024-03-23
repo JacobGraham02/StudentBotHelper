@@ -31,26 +31,17 @@ export default class BotController {
         }
     }
 
-    async getBotCommandDocument(command_name: string) {
-        
-        try {
-            const bot_command_document = await this.bot_repository.getBotCommandDocument(command_name);
-            return bot_command_document;
-        } catch (error: any) {
-            console.error(`There was an error when attempting to get a bot command from the MongoDB database: ${error}`);
-            throw new Error(`There was an error when attempting to get a bot command from the MongoDB database: ${error}`);
-        }
-    }
-
-    async getAllCommandDocuments() {
+    async getAllCommandFiles() {
 
         try {
-            const bot_command_documents = await this.bot_repository.getAllBotCommandDocuments();
+            const bot_command_documents = await this.bot_repository.getAllBotCommandFiles();
 
-            return bot_command_documents
+            const commands_array = Array.isArray(bot_command_documents) ? bot_command_documents : [bot_command_documents]
+
+            return commands_array
         } catch (error: any) {
-            console.error(`There was an error when attempting to fetch all bot commands from the MongoDB database: ${error}`);
-            throw new Error(`There was an error when attempting to fetch all bot commands from the MongoDB database: ${error}`);
+            console.error(`There was an error when attempting to fetch all bot commands: ${error}`);
+            throw new Error(`There was an error when attempting to fetch all bot commands: ${error}`);
         }
     }
 
@@ -88,14 +79,14 @@ export default class BotController {
         }
     }
 
-    async writeCommandFileToContainer(commandName: string, commandFile: Object, containerName: string) {
-        try {
-            const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandName, commandFile, containerName);
+    // async writeCommandFileToContainer(commandFile: ICommandFileStructure, containerName: string) {
+    //     try {
+    //         const azure_container_commands = await this.bot_repository.writeCommandToContainer(commandFile, containerName);
 
-            return azure_container_commands;
-        } catch (error: any) {
-            console.error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
-            throw new Error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
-        }
-    }
+    //         return azure_container_commands;
+    //     } catch (error: any) {
+    //         console.error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
+    //         throw new Error(`There was an error when attempting to write a command file to the container: ${containerName}: ${error}`);
+    //     }
+    // }
 }

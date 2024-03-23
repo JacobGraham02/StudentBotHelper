@@ -375,9 +375,11 @@ bot_commands_router.get('/getcommands', async function (request: Request, respon
     const bot_database_repository_instance: BotRepository = new BotRepository();
     const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
     
-    const commands = await bot_controller_instance.getAllCommandDocuments();
+    const commands = await bot_controller_instance.getAllCommandFiles();
 
-    response.json(commands);
+    return response.status(200).json({
+      data: commands
+    });
   } catch (error) {
     console.error(`An error occurred when attempting to retrieve all bot commands from the database: ${error}`);
     throw new Error(`There was an error when attempting to retrieve the bot commands. Please inform the server administrator of this error: ${error}`);
@@ -457,12 +459,8 @@ bot_commands_router.put('/writelog', async function(request: Request, response: 
 
 bot_commands_router.put('/writecommand', async function(request: Request, response: Response, next: NextFunction) {
   const {
-    commandFileName,
-    commandFileData,
-    containerName,
+    containerName
   }: {
-    commandFileName: string,
-    commandFileData: Object,
     containerName: string
   } = request.body;
 
@@ -474,12 +472,12 @@ bot_commands_router.put('/writecommand', async function(request: Request, respon
     const bot_database_repository_instance: BotRepository = new BotRepository();
     const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
 
-    await bot_controller_instance.writeCommandFileToContainer(commandFileName, commandFileData, containerName);
+    // await bot_controller_instance.writeCommandFileToContainer(commandFileData, containerName);
 
-    response.json(`You have successfully added the ${commandFileName} file to the container: ${containerName}`); 
+    response.json(`You have successfully added the command file to the container: ${containerName}`); 
   } catch (error) {
-    console.error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
-    throw new Error(`There was an error when attempting to write the ${commandFileName} file to the specified container: ${error}`);
+    console.error(`There was an error when attempting to write the command file to the specified container: ${error}`);
+    throw new Error(`There was an error when attempting to write the command file to the specified container: ${error}`);
   }
 });
 

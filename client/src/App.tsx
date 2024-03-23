@@ -36,6 +36,7 @@ import LogsPage from "./pages/LogsPage.js";
 import DashboardPage from "./pages/DashboardPage.js";
 import LandingPage from "./pages/LandingPage.js";
 import ProfilePage from "./pages/ProfilePage.js";
+import CommandPage from "./pages/CommandPage.js";
 
 const GoogleClientID = OAuthCreds.google.clientID;
 
@@ -86,6 +87,10 @@ const router = createBrowserRouter([
             <CommandsPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "command",
+        element: <CommandPage isUserLoggedIn={true} />
       },
       {
         path: 'logs',

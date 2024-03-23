@@ -3,7 +3,9 @@ import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
-import { Container, Row, Col, FormGroup, FormLabel, FormControl } from "react-bootstrap";
+import { Container, Row, Col, FormGroup, FormLabel, FormControl, Button } from "react-bootstrap";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const navigate = useNavigate();
@@ -37,6 +39,19 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
       }
     };
 
+    const showCancelConfirmation = () => {
+        setModalContent({
+          title: `Cancel confirmation`,
+          body: `Are you sure you want to go back to the previous page?`,
+          cancelButtonText: `Cancel`,
+          confirmButtonText: `Confirm`,
+          onConfirm: () => {
+            navigate(-1)
+          }
+        });
+        setShowModal(true);
+    }
+
     return (
       <main id="main" className="text-center">
           <CustomModal
@@ -48,6 +63,17 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
               confirmButtonText={modalContent.confirmButtonText!}
               onConfirm={modalContent.onConfirm}
           />
+
+            <Container>
+                <Row className="my-1 justify-content-between mt-5">
+                  <Col xs="auto">
+                    <Button className="btn btn-danger" onClick={() => showCancelConfirmation()}>
+                      <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
+                      Go back
+                    </Button>
+                  </Col>
+                </Row>
+            </Container>
       
           <aside id="bot_configuration_options_page_content">
               <h1 id="bot_onfiguration_options_page_title">
