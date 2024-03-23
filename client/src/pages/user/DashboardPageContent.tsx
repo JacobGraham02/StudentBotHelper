@@ -28,6 +28,7 @@ const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
       try {
         const commands = await getAllBotCommands();
         setBotCommands(commands.data.data);
+        console.log(commands.data.data[0].data);
       } catch (error) {
         console.error(`There was an error fetching bot commands: ${error}`);
       } 
@@ -56,16 +57,29 @@ const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
     }
   };
 
+  const handleCommandClick = (command: any) => {
+    navigate("/command", { state: { command_object: command, command_data: command.data }});
+  };
+
   return (
     <main id="main" className="text-center">
+       <aside id="bot_configuration_options_page_content">
+          <h1 id="dashboard_h1_title">
+            Your dashboard
+          </h1>
+          <h3 id="dashboard_h3_title">
+            Below are a list of commands available to you:
+          </h3>
+        </aside>
       <div>
         <ul>
           {currentCommands.map((command, index) => (
             <li key={index}>
               <NavLink
-                to="/commands"
-                state={{ command_object: command }}
+                to="/command"
+                state={{ command_object: command, command_data: command.data }}
                 className="nav-link"
+                onClick={() => handleCommandClick(command)}
               >
                 {command.data.name}
               </NavLink>
