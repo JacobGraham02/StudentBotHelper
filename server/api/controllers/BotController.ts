@@ -36,10 +36,9 @@ export default class BotController {
         try {
             const bot_command_documents = await this.bot_repository.getAllBotCommandFiles();
 
-            console.log(`Bot command documents is: `);
-            console.log(bot_command_documents);
+            const commands_array = Array.isArray(bot_command_documents) ? bot_command_documents : [bot_command_documents]
 
-            return bot_command_documents
+            return commands_array
         } catch (error: any) {
             console.error(`There was an error when attempting to fetch all bot commands: ${error}`);
             throw new Error(`There was an error when attempting to fetch all bot commands: ${error}`);

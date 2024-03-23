@@ -111,34 +111,34 @@ export default class BotRepository {
     public async getAllBotCommandFiles() {
         const commands_directory = path.join(__dirname, "../../../dist/commands");
 
+        let commandObjects: any[] = [];
         try {
-            let commandObjects: any = [];
             const commandFiles: string[] = await fs.readdir(commands_directory);
             const jsCommandFiles = commandFiles.filter(file => file.endsWith('.js'));
-        
+
             for (const file of jsCommandFiles) {
                 const filePath = path.join(commands_directory, file);
-                
-                // Check if file exists
-                try {
-                    await fs.stat(filePath);
-                } catch(fileFetchError) {
-                    console.error(`File does not exist: ${filePath}`);
-                    continue;
-                }
-        
-                const command = await import(filePath);
-                const commandObject = command.default();
-                const commandObjectExecuteFunction = commandObject.execute;
-                commandObjects.push({ data: commandObject.data, authorization_role_name: commandObject.authorization_role_name, execute: commandObjectExecuteFunction });
-            }
 
-            return commandObjects;
+                try {
+                    const commandModule = await import(filePath);
+                    const command = commandModule.default();
+
+                    commandObjects.push({
+                        data: command.data, // Or serialize if necessary
+                        authorization_role_name: command.authorization_role_name,
+                        execute: command.execute.toString() // This retains the function reference
+                    });
+                } catch(fileFetchError) {
+                    console.error(`Error processing file ${filePath}: ${fileFetchError}`);
+                }
+            }
         } catch (error) {
-          console.error(`There was an error when attempting to retrieve the bot commands: ${error}`);
-          throw new Error(`There was an error when attempting to retrieve the bot commands: ${error}`);
+            console.error(`There was an error when attempting to retrieve the bot commands: ${error}`);
+            throw error;
         }
+        return commandObjects;
     }
+    
 
     public async getBot(bot_id) {
         const database_connection = await this.database_connection_manager.getConnection();

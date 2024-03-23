@@ -377,14 +377,8 @@ bot_commands_router.get('/getcommands', async function (request: Request, respon
     
     const commands = await bot_controller_instance.getAllCommandFiles();
 
-    const commandsWithSerializedExecute = commands.map((command: any) => ({
-      data: command.data,
-      authorization_role_name: command.authorization_role_name,
-      execute: command.execute.toString() // Serialize the execute function
-    }));
-
     return response.status(200).json({
-      data: commandsWithSerializedExecute
+      data: commands
     });
   } catch (error) {
     console.error(`An error occurred when attempting to retrieve all bot commands from the database: ${error}`);

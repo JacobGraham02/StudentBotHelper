@@ -27,9 +27,7 @@ const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
     const fetchBotCommands = async () => {
       try {
         const commands = await getAllBotCommands();
-        console.log(commands);
         setBotCommands(commands.data.data);
-        console.log(commands.data);
       } catch (error) {
         console.error(`There was an error fetching bot commands: ${error}`);
       } 

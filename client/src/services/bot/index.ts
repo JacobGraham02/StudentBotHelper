@@ -62,7 +62,7 @@ export const postChangeUserOptions = async (userOptions: UserInfo) => {
 
 export const getAllBotCommands = async () => {
   try {
-    const allBotCommandDocuments = instance.get("bot/getcommands");
+    const allBotCommandDocuments = await instance.get("bot/getcommands");
 
     return allBotCommandDocuments;
 
