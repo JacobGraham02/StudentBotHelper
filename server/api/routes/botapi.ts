@@ -10,7 +10,6 @@ import Logger from "../../utils/Logger";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
 import CommandRequestEmail from "../../utils/CommandRequestEmail";
 import { UUID } from "crypto";
-import ICommandFileStructure from "../interface/ICommandFileStructure";
 dotenv.config({ path: "../../../.env" });
 
 /**
@@ -458,10 +457,8 @@ bot_commands_router.put('/writelog', async function(request: Request, response: 
 
 bot_commands_router.put('/writecommand', async function(request: Request, response: Response, next: NextFunction) {
   const {
-    commandFileData,
-    containerName,
+    containerName
   }: {
-    commandFileData: ICommandFileStructure,
     containerName: string
   } = request.body;
 
@@ -473,7 +470,7 @@ bot_commands_router.put('/writecommand', async function(request: Request, respon
     const bot_database_repository_instance: BotRepository = new BotRepository();
     const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
 
-    await bot_controller_instance.writeCommandFileToContainer(commandFileData, containerName);
+    // await bot_controller_instance.writeCommandFileToContainer(commandFileData, containerName);
 
     response.json(`You have successfully added the command file to the container: ${containerName}`); 
   } catch (error) {

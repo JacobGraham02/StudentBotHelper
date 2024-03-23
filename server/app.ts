@@ -41,7 +41,6 @@ import CommonClassWork from "./entity/CommonClassWork";
 import Logger from "./utils/Logger";
 import BotController from "./api/controllers/BotController";
 import BotRepository from "./database/MongoDB/BotRepository";
-import ICommandFileStructure from "./api/interface/ICommandFileStructure";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const bot_repository = new BotRepository();
@@ -99,18 +98,16 @@ async function fetchCommandFiles() {
     const command = await import(command_file_path);
     if (Object.keys(command).length >= 1 && command.constructor === Object) {
       const command_object = command.default(logger);
+
+      // console.log(command_file_path);
       // console.log(command_object.data.name);
       // console.log(command_object.authorization_role_name);
       // console.log(command_object.execute);
 
       if (command_object.data.name === 'hello-world') {
-        const commandObject = {
-          data: command_object.data,
-          authorization_role_name: command_object.authorization_role_name,
-          execute: command_object.execute
-        }
         const containerName = 'studentbotcommands'
-        testWriteCommandToContainer(commandObject, containerName);
+        testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
+        testReadCommandsFromContainer(command_file_path, containerName);
       }
 
       discord_client_instance.discord_commands.set(
@@ -121,15 +118,22 @@ async function fetchCommandFiles() {
   }
 }
 
-async function testWriteCommandToContainer(commandFileData: ICommandFileStructure, containerName: string): Promise<void> {
+async function testWriteCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
   try {
-      await bot_repository.writeCommandToContainer(commandFileData, containerName);
-      console.log(`Command file '${commandFileData.data.name}' written to the container '${containerName}' successfully.`);
+      await bot_repository.writeCommandToContainer(filePath, fileName, containerName);
+      console.log(`Command file '${fileName}' written to the container '${containerName}' successfully.`);
   } catch (error) {
-      console.error(`Error writing command file '${commandFileData.data.name}' to the container '${containerName}':`, error);
+      console.error(`Error writing command file '${fileName}' to the container '${containerName}':`, error);
   }
 }
 
+async function testReadCommandsFromContainer(filePath: string, containerName: string) {
+  try {
+    await bot_repository.downloadAllCommandsFromContainer(filePath, containerName);
+  } catch (error) {
+    console.error(`There was an error when attempting to download all command files from Azure blob storage: ${error}`);
+  }
+}
 /**
  * Discord bots throw events when some operation occurs. In this instance, the Discord API throws the 'ready' event via the bot because the bot is ready to be used and is
  * connected to the Discord channel.

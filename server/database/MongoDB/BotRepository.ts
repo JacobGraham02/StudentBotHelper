@@ -5,8 +5,8 @@ import { DiscordBotInformationType } from './types/DiscordBotInformationType';
 import * as dotenv from "dotenv";
 import { BlobServiceClient, BlobUploadCommonResponse } from '@azure/storage-blob';
 import { LogFile } from './types/LogFileType';
-import ICommandFileStructure from '../../api/interface/ICommandFileStructure';
-import serializeJavascript from 'serialize-javascript';
+import { promises as fs} from 'fs';
+import { mkdir } from 'fs/promises';
 dotenv.config();
 
 export default class BotRepository {
@@ -240,40 +240,8 @@ export default class BotRepository {
             throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
         }
     }
-
-    public async readAllCommandsFromContainer(containerName: string) {
-        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
-        if (!storageAccountConnection) {
-            throw new Error(`The azure storage account connection string is undefined`);
-        }
-    
-        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-        const commandFiles: any[] = [];
-
-        await containerClient.createIfNotExists();
-    
-        try {
-            // List all blobs in the container
-            for await (const blob of containerClient.listBlobsFlat()) {
-                if (blob.name.endsWith('.js')) { 
-                    const blobClient = containerClient.getBlockBlobClient(blob.name);
-                    const downloadResponse = await blobClient.downloadToBuffer();
-                    const commandFileContents = downloadResponse;
-
-                    commandFiles.push(commandFileContents);
-                }
-            }
-    
-            return commandFiles;
-        } catch (error) {
-            console.error(`An error has occurred when attempting to read log files from Microsoft Azure: ${error}`);
-            throw new Error(`An error has occurred when attempting to read log files from Micosoft Azure: ${error}`);
-        }
-    }
-    
-    public async writeCommandToContainer(commandFileData: ICommandFileStructure, containerName: string): Promise<void> {
+    public async writeCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
@@ -284,8 +252,8 @@ export default class BotRepository {
             throw new Error(`The azure storage container name is undefined or invalid`);
         }
     
-        // Serialize the function object to a string
-        const serializedFileContents = serializeJavascript(commandFileData);
+        // Read the file contents
+        const fileContents = await fs.readFile(filePath, { encoding: 'utf8' });
     
         // Create BlobServiceClient
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
@@ -296,14 +264,14 @@ export default class BotRepository {
         try {
             await containerClient.createIfNotExists();
     
-            // Define blob file name
-            const blobFileName = `${commandFileData.data.name}.js`; // Change file extension to .js
+            // Define blob file name, ensuring it matches the desired extension
+            const blobFileName = `${fileName}.js`;
     
             // Get blob client for the file
             const blobClient = containerClient.getBlockBlobClient(blobFileName);
     
-            // Upload serialized file contents to blob
-            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(serializedFileContents, Buffer.byteLength(serializedFileContents));
+            // Upload the file contents to blob
+            const uploadResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
     
             // Check if upload was successful
             if (uploadResponse._response.status === 201) {
@@ -312,44 +280,43 @@ export default class BotRepository {
                 throw new Error(`Failed to upload command file '${blobFileName}'.`);
             }
         } catch (error) {
-            console.error(`Error in creating container or uploading command file '${commandFileData.data.name}':`, error);
+            console.error(`Error in creating container or uploading command file:`, error);
             throw error;
         }
     }
-    
-    public async fetchCommandFromContainer(containerName: string, fileName: string): Promise<ICommandFileStructure | undefined> {
+
+    public async downloadAllCommandsFromContainer(filePath: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
-            throw new Error(`The azure storage account connection string is undefined or invalid`);
+            throw new Error(`The Azure storage account connection string is undefined or invalid.`);
         }
     
         if (!containerName) {
-            throw new Error(`The azure storage container name is undefined or invalid`);
+            throw new Error(`The Azure storage container name is undefined or invalid.`);
         }
     
+        // Create BlobServiceClient
+        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+    
+        // Get container client
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+    
         try {
-            // Create BlobServiceClient
-            const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
+            // Ensure the local directory exists
+            await mkdir(filePath, { recursive: true });
     
-            // Get container client
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-    
-            // Define blob file name
-            const blobFileName = `${fileName}.js`; // Change file extension to .js
-    
-            // Get blob client for the file
-            const blobClient = containerClient.getBlockBlobClient(blobFileName);
-    
-            // Download blob content
-            const blobDownloadResponse = await blobClient.downloadToBuffer();
-    
-            // Deserialize the downloaded content
-
-            
-            // return deserializedFileContents as ICommandFileStructure;
+            // List all blobs in the container and download each one
+            for await (const blob of containerClient.listBlobsFlat()) {
+                const localFilePath = `${filePath}/${blob.name}`;
+                const blobClient = containerClient.getBlobClient(blob.name);
+                
+                // Download the blob's contents and save to a local file
+                await blobClient.downloadToFile(localFilePath);
+                console.log(`Blog files were downloaded`);
+            }
         } catch (error) {
-            console.error(`Error in fetching command file '${fileName}':`, error);
+            console.error(`Error downloading commands from container:`, error);
             throw error;
         }
     }

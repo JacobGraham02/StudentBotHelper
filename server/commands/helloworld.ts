@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from 'discord.js';
 export default function() {
     const hello_world_object: Object = {
         data: new SlashCommandBuilder()
-            .setName('hello-world')
+            .setName('test-hello-world')
             .setDescription('Use this command to get a hello world message!'),
 
         authorization_role_name: ["Discord admin", "Bot user"],
