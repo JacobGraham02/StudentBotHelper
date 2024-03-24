@@ -242,7 +242,7 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
     }
 
     const commandChannelIds = {
-      bot_id: authCtx.userAuthDetails.bot.bot_id,
+      bot_id: authCtx?.userAuthDetails.bot.bot_id,
       bot_guild_id: configurationData.guildId.value,
       bot_command_channel_id: configurationData.commandChannelId.value,
       bot_button_channel_id: configurationData.buttonChannelId.value,
@@ -258,6 +258,16 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       if (patchChannelIdsResponse) {
         onClearHandler();
         showSuccessSubmissionConfirmation();
+
+        const newChannels = {
+          bot_guild_id: configurationData.guildId.value,
+          bot_command_channel_id: configurationData.commandChannelId.value,
+          bot_button_channel_id: configurationData.buttonChannelId.value,
+          bot_info_channel_id: configurationData.botInfoChannelId.value,
+          bot_error_channel_id: configurationData.botErrorChannelId.value
+        }
+        
+        authCtx?.updateBotChannels(newChannels);
       }
     } catch (error) {
       showErrorSubmissionConfirmation

@@ -32,6 +32,7 @@ type AuthContextType = {
   login: (userDetails: UserAuthDetails) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
+  updateBotChannels: (channels: { [key: string]: any }) => void; 
 };
 
 const initialState: UserAuthDetails = {
@@ -54,7 +55,7 @@ const initialState: UserAuthDetails = {
   },
 };
 
-type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" } | { type: "UPDATE_NAME"; payload: string };
+type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" } | { type: "UPDATE_NAME"; payload: string } | { type: "UPDATE_BOT_CHANNEL"; payload: { [key: string]: any}};
 
 // Create reducer for CRUD actions
 const authReducer = (
@@ -67,7 +68,9 @@ const authReducer = (
     case "LOGOUT":
       return { id: "", token: "", name: "", email: "", role: 0, bot: {} };
     case "UPDATE_NAME":
-      return { ...state, name: action.payload }
+      return { ...state, name: action.payload };
+    case "UPDATE_BOT_CHANNEL":
+      return { ...state, bot: { ...state.bot, ...action.payload } };
     default:
       return state;
   }
@@ -96,7 +99,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
   
   const updateName = (name: string) => {
-    dispatch({ type: "UPDATE_NAME", payload: name});
+    dispatch({ type: "UPDATE_NAME", payload: name });
+  };
+
+  const updateBotChannels = (channels: { [key: string]: any }) => {
+    dispatch({ type: "UPDATE_BOT_CHANNEL", payload: channels });
   };
 
   const logout = () => {
@@ -115,11 +122,18 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ userAuthDetails, login, logout, isLoggedIn, updateName }}
+      value={{
+        userAuthDetails,
+        login,
+        logout,
+        isLoggedIn,
+        updateBotChannels
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export default AuthProvider;
