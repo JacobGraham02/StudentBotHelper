@@ -1,11 +1,9 @@
-import { UUID } from "crypto";
-
 /**
  * Implemented a type to represent the data object that will be passed to the createBot database function in the BotRepository class.
  * This interface defines all of the properties that exist for that object.
  */
 export type DiscordBotInformationType = {
-  bot_id?: UUID;
+  bot_id?: string;
   bot_username?: string;
   bot_password?: string;
   bot_email?: string;

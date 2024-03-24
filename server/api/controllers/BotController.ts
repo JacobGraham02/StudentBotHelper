@@ -54,7 +54,7 @@ export default class BotController {
         }
 
         try {
-            const update_bot_channel_id = await this.bot_repository.createBot(updateBotChannels);
+            const update_bot_channel_id = await this.bot_repository.updateBotChannelIds(updateBotChannels);
 
             return update_bot_channel_id;
         } catch (error: any) {

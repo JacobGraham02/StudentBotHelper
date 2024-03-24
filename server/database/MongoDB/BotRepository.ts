@@ -37,25 +37,41 @@ export default class BotRepository {
         const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
-
-            const new_discord_bot_information_document = {
-                bot_id: discord_bot_information.bot_id,
-                bot_email: discord_bot_information.bot_email,
-                bot_username: discord_bot_information.bot_username,
-                bot_password: discord_bot_information.bot_password,
-                bot_guild_id: discord_bot_information.bot_guild_id,
-                bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
-                bot_commands_channel: discord_bot_information.bot_commands_channel_id,
-                bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
-                bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
-            };
-
-            await bot_collection.updateOne(
-                { bot_guild_id: discord_bot_information.bot_guild_id },
-                { $setOnInsert: new_discord_bot_information_document },
-                { upsert: true }
-            );
-
+    
+            // Check if the bot already exists
+            const existing_bot = await bot_collection.findOne({ bot_id: discord_bot_information.bot_id });
+    
+            if (existing_bot) {
+                // Update existing document
+                await bot_collection.updateOne(
+                    { bot_id: discord_bot_information.bot_id },
+                    {
+                        $set: {
+                            bot_email: discord_bot_information.bot_email,
+                            bot_username: discord_bot_information.bot_username,
+                            bot_password: discord_bot_information.bot_password,
+                            bot_guild_id: discord_bot_information.bot_guild_id,
+                            bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
+                            bot_commands_channel: discord_bot_information.bot_commands_channel_id,
+                            bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
+                            bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
+                        }
+                    }
+                );
+            } else {
+                await bot_collection.insertOne({
+                    bot_id: discord_bot_information.bot_id,
+                    bot_email: discord_bot_information.bot_email,
+                    bot_username: discord_bot_information.bot_username,
+                    bot_password: discord_bot_information.bot_password,
+                    bot_guild_id: discord_bot_information.bot_guild_id,
+                    bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
+                    bot_commands_channel: discord_bot_information.bot_commands_channel_id,
+                    bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
+                    bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
+                });
+            }
+    
         } catch (error: any) {
             console.error(`There was an error when attempting to update the command channel ids in the database. Please inform the server administrator of this error: ${error}`);
             throw error;
@@ -63,6 +79,37 @@ export default class BotRepository {
             await this.releaseConnectionSafely(database_connection);
         }
     }
+
+    public async updateBotChannelIds(discord_bot_information: DiscordBotInformationType): Promise<void> {
+        const database_connection = await this.database_connection_manager.getConnection();
+        try {
+            const bot_collection = database_connection.collection('bot');
+    
+            // Check if the bot already exists
+            const existing_bot = await bot_collection.findOne({ bot_id: discord_bot_information.bot_id });
+    
+            if (existing_bot) {
+                // Update existing document with only the bot channel IDs
+            await bot_collection.updateOne(
+                { bot_id: discord_bot_information.bot_id },
+                {
+                    $set: {
+                        bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
+                        bot_commands_channel: discord_bot_information.bot_commands_channel_id,
+                        bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
+                        bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
+                    }
+                }
+            );
+            }
+        } catch (error: any) {
+            console.error(`There was an error when attempting to update the bot channel IDs in the database. Please inform the server administrator of this error: ${error}`);
+            throw error;
+        } finally {
+            await this.releaseConnectionSafely(database_connection);
+        }
+    }
+    
 
     public async createBotCommand(bot_command: DiscordBotCommandType): Promise<void> {
         const database_connection = await this.database_connection_manager.getConnection();

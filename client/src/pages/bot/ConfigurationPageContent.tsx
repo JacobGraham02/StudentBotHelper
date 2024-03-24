@@ -24,6 +24,28 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
 
   const authCtx = useContext(AuthContext);
 
+  let guild_id = undefined;
+  let command_error_channel_id = undefined;
+  let command_info_channel_id = undefined;
+  let command_channel_id = undefined;
+  let bot_role_button_channel_id = undefined;
+
+  if (authCtx?.userAuthDetails.bot.bot_guild_id) {
+    guild_id = authCtx.userAuthDetails.bot.bot_guild_id;
+  }
+  if (authCtx?.userAuthDetails.bot.bot_commands_channel) {
+    command_channel_id = authCtx.userAuthDetails.bot.bot_commands_channel;
+  } 
+  if (authCtx?.userAuthDetails.bot.bot_command_usage_error_channel) {
+    command_error_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_error_channel;
+  }
+  if (authCtx?.userAuthDetails.bot.bot_command_usage_information_channel) {
+    command_info_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_information_channel;
+  }
+  if (authCtx?.userAuthDetails.bot.bot_role_button_channel_id) {
+    bot_role_button_channel_id = authCtx.userAuthDetails.bot.bot_role_button_channel_id;
+  }
+
   const [confirmClear, setConfirmClear] = useState(false);
   
   const [showModal, setShowModal] = useState(false);
@@ -124,33 +146,33 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
   const [configurationData, setConfigurationData] = useState<ConfigurationForm>(
     {
       guildId: {
-        value: "",
+        value: guild_id  ?? '',
         error: "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
-        valid: false,
+        valid: guild_id ? true : false,
         touched: false,
       },
       commandChannelId: {
-        value: "",
+        value: command_channel_id  ?? '',
         error: "Invalid bot command channel id. Please input a string of 18 numbers ranging from 0 to 9",
-        valid: false,
+        valid: command_channel_id ? true : false,
         touched: false,
       },
       buttonChannelId: {
-        value: "",
+        value: bot_role_button_channel_id  ?? '',
         error: "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
-        valid: false,
+        valid: bot_role_button_channel_id ? true : false,
         touched: false,
       },
       botInfoChannelId: {
-        value: "",
+        value: command_info_channel_id  ?? '',
         error: "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
-        valid: false,
+        valid: command_info_channel_id ? true : false,
         touched: false,
       },
       botErrorChannelId: {
-        value: "",
+        value:  command_error_channel_id ?? '',
         error: "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
-        valid: false,
+        valid: command_error_channel_id ? true : false,
         touched: false,
       },
     }
@@ -219,13 +241,8 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       return;
     }
 
-    if (!(authCtx?.userAuthDetails.id)) {
-      showErrorSubmissionConfirmation
-      return;
-    }
-
     const commandChannelIds = {
-      bot_id: authCtx.userAuthDetails.id,
+      bot_id: authCtx.userAuthDetails.bot.bot_id,
       bot_guild_id: configurationData.guildId.value,
       bot_command_channel_id: configurationData.commandChannelId.value,
       bot_button_channel_id: configurationData.buttonChannelId.value,

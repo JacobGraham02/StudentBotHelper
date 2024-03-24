@@ -410,7 +410,7 @@ bot_commands_router.patch('/updatechannelids', async function(request: Request, 
     bot_info_channel_id,
     bot_error_channel_id
   }: {
-    bot_id: UUID
+    bot_id: string
     bot_guild_id: string,
     bot_command_channel_id: string,
     bot_button_channel_id: string,
