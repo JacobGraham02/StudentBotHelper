@@ -431,9 +431,9 @@ bot_commands_router.patch('/updatechannelids', async function(request: Request, 
     const bot_database_repository_instance: BotRepository = new BotRepository();
     const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
 
-    const changeBotChannelIds = await bot_controller_instance.updateBotChannelIds(updateChannelIdsObject);
+    const changeBotChannelIdsResponse = await bot_controller_instance.updateBotChannelIds(updateChannelIdsObject);
 
-    return changeBotChannelIds;
+    response.json(changeBotChannelIdsResponse);
   } catch (error) {
     console.error(`An error occurred when attempting to update the bot channel ids in the database: ${error}`);
     throw new Error(`An error occurred when attempting to update the bot channel ids in the database. Please inform the server administrator of this error: ${error}`);

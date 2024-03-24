@@ -35,7 +35,6 @@ export default class BotRepository {
      * @param discord_bot_information IDiscordBotInformation
      */
     public async createBot(discord_bot_information: DiscordBotInformationType): Promise<void> {
-        console.log(discord_bot_information);
         const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
