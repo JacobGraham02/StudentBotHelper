@@ -35,6 +35,7 @@ export default class BotRepository {
      * @param discord_bot_information IDiscordBotInformation
      */
     public async createBot(discord_bot_information: DiscordBotInformationType): Promise<void> {
+        console.log(discord_bot_information);
         const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
@@ -44,6 +45,7 @@ export default class BotRepository {
                 bot_email: discord_bot_information.bot_email,
                 bot_username: discord_bot_information.bot_username,
                 bot_password: discord_bot_information.bot_password,
+                bot_guild_id: discord_bot_information.bot_guild_id,
                 bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
                 bot_commands_channel: discord_bot_information.bot_commands_channel_id,
                 bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
@@ -55,8 +57,9 @@ export default class BotRepository {
                 { $setOnInsert: new_discord_bot_information_document },
                 { upsert: true }
             );
+
         } catch (error: any) {
-            console.error(`There was an error when attempting to create a Discord bot document in the database. Please inform the server administrator of this error: ${error}`);
+            console.error(`There was an error when attempting to update the command channel ids in the database. Please inform the server administrator of this error: ${error}`);
             throw error;
         } finally {
             await this.releaseConnectionSafely(database_connection);
@@ -80,7 +83,7 @@ export default class BotRepository {
             await commands_collection.updateOne(
                 { bot_id: bot_command.botId },
                 { $setOnInsert: new_command_document },
-                { upsert: true}
+                { upsert: true }
             )
         } catch (error: any) {
             console.error(`There was an error when attempting to create Discord bot command in the database. Please inform the server administrator of this error: ${error}`);

@@ -1,18 +1,7 @@
 import { instance } from "../index.ts";
 import { Bot, BotCommand, BotConfiguration } from "../../pages/types/BotTypes.ts";
 import { UserInfo } from "../../pages/types/UserTypes.ts";
-
-export const postBotConfigurations = async (botConfiguration: BotConfiguration) => {
-  try {
-    const postBotConfigurationResponse = await instance.post("bot/configs", botConfiguration);
-
-    return postBotConfigurationResponse;
-
-  } catch (error) {
-    console.error(`There was an error when attempting to post the bot configuration options to the MongoDB database: ${error}`);
-    throw new Error(`There was an error when attempting to post the bot configuration options to the MongoDB database: ${error}`);
-  }
-};
+import { UUID } from "crypto";
 
 export const postBotCommands = async (botCommand: BotCommand) => {
   try {
@@ -74,6 +63,28 @@ export const getAllBotCommands = async () => {
       console.error(`There was an error when attempting to get all bot commands: ${error}`);
       throw new Error(`There was an error when attempting to get all bot commands: ${error}`);
     }
+  }
+}
+
+export const updateBotId = async (bot_id: UUID) => {
+  try {
+    const updateBotIdResponse = await instance.patch("bot/updatebotid", { bot_id });
+
+    return updateBotIdResponse;
+  } catch (error) {
+    console.error(`There was an error when attempting to update the bot id: ${error}`);
+    throw new Error(`There was an error when attempting to update the bot id: ${error}`);
+  }
+}
+
+export const updateBotLoggingChannels = async (bot_channels_ids: any) => {
+  try {
+    const updateBotChannelsResponse = await instance.patch("bot/updatechannelids", bot_channels_ids);
+
+    return updateBotChannelsResponse;
+  } catch (error) {
+    console.error(`There was an error when attempting to update the bot logging channel ids: ${error}`);
+    throw new Error(`There was an error when attempting to update the bot logging channel ids: ${error}`);
   }
 }
 

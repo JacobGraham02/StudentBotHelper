@@ -80,18 +80,6 @@ Get the singleton instance of the custom event emitter class. The event emitter 
 */
 const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
 
-/*
-  [
-    {
-      _id: new ObjectId("65f7899fb911099617e2a4d7"),
-      bot_id: 1,
-      command_description: 'Test command description',
-      command_function: 'I want this command to say the word pong when a user types in the command ping',
-      command_name: 'Test command 1',
-      command_users: [ 'Auth user 1', 'Auth user 2' ]
-    }
-  ]
-  */
 async function fetchCommandFiles() {
   for (const command_file of filtered_commands_files) {
     const command_file_path = path.join(commands_folder_path, command_file);

@@ -31,6 +31,38 @@ export default class BotController {
         }
     }
 
+    async updateBotId(bot_id: UUID) {
+        const updateBotId: DiscordBotInformationType = {
+            bot_id: bot_id
+        }
+        try {
+            await this.bot_repository.createBot(updateBotId);
+        } catch (error: any) {
+            console.error(`There was an error when attempting to change the bot id: ${error}`);
+            throw new Error(`There was an error when attempting to change the bot id: ${error}`);
+        }
+    }
+
+    async updateBotChannelIds(bot_channels: DiscordBotInformationType) {
+        const updateBotChannels: DiscordBotInformationType = {
+            bot_id: bot_channels.bot_id,
+            bot_guild_id: bot_channels.bot_guild_id,
+            bot_commands_channel_id: bot_channels.bot_commands_channel_id,
+            bot_command_usage_information_channel_id: bot_channels.bot_command_usage_information_channel_id,
+            bot_command_usage_error_channel_id: bot_channels.bot_command_usage_error_channel_id,
+            bot_role_button_channel_id: bot_channels.bot_role_button_channel_id
+        }
+
+        try {
+            const update_bot_channel_id = await this.bot_repository.createBot(updateBotChannels);
+
+            return update_bot_channel_id;
+        } catch (error: any) {
+            console.error(`There was an error when attempting to update the bot channel ids: ${error}`);
+            throw new Error(`There was an error when attempting to update the bot channel ids: ${error}`);
+        }   
+    }
+
     async getAllCommandFiles() {
 
         try {

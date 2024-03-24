@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ConfigurationForm } from "../types/BotTypes";
 import {
   Container,
@@ -12,14 +12,17 @@ import {
 } from "react-bootstrap";
 
 import { useNavigate } from "react-router-dom";
-import { postBotConfigurations } from "../../services/bot/index";
+import { updateBotLoggingChannels } from "../../services/bot/index";
 import { faArrowUpRightFromSquare, faEraser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "../user/interfaces/IModalContent";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
   const navigate = useNavigate();
+
+  const authCtx = useContext(AuthContext);
 
   const [confirmClear, setConfirmClear] = useState(false);
   
@@ -216,19 +219,26 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       return;
     }
 
+    if (!(authCtx?.userAuthDetails.id)) {
+      showErrorSubmissionConfirmation
+      return;
+    }
+
     const commandChannelIds = {
-      guildId: configurationData.guildId.value,
-      commandChannelId: configurationData.commandChannelId.value,
-      buttonChannelId: configurationData.buttonChannelId.value,
-      botInfoChannelId: configurationData.botInfoChannelId.value,
-      botErrorChannelId: configurationData.botErrorChannelId.value
+      bot_id: authCtx.userAuthDetails.id,
+      bot_guild_id: configurationData.guildId.value,
+      bot_command_channel_id: configurationData.commandChannelId.value,
+      bot_button_channel_id: configurationData.buttonChannelId.value,
+      bot_info_channel_id: configurationData.botInfoChannelId.value,
+      bot_error_channel_id: configurationData.botErrorChannelId.value
     }
 
     try {
-      const postChannelIdsResponse = await postBotConfigurations(
+      const patchChannelIdsResponse = await updateBotLoggingChannels(
         commandChannelIds
       );
-      if (postChannelIdsResponse) {
+
+      if (patchChannelIdsResponse) {
         onClearHandler();
         showSuccessSubmissionConfirmation();
       }
@@ -236,7 +246,7 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       showErrorSubmissionConfirmation
     }
   };
-
+  
   if (userLoggedIn) {
     return (
       <main id="main" className="text-center">

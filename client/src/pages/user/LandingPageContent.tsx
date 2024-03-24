@@ -1,10 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
+import { AuthContext } from "../../contexts/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
+import { updateBotId } from "../../services/bot";
 
 const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
     const navigate = useNavigate();
+
+    const authCtx = useContext(AuthContext);
+
+    if (authCtx?.userAuthDetails.id) {
+        updateBotId(authCtx.userAuthDetails.id);
+    }
 
     const [showModal, setShowModal] = useState(false);
 
@@ -15,7 +23,7 @@ const LandingPageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
       confirmButtonText: "",
       onConfirm: () => {}  
     });
-    
+
     return (
         <main id="main" className="text-center">
             <CustomModal
