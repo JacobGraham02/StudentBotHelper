@@ -103,15 +103,13 @@ const Login = () => {
         const response = await loginUser(loginData);
         const bot = await getBot(loginData.email);
 
-        console.log(`Bot document is: `);
-        console.log(bot);
-
         const userData = {
           id: response.user.id,
           token: response.user.token,
           name: response.user.name,
           email: response.user.email,
           role: response.user.role,
+          bot: bot.data
         };
 
         // Log the user in
