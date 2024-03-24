@@ -12,7 +12,13 @@ export default function() {
             .addStringOption(options =>
                 options.setName('username')
                 .setDescription('(Required) your username')
-                .setRequired(true))
+                .setRequired(true)
+            )
+            .addStringOption(options =>
+                options.setName('email')
+                .setDescription('(Required) your email')
+                .setRequired(true)
+            )
             .addStringOption(options =>
                 options.setName('password')
                 .setDescription('(Required) your password')
@@ -29,13 +35,17 @@ export default function() {
         async execute(interaction) {
             const bot_repository: BotRepository = new BotRepository();
             const student_username = interaction.options.getString('username');
+            const student_email = interaction.options.getString('email');
             const student_password = interaction.options.getString('password');
             const discord_user_id = interaction.options.getString('userid');
+            const guild_id = interaction.guild.id;
             const student_for_database_password_object = hashPassword(student_password);
 
             const student_object: DiscordBotInformationType = {
                 bot_id: discord_user_id,
                 bot_username: student_username,
+                bot_email: student_email,
+                bot_guild_id: guild_id,
                 bot_password: student_for_database_password_object.hash,
             }
 

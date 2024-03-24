@@ -1,4 +1,3 @@
-import { UUID } from 'crypto';
 import DatabaseConnectionManager from './DatabaseConnectionManager';
 import { DiscordBotCommandType } from './types/DiscordBotCommandType';
 import { DiscordBotInformationType } from './types/DiscordBotInformationType';
@@ -14,11 +13,11 @@ export default class BotRepository {
 
     private database_connection_manager = new DatabaseConnectionManager();
 
-    public async findBotByUUID(bot_uuid: UUID): Promise<any> {
+    public async findBotByEmail(bot_email: string): Promise<any> {
         const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
-            const bot = await bot_collection.findOne({ bot_uuid: bot_uuid });
+            const bot = await bot_collection.findOne({ bot_email: bot_email });
             return bot;
         } catch (error) {
             console.error(`There was an error when attempting to fetch all bot data given a UUID. Please inform the server administrator of this error: ${error}`);
@@ -52,7 +51,7 @@ export default class BotRepository {
             };
 
             await bot_collection.updateOne(
-                { bot_id: discord_bot_information.bot_id },
+                { bot_guild_id: discord_bot_information.bot_guild_id },
                 { $setOnInsert: new_discord_bot_information_document },
                 { upsert: true }
             );
