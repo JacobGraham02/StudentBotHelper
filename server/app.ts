@@ -154,8 +154,6 @@ discord_client_instance.on("ready", async () => {
  *
  */
 discord_client_instance.on("interactionCreate", async (interaction) => {
-
-  console.log(interaction);
   
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
