@@ -10,12 +10,16 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import fs from "fs";
 import {
+  ActionRowBuilder,
   Collection,
+  Events,
   GatewayIntentBits,
   Guild,
   GuildMemberRoleManager,
   GuildScheduledEventEntityType,
   GuildScheduledEventPrivacyLevel,
+  ModalBuilder,
+  TextInputStyle
 } from "discord.js";
 /*
 Imports from Custom classes
@@ -25,7 +29,7 @@ import userRouter from "./api/routes/user";
 import apiRouter from "./api/routes/botapi";
 import CustomDiscordClient from "./utils/CustomDiscordClient";
 import CustomEventEmitter from "./utils/CustomEventEmitter";
-import { EmbedBuilder } from "@discordjs/builders";
+import {EmbedBuilder, MessageActionRowComponentBuilder, ModalActionRowComponentBuilder, TextInputBuilder} from "@discordjs/builders";
 import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository";
 import CommonClass from "./entity/CommonClass";
 import {
@@ -41,6 +45,8 @@ import CommonClassWork from "./entity/CommonClassWork";
 import Logger from "./utils/Logger";
 import BotController from "./api/controllers/BotController";
 import BotRepository from "./database/MongoDB/BotRepository";
+import ts from "typescript";
+import { DiscordBotInformationType } from "./database/MongoDB/types/DiscordBotInformationType";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const bot_repository = new BotRepository();
@@ -87,11 +93,11 @@ async function fetchCommandFiles() {
     if (Object.keys(command).length >= 1 && command.constructor === Object) {
       const command_object = command.default(logger);
 
-      if (command_object.data.name === 'hello-world') {
-        const containerName = 'studentbotcommands'
-        testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
-        testReadCommandsFromContainer(command_file_path, containerName);
-      }
+      // if (command_object.data.name === 'hello-world') {
+      //   const containerName = 'studentbotcommands'
+      //   testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
+      //   testReadCommandsFromContainer(command_file_path, containerName);
+      // }
 
       discord_client_instance.discord_commands.set(
         command_object.data.name,
@@ -217,8 +223,38 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
     );
   }
 });
+// https://discord.com/oauth2/authorize?client_id=1138878672711991316&permissions=8&redirect_uri=https%3A%2F%2Flocalhost%3A8080&scope=bot
 
 discord_client_instance.login(discord_bot_token);
+
+discord_client_instance.on(Events.InteractionCreate, async interaction => {
+  if (interaction.isModalSubmit()) {
+    const guildId = interaction.guildId;
+    const commandChannelId = interaction.fields.getTextInputValue(`commandChannelIdInput`);
+    const informationChannelId = interaction.fields.getTextInputValue(`informationChannelIdInput`);
+    const errorChannelId = interaction.fields.getTextInputValue(`errorChannelIdInput`);
+    const botRoleButtonChannelId = interaction.fields.getTextInputValue(`botRoleButtonChannelIdInput`);
+
+    if (interaction.customId === `channelIdInputModal`) {
+      await interaction.reply({content: `Your submission was received successfully`, ephemeral: true});
+    }
+
+    const createBotObject: DiscordBotInformationType = {
+      bot_guild_id: guildId!,
+      bot_commands_channel_id: commandChannelId!,
+      bot_command_usage_information_channel_id: informationChannelId!,
+      bot_command_usage_error_channel_id: errorChannelId!,
+      bot_role_button_channel_id: botRoleButtonChannelId!
+    }
+
+    try {
+      await bot_repository.createBot(createBotObject);
+    } catch (error) {
+      console.error(`There was an error when creating a new document in the database: ${error}`);
+      throw new Error(`There was an error when creating a new document in the database: ${error}`);
+    }
+  }
+});
 
 custom_event_emitter.on(
   "databaseOperationEvent",
