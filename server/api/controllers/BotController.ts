@@ -77,10 +77,10 @@ export default class BotController {
         }
     }
 
-    async getBotDocument(bot_id: UUID) {
+    async getBotDocument(bot_email: string) {
 
         try {
-            const bot_document = await this.bot_repository.getBot(bot_id);
+            const bot_document = await this.bot_repository.findBotByEmail(bot_email);
 
             return bot_document;
         } catch (error) {

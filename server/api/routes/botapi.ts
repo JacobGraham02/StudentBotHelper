@@ -460,19 +460,15 @@ bot_commands_router.get('/getlogs', async function(request: Request, response: R
   }
 });
 
-bot_commands_router.get('/bot', async function(request: Request, response: Response, next: NextFunction) {
-  const {
-    bot_id
-  }: {
-    bot_id: UUID
-  } = request.body;
+bot_commands_router.get('/getbot', async function(request: Request, response: Response, next: NextFunction) {
+  const botEmail: string = request.headers['bot-email'] as string;
   
   try {
     
     const bot_database_repository_instance: BotRepository = new BotRepository();
     const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
 
-    const bot = await bot_controller_instance.getBotDocument(bot_id);
+    const bot = await bot_controller_instance.getBotDocument(botEmail);
 
     response.json(bot);
   } catch (error) {

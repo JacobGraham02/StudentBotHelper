@@ -1,5 +1,5 @@
 import { instance } from "../index.ts";
-import { Bot, BotCommand, BotConfiguration } from "../../pages/types/BotTypes.ts";
+import { Bot, BotCommand, BotConfiguration, GetBot } from "../../pages/types/BotTypes.ts";
 import { UserInfo } from "../../pages/types/UserTypes.ts";
 import { UUID } from "crypto";
 
@@ -48,6 +48,22 @@ export const postChangeUserOptions = async (userOptions: UserInfo) => {
   }
 }
 
+export const getBot = async (botEmail: string) => {
+  try {
+    const headers = {
+      'bot-email': botEmail
+    }
+    const allBotCommandDocuments = await instance.get("bot/getbot", {
+      headers: headers
+    });
+
+    return allBotCommandDocuments;
+
+  } catch (error) {
+      console.error(`The request to fetch the bot timed out: ${error}.`);
+      throw new Error(`The request to fetch the bot timed out. Please try again later: ${error}.`);
+  } 
+}
 
 export const getAllBotCommands = async () => {
   try {
