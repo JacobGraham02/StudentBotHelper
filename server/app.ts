@@ -110,46 +110,6 @@ const registerInitialSetupCommands = async (botId: string, guildId: string) => {
   }
 }
 
-
-const registerCommands = async (botId: string, guildId: string) => {
-  const commands_folder_path: string = path.join(__dirname, "./commands");
-  const filtered_commands_files: string[] = fs
-    .readdirSync(commands_folder_path)
-    .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
-  discord_client_instance.discord_commands = new Collection();
-
-  const commands = [];
-
-  for (const command_file of filtered_commands_files) {
-    const command_file_path = path.join(commands_folder_path, command_file);
-    const command = await import(command_file_path);
-    const command_object = command.default();
-
-    console.log(command_object.data.name)
-    discord_client_instance.discord_commands.set(command_object.data.name, command_object);
-
-    // Check if the bot ID array in the command matches the target bot ID
-    if (initialBotCommandNames.includes(command_object.data.name) && command_object.bot_id.includes(botId)) {
-      commands.push(command_object.data);
-    }
-  }
-
-  if (discord_token && botId && guildId) {
-    const rest = new REST({ version: '10' }).setToken(discord_token);
-
-    rest.put(Routes.applicationGuildCommands(botId, guildId), {
-      body: commands
-    }).then(() => {
-      console.log('The bot commands were successfully registered');
-    }).catch((error) => {
-      console.error(`The application encountered an error when registering the commands with the discord bot. All environment variables were valid. ${error}`);
-    });
-  } else {
-    console.error(`The discord client id, guild id, or bot token was invalid when trying to register commands with the bot`);
-  }
-};
-
-
 /*
 Get the singleton instance of the custom event emitter class. The event emitter must be a singleton because only one event emitter can exist in Node.js to prevent any problems.
 */
