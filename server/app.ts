@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 
 /*
 Imports from Node.js and other libraries defined in package.json
@@ -48,6 +48,7 @@ import BotController from "./api/controllers/BotController";
 import BotRepository from "./database/MongoDB/BotRepository";
 import { DiscordBotInformationType } from "./database/MongoDB/types/DiscordBotInformationType";
 import { hashPassword } from "./modules/hashAndValidatePassword";
+import { exec } from "child_process";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const bot_repository = new BotRepository();
@@ -78,9 +79,9 @@ const registerInitialSetupCommands = async (botId: string, guildId: string) => {
     .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
   discord_client_instance.discord_commands = new Collection();
 
-  const commands = [];
+  const commands: any[] = [];
 
-  const initialBotCommandNames = [`setupuser`, `setupchannels`];
+  const initialBotCommandNames = [`setupuser`, `setupchannels`, `registercommands`];
 
   for (const command_file of filtered_commands_files) {
     const command_file_path = path.join(commands_folder_path, command_file);
@@ -136,7 +137,6 @@ async function testReadCommandsFromContainer(filePath: string, containerName: st
  * connected to the Discord channel.
  */
 discord_client_instance.on("ready", async () => {
-
   if (discord_client_instance.user) {
     console.log(
       `The discord bot is logged in as ${discord_client_instance.user.tag}`
@@ -187,6 +187,19 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
     return;
   }
 
+  if (interaction.commandName === `registercommands`) {
+    if (!discord_client_instance) {
+      console.log(`The discord_client_instance is undefined`);
+      return;
+    }
+
+    const registerCommandResult = await command.execute(interaction);
+
+    if (registerCommandResult && registerCommandResult.discord_client_instance_collection) {
+      discord_client_instance.discord_commands = registerCommandResult.discord_client_instance_collection;
+    }
+  }
+
   let channelForCommands: Channel | undefined = undefined;
   let channelToSendLogs: Channel | undefined = undefined;
   let channelToSendErrors: Channel | undefined = undefined;
@@ -208,6 +221,9 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       Given the interaction that the user just had with the bot, we will call the asynchronous 'execute' function that is in the command file. This will trigger the Discord
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
+
+    logger = new Logger(discord_client_instance);
+
     try {
 
       await command.execute(interaction);
@@ -217,8 +233,6 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       if (!botInfo) {
         return;
       }
-
-      logger = new Logger(discord_client_instance);
 
       if (!botInfo) {
         throw new Error(`Bot information not found for this guild`);
@@ -231,8 +245,6 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       channelForCommands = interaction.client.channels.cache.get(channelIdForCommands);
       channelToSendLogs = interaction.client.channels.cache.get(channdlIdForLogs);
       channelToSendErrors = interaction.client.channels.cache.get(channelIdForErrors);
-
-      
 
       logger.logDiscordMessage(
         channelToSendLogs,
@@ -266,12 +278,7 @@ discord_client_instance.login(discord_bot_token);
 discord_client_instance.on('guildCreate', async (guild) => {
   const bot_id = discord_client_instance.user?.id;
   const guild_id = guild.id;
-  registerInitialSetupCommands(bot_id!, guild_id);
-
-  // logger.logDiscordMessage(
-  //   channelToSendLogs,
-  //   `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
-  // );
+  await registerInitialSetupCommands(bot_id!, guild_id);
 });
 
 discord_client_instance.on(Events.InteractionCreate, async interaction => {
@@ -330,67 +337,68 @@ discord_client_instance.on(Events.InteractionCreate, async interaction => {
   }
 });
 
-custom_event_emitter.on(
-  "databaseOperationEvent",
-  /**
-   * An asynchronous arrow function that uses the Discord API EmbedBuilder to create nicely-formatted messages to send to a specific channel in Discord whenever the
-   * database on Microsoft Azure is used. Tshe Discord API recognizes channels by using an integer id, so we will use an integer from the .env file.
-   *
-   * @param message an instance of IDatabaseResponseObject
-   */
-  async (message: IDatabaseResponseObject) => {
-    const database_operation_embedded_message = new EmbedBuilder()
-      .setColor(0x299bcc)
-      .setTitle("Database operation on Azure MySQL database")
-      .setThumbnail("https://i.imgur.com/WL7Bt6g.png")
-      .setDescription(`Database operation response status: ${message.status}`)
-      .addFields({
-        name: "Database response status:",
-        value: message.statusText,
-        inline: true,
-      })
-      .setTimestamp()
-      .setFooter({
-        text: "Azure database operation",
-        iconURL: "https://i.imgur.com/WL7Bt6g.png",
-      });
+// custom_event_emitter.on(
+//   "databaseOperationEvent",
+//   /**
+//    * An asynchronous arrow function that uses the Discord API EmbedBuilder to create nicely-formatted messages to send to a specific channel in Discord whenever the
+//    * database on Microsoft Azure is used. Tshe Discord API recognizes channels by using an integer id, so we will use an integer from the .env file.
+//    *
+//    * @param message an instance of IDatabaseResponseObject
+//    */
+//   async (message: IDatabaseResponseObject) => {
+//     const database_operation_embedded_message = new EmbedBuilder()
+//       .setColor(0x299bcc)
+//       .setTitle("Database operation on Azure MySQL database")
+//       .setThumbnail("https://i.imgur.com/WL7Bt6g.png")
+//       .setDescription(`Database operation response status: ${message.status}`)
+//       .addFields({
+//         name: "Database response status:",
+//         value: message.statusText,
+//         inline: true,
+//       })
+//       .setTimestamp()
+//       .setFooter({
+//         text: "Azure database operation",
+//         iconURL: "https://i.imgur.com/WL7Bt6g.png",
+//       });
 
-    const discord_channel_for_operation_results =
-      process.env.discord_bot_http_response_channel_id;
+//     const discord_channel_for_operation_results =
+//       process.env.discord_bot_http_response_channel_id;
 
-    if (!discord_channel_for_operation_results) {
-      logger.logDiscordError(
-        `The discord channel id for database operation results to be stored could not be resolved`
-      );
-      throw new Error(
-        `The discord channel id for database operation results to be stored could not be resolved`
-      );
-    }
+//     if (!discord_channel_for_operation_results) {
+//       logger.logDiscordError(
+//         channelToSendErrors,
+//         `The discord channel id for database operation results to be stored could not be resolved`
+//       );
+//       throw new Error(
+//         `The discord channel id for database operation results to be stored could not be resolved`
+//       );
+//     }
 
-    /*
-    The Discord bot instance caches the discord channel, so we have to fetch the cached channel given the channel id
-    */
-    const discord_channel_for_messages =
-      await discord_client_instance.channels.fetch(
-        discord_channel_for_operation_results
-      );
+//     /*
+//     The Discord bot instance caches the discord channel, so we have to fetch the cached channel given the channel id
+//     */
+//     const discord_channel_for_messages =
+//       await discord_client_instance.channels.fetch(
+//         discord_channel_for_operation_results
+//       );
 
-    /*
-    We must use the 'embeds' option and pass in the EmbedBuilder as parameter data 
-    */
-    if (
-      discord_channel_for_messages &&
-      discord_channel_for_messages.isTextBased()
-    ) {
-      discord_channel_for_messages.send({
-        embeds: [database_operation_embedded_message],
-      });
-      logger.logDiscordMessage(
-        `The database operation has been successfully recorded`
-      );
-    }
-  }
-);
+//     /*
+//     We must use the 'embeds' option and pass in the EmbedBuilder as parameter data 
+//     */
+//     if (
+//       discord_channel_for_messages &&
+//       discord_channel_for_messages.isTextBased()
+//     ) {
+//       discord_channel_for_messages.send({
+//         embeds: [database_operation_embedded_message],
+//       });
+//       logger.logDiscordMessage(
+//         `The database operation has been successfully recorded`
+//       );
+//     }
+//   }
+// );
 
 custom_event_emitter.on(
   "showClassesInSchedule",
@@ -408,9 +416,9 @@ custom_event_emitter.on(
     const discord_channel_for_class_data_results =
       process.env.discord_bot_command_channel_id;
     if (!discord_channel_for_class_data_results) {
-      logger.logDiscordError(
-        `The discord channel id for showing classes this semester could not be resolved`
-      );
+      // logger.logDiscordError(
+      //   `The discord channel id for showing classes this semester could not be resolved`
+      // );
       throw new Error(
         `The discord channel id for showing classes this semester could not be resolved.`
       );
@@ -577,9 +585,9 @@ custom_event_emitter.on(
         ++number_of_events_created;
         discordEventClassInstance.createNewDiscordEvent(discord_event_data);
       }
-      logger.logDiscordMessage(
-        `A total of ${number_of_events_created} class events have been created`
-      );
+      // logger.logDiscordMessage(
+      //   `A total of ${number_of_events_created} class events have been created`
+      // );
     }
   }
 );

@@ -10,9 +10,7 @@ export default function() {
                 .setDescription(`(Optional) The channel in which to add this button`)
                 .setRequired(false)
             ),
-            authorization_role_name: ["Discord admin"],
-            guild_id: ["1171639827565916263"],
-            bot_id: ["1138878672711991316"],
+        authorization_role_name: ["Discord admin"],
 
         async execute(interaction) {
             let channel_to_add_button = interaction.options.channel;
