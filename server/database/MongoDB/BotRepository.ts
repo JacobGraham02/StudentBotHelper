@@ -55,44 +55,24 @@ export default class BotRepository {
             // Check if the bot already exists
             const existing_bot = await bot_collection.findOne({ bot_id: discord_bot_information.bot_id });
     
-            if (existing_bot) {
-                // Update existing document
-                await bot_collection.updateOne(
-                    { bot_id: discord_bot_information.bot_id },
-                    {
-                        $set: {
-                            bot_email: discord_bot_information.bot_email,
-                            bot_username: discord_bot_information.bot_username,
-                            bot_password: discord_bot_information.bot_password,
-                            bot_guild_id: discord_bot_information.bot_guild_id,
-                            bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
-                            bot_commands_channel: discord_bot_information.bot_commands_channel_id,
-                            bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
-                            bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
-                        }
-                    }
-                );
-            } else {
+            if (!existing_bot) {
+                // Insert new document since it does not exist
                 await bot_collection.insertOne({
                     bot_id: discord_bot_information.bot_id,
+                    bot_guild_id: discord_bot_information.bot_guild_id,
                     bot_email: discord_bot_information.bot_email,
                     bot_username: discord_bot_information.bot_username,
-                    bot_password: discord_bot_information.bot_password,
-                    bot_guild_id: discord_bot_information.bot_guild_id,
-                    bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
-                    bot_commands_channel: discord_bot_information.bot_commands_channel_id,
-                    bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
-                    bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
+                    bot_password: discord_bot_information.bot_password
                 });
-            }
-    
+            } 
         } catch (error: any) {
-            console.error(`There was an error when attempting to update the command channel ids in the database. Please inform the server administrator of this error: ${error}`);
+            console.error(`There was an error when attempting to create a new bot document in the database: ${error}`);
             throw error;
         } finally {
             await this.releaseConnectionSafely(database_connection);
         }
     }
+    
 
     public async updateBotChannelIds(discord_bot_information: DiscordBotInformationType): Promise<void> {
         const database_connection = await this.database_connection_manager.getConnection();
