@@ -249,35 +249,45 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
     try {
-      // const botInfo = await bot_repository.findBotByGuildId(interaction.guildId!);
 
-      // if (!botInfo) {
-      //   throw new Error(`Bot information not found for this guild`);
-      // }
-
-      // const channelIdForCommands = botInfo.bot_commands_channel;
-      // const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
-      // const channelIdForErrors = botInfo.bot_command_usage_error_channel;
-
-      // channelForCommands = interaction.client.channels.cache.get(channelIdForCommands);
-      // channelToSendLogs = interaction.client.channels.cache.get(channdlIdForLogs);
-      // channelToSendErrors = interaction.client.channels.cache.get(channelIdForErrors);
-
-      // logger.logDiscordMessage(
-      //   channelToSendLogs,
-      //   `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
-      // );
       await command.execute(interaction);
+      
+      const botInfo = await bot_repository.findBotByGuildId(interaction.guildId!);
+
+      if (!botInfo) {
+        return;
+      }
+
+      logger = new Logger(discord_client_instance);
+
+      if (!botInfo) {
+        throw new Error(`Bot information not found for this guild`);
+      }
+
+      const channelIdForCommands = botInfo.bot_commands_channel;
+      const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
+      const channelIdForErrors = botInfo.bot_command_usage_error_channel;
+
+      channelForCommands = interaction.client.channels.cache.get(channelIdForCommands);
+      channelToSendLogs = interaction.client.channels.cache.get(channdlIdForLogs);
+      channelToSendErrors = interaction.client.channels.cache.get(channelIdForErrors);
+
+      
+
+      logger.logDiscordMessage(
+        channelToSendLogs,
+        `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
+      );
     } catch (error) {
-        throw new Error(`There was an error when attempting to execute this command: ${error}`);
-      // logger.logDiscordError(
-      //   channelToSendErrors,
-      //   `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
-      // );
-      // await interaction.reply({
-      //   content: `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
-      //   ephemeral: true,
-      // });
+      logger.logDiscordError(
+        channelToSendErrors,
+        `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
+      );
+      await interaction.reply({
+        content: `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
+        ephemeral: true,
+      });
+      throw new Error(`There was an error when attempting to execute this command: ${error}`);
     }
   } else {
     await interaction.reply({
