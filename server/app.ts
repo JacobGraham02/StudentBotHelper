@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+
 /*
 Imports from Node.js and other libraries defined in package.json
 */
@@ -10,17 +13,14 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import fs from "fs";
 import {
-  ActionRowBuilder,
+  Channel,
   Collection,
   Events,
   GatewayIntentBits,
   Guild,
   GuildMemberRoleManager,
   GuildScheduledEventEntityType,
-  GuildScheduledEventPrivacyLevel,
-  ModalBuilder,
-  TextInputStyle
-} from "discord.js";
+  GuildScheduledEventPrivacyLevel} from "discord.js";
 /*
 Imports from Custom classes
 */
@@ -29,7 +29,7 @@ import userRouter from "./api/routes/user";
 import apiRouter from "./api/routes/botapi";
 import CustomDiscordClient from "./utils/CustomDiscordClient";
 import CustomEventEmitter from "./utils/CustomEventEmitter";
-import {EmbedBuilder, MessageActionRowComponentBuilder, ModalActionRowComponentBuilder, TextInputBuilder} from "@discordjs/builders";
+import {EmbedBuilder} from "@discordjs/builders";
 import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository";
 import CommonClass from "./entity/CommonClass";
 import {
@@ -45,7 +45,6 @@ import CommonClassWork from "./entity/CommonClassWork";
 import Logger from "./utils/Logger";
 import BotController from "./api/controllers/BotController";
 import BotRepository from "./database/MongoDB/BotRepository";
-import ts from "typescript";
 import { DiscordBotInformationType } from "./database/MongoDB/types/DiscordBotInformationType";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
@@ -61,11 +60,7 @@ const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   ],
   discord_commands: Collection<any, any>,
 });
-const logger: Logger = new Logger(
-  process.env.discord_bot_information_messages_channel_id,
-  process.env.discord_bot_error_messages_channel_id,
-  discord_client_instance
-);
+let logger: Logger;
 /*
 Variables defined in the application .env file
 */
@@ -81,31 +76,62 @@ const filtered_commands_files: string[] = fs
 discord_client_instance.discord_commands = new Collection();
 
 const commands: any[] = [];
+
+const registerCommands = async (botId: string, guildId: string) => {
+  const commands = [];
+
+  for (const command_file of filtered_commands_files) {
+    const command_file_path = path.join(commands_folder_path, command_file);
+    const command = await import(command_file_path);
+    const command_object = command.default();
+
+    // Check if the bot ID array in the command matches the target bot ID
+    if (command_object.bot_id.includes(botId)) {
+      commands.push(command_object.data);
+    }
+  }
+
+  if (discord_token && botId && guildId) {
+    const rest = new REST({ version: '10' }).setToken(discord_token);
+
+    rest.put(Routes.applicationGuildCommands(botId, guildId), {
+      body: commands
+    }).then(() => {
+      console.log('The application commands were successfully registered');
+    }).catch((error) => {
+      console.error(`The application encountered an error when registering the commands with the discord bot. All environment variables were valid. ${error}`);
+    });
+  } else {
+    console.error(`The discord client id, guild id, or bot token was invalid when trying to register commands with the bot`);
+  }
+};
+
+
 /*
 Get the singleton instance of the custom event emitter class. The event emitter must be a singleton because only one event emitter can exist in Node.js to prevent any problems.
 */
 const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
 
-async function fetchCommandFiles() {
-  for (const command_file of filtered_commands_files) {
-    const command_file_path = path.join(commands_folder_path, command_file);
-    const command = await import(command_file_path);
-    if (Object.keys(command).length >= 1 && command.constructor === Object) {
-      const command_object = command.default(logger);
+// async function fetchCommandFiles() {
+//   for (const command_file of filtered_commands_files) {
+//     const command_file_path = path.join(commands_folder_path, command_file);
+//     const command = await import(command_file_path);
+//     if (Object.keys(command).length >= 1 && command.constructor === Object) {
+//       const command_object = command.default(logger);
 
-      // if (command_object.data.name === 'hello-world') {
-      //   const containerName = 'studentbotcommands'
-      //   testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
-      //   testReadCommandsFromContainer(command_file_path, containerName);
-      // }
+//       if (command_object.data.name === 'hello-world') {
+//         const containerName = 'studentbotcommands'
+//         testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
+//         testReadCommandsFromContainer(command_file_path, containerName);
+//       }
 
-      discord_client_instance.discord_commands.set(
-        command_object.data.name,
-        command_object
-      );
-    }
-  }
-}
+//       discord_client_instance.discord_commands.set(
+//         command_object.data.name,
+//         command_object
+//       );
+//     }
+//   }
+// }
 
 async function testWriteCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
   try {
@@ -180,6 +206,10 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
     return;
   }
 
+  let channelForCommands: Channel | undefined = undefined;
+  let channelToSendLogs: Channel | undefined = undefined;
+  let channelToSendErrors: Channel | undefined = undefined;
+  
   /*
   The if statement checks for the following 3 conditions:
   1. The command that is executed contains an authorization_role_name property
@@ -198,12 +228,32 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
     try {
+      const botInfo = await bot_repository.findBotByGuildId(interaction.guildId!);
+
+      if (!botInfo) {
+        throw new Error(`Bot information not found for this guild`);
+      }
+
+      const botGuildId = botInfo.bot_guild_id;
+      const botId = botInfo.bot_id;
+      const channelIdForCommands = botInfo.bot_commands_channel;
+      const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
+      const channelIdForErrors = botInfo.bot_command_usage_error_channel;
+
+      await registerCommands(botId, botGuildId);
+
+      channelForCommands = interaction.client.channels.cache.get(channelIdForCommands);
+      channelToSendLogs = interaction.client.channels.cache.get(channdlIdForLogs);
+      channelToSendErrors = interaction.client.channels.cache.get(channelIdForErrors);
+
       logger.logDiscordMessage(
+        channelToSendLogs,
         `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
       );
       await command.execute(interaction);
     } catch (error) {
       logger.logDiscordError(
+        channelToSendErrors,
         `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
       );
       await interaction.reply({
@@ -217,11 +267,11 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       ephemeral: true,
     });
     logger.logDiscordError(
+      channelToSendErrors,
       `The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`
     );
   }
 });
-// https://discord.com/oauth2/authorize?client_id=1138878672711991316&permissions=8&redirect_uri=https%3A%2F%2Flocalhost%3A8080&scope=bot
 
 discord_client_instance.login(discord_bot_token);
 

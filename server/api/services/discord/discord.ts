@@ -31,10 +31,8 @@ const updateApplicationConfig = async (data: ApplicationConfigs) => {
 };
 
 // Get the Guild Application Commands
-const getGuildApplicationCommands = async (applicationId: string) => {
+const getGuildApplicationCommands = async (applicationId: string, guildId: string) => {
   try {
-    // Assuming we will hard code the guild Id (server)... Making this dynamic for dealing with other guilds(Servers)
-    const guildId = process.env.discord_bot_guild_id;
     const applicationCommands = await instanceDiscordAPI.get(
       `applications/${applicationId}/guilds/${guildId}/commands`
     );
@@ -50,10 +48,10 @@ const getGuildApplicationCommands = async (applicationId: string) => {
 // Create a Guild Application Command
 const createGuildApplicationCommands = async (
   applicationId: string,
+  guildId: string,
   data: ApplicationCommandParams
 ) => {
   try {
-    const guildId = process.env.discord_bot_guild_id;
     const response = await instanceDiscordAPI.post(
       `applications/${applicationId}/guilds/${guildId}/commands`,
       data

@@ -27,6 +27,20 @@ export default class BotRepository {
         }
     }
 
+    public async findBotByGuildId(guild_id: string): Promise<any> {
+        const database_connection = await this.database_connection_manager.getConnection();
+        try {
+            const bot_collection = database_connection.collection('bot');
+            const bot = await bot_collection.findOne({ bot_guild_id: guild_id });
+            return bot;
+        } catch (error) {
+            console.error(`There was an error when attempting to fetch all bot data given a UUID. Please inform the server administrator of this error: ${error}`);
+            throw error;
+        } finally {
+            await this.releaseConnectionSafely(database_connection);
+        }
+    }
+
     /**
      * This database function creates a document in an existing MongoDB database where the document has the specified list of key value pairs defined within it.
      * All of the key-value pairs and their data types can be found in the IDiscordBotInformation interface. 
