@@ -10,6 +10,7 @@ import Logger from "../../utils/Logger";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
 import CommandRequestEmail from "../../utils/CommandRequestEmail";
 import { UUID } from "crypto";
+import { DiscordBotInformationType } from "../../database/MongoDB/types/DiscordBotInformationType";
 dotenv.config({ path: "../../../.env" });
 
 /**
@@ -386,6 +387,58 @@ bot_commands_router.get('/getcommands', async function (request: Request, respon
   }
 });
 
+bot_commands_router.patch('/updatebotid', async function(request: Request, response: Response, next: NextFunction) {
+  try {
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    const changeBotId = await bot_controller_instance.updateBotId(request.body.bot_id);
+
+    return changeBotId;
+  } catch (error) {
+    console.error(`An error occurred when attempting to update the bot id in the database: ${error}`);
+    throw new Error(`An error occurred when attempting to update the bot id in the database. Please inform the server administrator of this error: ${error}`);
+  }
+});
+
+bot_commands_router.patch('/updatechannelids', async function(request: Request, response: Response, next: NextFunction) {
+  const {
+    bot_id,
+    bot_guild_id,
+    bot_command_channel_id,
+    bot_button_channel_id,
+    bot_info_channel_id,
+    bot_error_channel_id
+  }: {
+    bot_id: string
+    bot_guild_id: string,
+    bot_command_channel_id: string,
+    bot_button_channel_id: string,
+    bot_info_channel_id: string,
+    bot_error_channel_id: string
+  } = request.body;
+
+  const updateChannelIdsObject: DiscordBotInformationType = {
+    bot_id: bot_id,
+    bot_guild_id: bot_guild_id,
+    bot_commands_channel_id: bot_command_channel_id,
+    bot_role_button_channel_id: bot_button_channel_id,
+    bot_command_usage_information_channel_id: bot_info_channel_id,
+    bot_command_usage_error_channel_id: bot_error_channel_id
+  }
+
+  try {
+    const bot_database_repository_instance: BotRepository = new BotRepository();
+    const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
+
+    const changeBotChannelIdsResponse = await bot_controller_instance.updateBotChannelIds(updateChannelIdsObject);
+
+    response.json(changeBotChannelIdsResponse);
+  } catch (error) {
+    console.error(`An error occurred when attempting to update the bot channel ids in the database: ${error}`);
+    throw new Error(`An error occurred when attempting to update the bot channel ids in the database. Please inform the server administrator of this error: ${error}`);
+  }
+});
 
 bot_commands_router.get('/getlogs', async function(request: Request, response: Response, next: NextFunction) {
   try {
@@ -407,19 +460,15 @@ bot_commands_router.get('/getlogs', async function(request: Request, response: R
   }
 });
 
-bot_commands_router.get('/bot', async function(request: Request, response: Response, next: NextFunction) {
-  const {
-    bot_id
-  }: {
-    bot_id: UUID
-  } = request.body;
+bot_commands_router.get('/getbot', async function(request: Request, response: Response, next: NextFunction) {
+  const botEmail: string = request.headers['bot-email'] as string;
   
   try {
     
     const bot_database_repository_instance: BotRepository = new BotRepository();
     const bot_controller_instance: BotController = new BotController(bot_database_repository_instance);
 
-    const bot = await bot_controller_instance.getBotDocument(bot_id);
+    const bot = await bot_controller_instance.getBotDocument(botEmail);
 
     response.json(bot);
   } catch (error) {

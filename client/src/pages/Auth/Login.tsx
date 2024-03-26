@@ -8,6 +8,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 
 import { OAuthCreds } from "../../../config";
 import { loginUser } from "../../services/users/index";
+import { getBot } from "../../services/bot";
 
 const Login = () => {
   const authCtx = useContext(AuthContext);
@@ -100,6 +101,7 @@ const Login = () => {
 
       try {
         const response = await loginUser(loginData);
+        const bot = await getBot(loginData.email);
 
         const userData = {
           id: response.user.id,
@@ -107,6 +109,7 @@ const Login = () => {
           name: response.user.name,
           email: response.user.email,
           role: response.user.role,
+          bot: bot.data
         };
 
         // Log the user in

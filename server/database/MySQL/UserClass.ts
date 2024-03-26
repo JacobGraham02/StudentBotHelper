@@ -117,6 +117,7 @@ export default class User {
 
         return {
           token: token,
+          id: user.id,
           expires_in: "1 hour",
           name: user.full_name,
           email: user.email,
@@ -136,6 +137,8 @@ export default class User {
         "SELECT * FROM Users WHERE email = ?",
         [email]
       );
+
+      console.log(rows.id);
 
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {

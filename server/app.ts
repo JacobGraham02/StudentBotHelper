@@ -1,3 +1,5 @@
+
+
 /*
 Imports from Node.js and other libraries defined in package.json
 */
@@ -10,13 +12,16 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import fs from "fs";
 import {
+  Channel,
   Collection,
+  Events,
   GatewayIntentBits,
   Guild,
   GuildMemberRoleManager,
   GuildScheduledEventEntityType,
   GuildScheduledEventPrivacyLevel,
-} from "discord.js";
+  REST,
+  Routes} from "discord.js";
 /*
 Imports from Custom classes
 */
@@ -25,7 +30,7 @@ import userRouter from "./api/routes/user";
 import apiRouter from "./api/routes/botapi";
 import CustomDiscordClient from "./utils/CustomDiscordClient";
 import CustomEventEmitter from "./utils/CustomEventEmitter";
-import { EmbedBuilder } from "@discordjs/builders";
+import {EmbedBuilder} from "@discordjs/builders";
 import CommonClassWorkRepository from "./database/MySQL/CommonClassWorkRepository";
 import CommonClass from "./entity/CommonClass";
 import {
@@ -41,6 +46,9 @@ import CommonClassWork from "./entity/CommonClassWork";
 import Logger from "./utils/Logger";
 import BotController from "./api/controllers/BotController";
 import BotRepository from "./database/MongoDB/BotRepository";
+import { DiscordBotInformationType } from "./database/MongoDB/types/DiscordBotInformationType";
+import { hashPassword } from "./modules/hashAndValidatePassword";
+import { exec } from "child_process";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const bot_repository = new BotRepository();
@@ -55,11 +63,7 @@ const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   ],
   discord_commands: Collection<any, any>,
 });
-const logger: Logger = new Logger(
-  process.env.discord_bot_information_messages_channel_id,
-  process.env.discord_bot_error_messages_channel_id,
-  discord_client_instance
-);
+let logger: Logger;
 /*
 Variables defined in the application .env file
 */
@@ -68,50 +72,49 @@ const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
 const discord_token = process.env.discord_bot_token;
 const discord_client_id = process.env.discord_bot_application_id;
 
-const commands_folder_path: string = path.join(__dirname, "./commands");
-const filtered_commands_files: string[] = fs
-  .readdirSync(commands_folder_path)
-  .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
-discord_client_instance.discord_commands = new Collection();
+const registerInitialSetupCommands = async (botId: string, guildId: string) => {
+  const commands_folder_path: string = path.join(__dirname, "../dist/commands");
+  const filtered_commands_files: string[] = fs
+    .readdirSync(commands_folder_path)
+    .filter((file) => file !== "deploy-commands.ts" && !file.endsWith(".map"));
+  discord_client_instance.discord_commands = new Collection();
 
-const commands: any[] = [];
+  const commands: any[] = [];
+
+  const initialBotCommandNames = [`setupuser`, `setupchannels`, `registercommands`];
+
+  for (const command_file of filtered_commands_files) {
+    const command_file_path = path.join(commands_folder_path, command_file);
+    const command = await import(command_file_path);
+    const command_object = command.default();
+
+    discord_client_instance.discord_commands.set(command_object.data.name, command_object);
+
+    // Check if the bot ID array in the command matches the target bot ID
+    if (initialBotCommandNames.includes(command_object.data.name)) {
+      commands.push(command_object.data);
+    }
+  }
+
+  if (discord_token && botId && guildId) {
+    const rest = new REST({ version: '10' }).setToken(discord_token);
+
+    rest.put(Routes.applicationGuildCommands(botId, guildId), {
+      body: commands
+    }).then(() => {
+      console.log('The initial application setup commands were successfully registered');
+    }).catch((error) => {
+      console.error(`The application encountered an error when registering the commands with the discord bot. All environment variables were valid. ${error}`);
+    });
+  } else {
+    console.error(`The discord client id, guild id, or bot token was invalid when trying to register commands with the bot`);
+  }
+}
+
 /*
 Get the singleton instance of the custom event emitter class. The event emitter must be a singleton because only one event emitter can exist in Node.js to prevent any problems.
 */
 const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
-
-/*
-  [
-    {
-      _id: new ObjectId("65f7899fb911099617e2a4d7"),
-      bot_id: 1,
-      command_description: 'Test command description',
-      command_function: 'I want this command to say the word pong when a user types in the command ping',
-      command_name: 'Test command 1',
-      command_users: [ 'Auth user 1', 'Auth user 2' ]
-    }
-  ]
-  */
-async function fetchCommandFiles() {
-  for (const command_file of filtered_commands_files) {
-    const command_file_path = path.join(commands_folder_path, command_file);
-    const command = await import(command_file_path);
-    if (Object.keys(command).length >= 1 && command.constructor === Object) {
-      const command_object = command.default(logger);
-
-      if (command_object.data.name === 'hello-world') {
-        const containerName = 'studentbotcommands'
-        testWriteCommandToContainer(command_file_path, command_object.data.name, containerName);
-        testReadCommandsFromContainer(command_file_path, containerName);
-      }
-
-      discord_client_instance.discord_commands.set(
-        command_object.data.name,
-        command_object
-      );
-    }
-  }
-}
 
 async function testWriteCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
   try {
@@ -134,8 +137,6 @@ async function testReadCommandsFromContainer(filePath: string, containerName: st
  * connected to the Discord channel.
  */
 discord_client_instance.on("ready", async () => {
-  fetchCommandFiles();
-  
   if (discord_client_instance.user) {
     console.log(
       `The discord bot is logged in as ${discord_client_instance.user.tag}`
@@ -160,8 +161,6 @@ discord_client_instance.on("ready", async () => {
  *
  */
 discord_client_instance.on("interactionCreate", async (interaction) => {
-
-  console.log(interaction);
   
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
@@ -188,6 +187,23 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
     return;
   }
 
+  if (interaction.commandName === `registercommands`) {
+    if (!discord_client_instance) {
+      console.log(`The discord_client_instance is undefined`);
+      return;
+    }
+
+    const registerCommandResult = await command.execute(interaction);
+
+    if (registerCommandResult && registerCommandResult.discord_client_instance_collection) {
+      discord_client_instance.discord_commands = registerCommandResult.discord_client_instance_collection;
+    }
+  }
+
+  let channelForCommands: Channel | undefined = undefined;
+  let channelToSendLogs: Channel | undefined = undefined;
+  let channelToSendErrors: Channel | undefined = undefined;
+  
   /*
   The if statement checks for the following 3 conditions:
   1. The command that is executed contains an authorization_role_name property
@@ -205,19 +221,45 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       Given the interaction that the user just had with the bot, we will call the asynchronous 'execute' function that is in the command file. This will trigger the Discord
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
+
+    logger = new Logger(discord_client_instance);
+
     try {
+
+      await command.execute(interaction);
+      
+      const botInfo = await bot_repository.findBotByGuildId(interaction.guildId!);
+
+      if (!botInfo) {
+        return;
+      }
+
+      if (!botInfo) {
+        throw new Error(`Bot information not found for this guild`);
+      }
+
+      const channelIdForCommands = botInfo.bot_commands_channel;
+      const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
+      const channelIdForErrors = botInfo.bot_command_usage_error_channel;
+
+      channelForCommands = interaction.client.channels.cache.get(channelIdForCommands);
+      channelToSendLogs = interaction.client.channels.cache.get(channdlIdForLogs);
+      channelToSendErrors = interaction.client.channels.cache.get(channelIdForErrors);
+
       logger.logDiscordMessage(
+        channelToSendLogs,
         `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
       );
-      await command.execute(interaction);
     } catch (error) {
       logger.logDiscordError(
+        channelToSendErrors,
         `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
       );
       await interaction.reply({
         content: `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
         ephemeral: true,
       });
+      throw new Error(`There was an error when attempting to execute this command: ${error}`);
     }
   } else {
     await interaction.reply({
@@ -225,6 +267,7 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       ephemeral: true,
     });
     logger.logDiscordError(
+      channelToSendErrors,
       `The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`
     );
   }
@@ -232,67 +275,130 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
 
 discord_client_instance.login(discord_bot_token);
 
-custom_event_emitter.on(
-  "databaseOperationEvent",
-  /**
-   * An asynchronous arrow function that uses the Discord API EmbedBuilder to create nicely-formatted messages to send to a specific channel in Discord whenever the
-   * database on Microsoft Azure is used. Tshe Discord API recognizes channels by using an integer id, so we will use an integer from the .env file.
-   *
-   * @param message an instance of IDatabaseResponseObject
-   */
-  async (message: IDatabaseResponseObject) => {
-    const database_operation_embedded_message = new EmbedBuilder()
-      .setColor(0x299bcc)
-      .setTitle("Database operation on Azure MySQL database")
-      .setThumbnail("https://i.imgur.com/WL7Bt6g.png")
-      .setDescription(`Database operation response status: ${message.status}`)
-      .addFields({
-        name: "Database response status:",
-        value: message.statusText,
-        inline: true,
-      })
-      .setTimestamp()
-      .setFooter({
-        text: "Azure database operation",
-        iconURL: "https://i.imgur.com/WL7Bt6g.png",
-      });
+discord_client_instance.on('guildCreate', async (guild) => {
+  const bot_id = discord_client_instance.user?.id;
+  const guild_id = guild.id;
+  await registerInitialSetupCommands(bot_id!, guild_id);
+});
 
-    const discord_channel_for_operation_results =
-      process.env.discord_bot_http_response_channel_id;
+discord_client_instance.on(Events.InteractionCreate, async interaction => {
+  if (interaction.isModalSubmit()) {
 
-    if (!discord_channel_for_operation_results) {
-      logger.logDiscordError(
-        `The discord channel id for database operation results to be stored could not be resolved`
-      );
-      throw new Error(
-        `The discord channel id for database operation results to be stored could not be resolved`
-      );
+    if (interaction.customId === 'userDataInputModal') {
+        const student_username = interaction.fields.getTextInputValue('usernameInput');
+        const student_email = interaction.fields.getTextInputValue('emailInput');
+        const student_password = interaction.fields.getTextInputValue('passwordInput');
+        const bot_id = interaction.fields.getTextInputValue('botIdInput');
+        const student_for_database_password_object = hashPassword(student_password);
+        const guild_id = interaction.guildId;
+
+      const createBotObject: DiscordBotInformationType = {
+        bot_guild_id: guild_id!,
+        bot_id: bot_id,
+        bot_username: student_username,
+        bot_password: student_for_database_password_object.hash,
+        bot_email: student_email
+      }
+
+      try {
+        await bot_repository.createBot(createBotObject);
+      } catch (error) {
+        console.error(`There was an error when creating a new bot document in the database: ${error}`);
+        throw new Error(`There was an error when creating a new bot document in the database: ${error}`);
+      }
+
+    } else if (interaction.customId === `channelIdInputModal`) {
+
+      const commandChannelId = interaction.fields.getTextInputValue(`commandChannelIdInput`);
+      const informationChannelId = interaction.fields.getTextInputValue(`informationChannelIdInput`);
+      const errorChannelId = interaction.fields.getTextInputValue(`errorChannelIdInput`);
+      const botRoleButtonChannelId = interaction.fields.getTextInputValue(`roleButtonChannelIdInput`);
+      const botId = interaction.fields.getTextInputValue(`botIdInput`);
+
+      const updateBotChannelIdsObject: DiscordBotInformationType = {
+        bot_id: botId,
+        bot_role_button_channel_id: botRoleButtonChannelId,
+        bot_commands_channel_id: commandChannelId,
+        bot_command_usage_information_channel_id: informationChannelId,
+        bot_command_usage_error_channel_id: errorChannelId
+      }
+
+      try {
+        await bot_repository.updateBotChannelIds(updateBotChannelIdsObject);
+      } catch (error) {
+        console.error(`There was an error when updating the bot document in the database: ${error}`);
+        throw new Error(`There was an error when updating the bot document in the database: ${error}`);
+      }
     }
 
-    /*
-    The Discord bot instance caches the discord channel, so we have to fetch the cached channel given the channel id
-    */
-    const discord_channel_for_messages =
-      await discord_client_instance.channels.fetch(
-        discord_channel_for_operation_results
-      );
-
-    /*
-    We must use the 'embeds' option and pass in the EmbedBuilder as parameter data 
-    */
-    if (
-      discord_channel_for_messages &&
-      discord_channel_for_messages.isTextBased()
-    ) {
-      discord_channel_for_messages.send({
-        embeds: [database_operation_embedded_message],
-      });
-      logger.logDiscordMessage(
-        `The database operation has been successfully recorded`
-      );
+    if (interaction.customId === `channelIdInputModal` || interaction.customId === `userDataInputModal`) {
+      await interaction.reply({content: `Your submission was received successfully`, ephemeral: true});
     }
   }
-);
+});
+
+// custom_event_emitter.on(
+//   "databaseOperationEvent",
+//   /**
+//    * An asynchronous arrow function that uses the Discord API EmbedBuilder to create nicely-formatted messages to send to a specific channel in Discord whenever the
+//    * database on Microsoft Azure is used. Tshe Discord API recognizes channels by using an integer id, so we will use an integer from the .env file.
+//    *
+//    * @param message an instance of IDatabaseResponseObject
+//    */
+//   async (message: IDatabaseResponseObject) => {
+//     const database_operation_embedded_message = new EmbedBuilder()
+//       .setColor(0x299bcc)
+//       .setTitle("Database operation on Azure MySQL database")
+//       .setThumbnail("https://i.imgur.com/WL7Bt6g.png")
+//       .setDescription(`Database operation response status: ${message.status}`)
+//       .addFields({
+//         name: "Database response status:",
+//         value: message.statusText,
+//         inline: true,
+//       })
+//       .setTimestamp()
+//       .setFooter({
+//         text: "Azure database operation",
+//         iconURL: "https://i.imgur.com/WL7Bt6g.png",
+//       });
+
+//     const discord_channel_for_operation_results =
+//       process.env.discord_bot_http_response_channel_id;
+
+//     if (!discord_channel_for_operation_results) {
+//       logger.logDiscordError(
+//         channelToSendErrors,
+//         `The discord channel id for database operation results to be stored could not be resolved`
+//       );
+//       throw new Error(
+//         `The discord channel id for database operation results to be stored could not be resolved`
+//       );
+//     }
+
+//     /*
+//     The Discord bot instance caches the discord channel, so we have to fetch the cached channel given the channel id
+//     */
+//     const discord_channel_for_messages =
+//       await discord_client_instance.channels.fetch(
+//         discord_channel_for_operation_results
+//       );
+
+//     /*
+//     We must use the 'embeds' option and pass in the EmbedBuilder as parameter data 
+//     */
+//     if (
+//       discord_channel_for_messages &&
+//       discord_channel_for_messages.isTextBased()
+//     ) {
+//       discord_channel_for_messages.send({
+//         embeds: [database_operation_embedded_message],
+//       });
+//       logger.logDiscordMessage(
+//         `The database operation has been successfully recorded`
+//       );
+//     }
+//   }
+// );
 
 custom_event_emitter.on(
   "showClassesInSchedule",
@@ -310,9 +416,9 @@ custom_event_emitter.on(
     const discord_channel_for_class_data_results =
       process.env.discord_bot_command_channel_id;
     if (!discord_channel_for_class_data_results) {
-      logger.logDiscordError(
-        `The discord channel id for showing classes this semester could not be resolved`
-      );
+      // logger.logDiscordError(
+      //   `The discord channel id for showing classes this semester could not be resolved`
+      // );
       throw new Error(
         `The discord channel id for showing classes this semester could not be resolved.`
       );
@@ -479,9 +585,9 @@ custom_event_emitter.on(
         ++number_of_events_created;
         discordEventClassInstance.createNewDiscordEvent(discord_event_data);
       }
-      logger.logDiscordMessage(
-        `A total of ${number_of_events_created} class events have been created`
-      );
+      // logger.logDiscordMessage(
+      //   `A total of ${number_of_events_created} class events have been created`
+      // );
     }
   }
 );

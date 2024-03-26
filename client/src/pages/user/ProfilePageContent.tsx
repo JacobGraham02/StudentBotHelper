@@ -12,8 +12,6 @@ const ProfilePageContent = ({ userLoggedIn }: {userLoggedIn: boolean}) => {
 
     const authCtx = useContext(AuthContext);
 
-    let name: string = "";
-
     const [showModal, setShowModal] = useState(false);
 
     const [modalContent, setModalContent] = useState<IModalContent>({
