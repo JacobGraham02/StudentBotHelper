@@ -207,7 +207,7 @@ export default class BotRepository {
         return formattedDate;
     }
 
-    public async writeLogToAzureContainer(logName: string, fileContents: string, containerName: string): Promise<void> {
+    public async writeLogToAzureContainer(fileContents: string, logName: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
@@ -217,13 +217,11 @@ export default class BotRepository {
         if (!containerName) {
             throw new Error(`The azure storage container name is undefined or invalid`);
         }
-
-        const logFileLineDate = new Date().toISOString();
-
-        const modifiedFileConents = fileContents
-            .split('\n')
-            .map(line => `${logFileLineDate}: ${line}`)
-            .join('\n')
+    
+        const currentDateISO = this.getCurrentDateISO();
+    
+        // Define blob file name
+        const blobFileName = `${currentDateISO}-${logName}.log`;
     
         // Create BlobServiceClient
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
@@ -234,17 +232,27 @@ export default class BotRepository {
         try {
             await containerClient.createIfNotExists();
     
-            // Get current date in ISO format
-            const currentDate = this.getCurrentDateISO();
-    
-            // Define blob file name
-            const blobFileName = `${currentDate}-${logName}.log`;
-    
-            // Get blob client for the file
+            // Check if the log file already exists
             const blobClient = containerClient.getBlockBlobClient(blobFileName);
+            const exists = await blobClient.exists();
+    
+            let modifiedFileContents = fileContents;
+            
+            if (exists) {
+                // If the log file exists, append new logs to it
+                const existingFileContents = await blobClient.downloadToBuffer();
+                modifiedFileContents = existingFileContents.toString() + '\n' + modifiedFileContents;
+            }
+    
+            // Prepend log entry timestamp to each line
+            const logFileLineDate = new Date().toISOString();
+            modifiedFileContents = modifiedFileContents
+                .split('\n')
+                .map(line => `${logFileLineDate}: ${line}`)
+                .join('\n');
     
             // Upload file contents to blob
-            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(modifiedFileConents, Buffer.byteLength(modifiedFileConents));
+            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(modifiedFileContents, Buffer.byteLength(modifiedFileContents));
     
             // Check if upload was successful
             if (uploadResponse._response.status === 201) {
@@ -295,50 +303,6 @@ export default class BotRepository {
         }
     }
     
-    public async writeCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
-        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
-    
-        if (!storageAccountConnection) {
-            throw new Error(`The azure storage account connection string is undefined or invalid`);
-        }
-    
-        if (!containerName) {
-            throw new Error(`The azure storage container name is undefined or invalid`);
-        }
-    
-        // Read the file contents
-        const fileContents = await fs.readFile(filePath, { encoding: 'utf8' });
-    
-        // Create BlobServiceClient
-        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
-    
-        // Get container client
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-    
-        try {
-            await containerClient.createIfNotExists();
-    
-            // Define blob file name, ensuring it matches the desired extension
-            const blobFileName = `${fileName}.js`;
-    
-            // Get blob client for the file
-            const blobClient = containerClient.getBlockBlobClient(blobFileName);
-    
-            // Upload the file contents to blob
-            const uploadResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
-    
-            // Check if upload was successful
-            if (uploadResponse._response.status === 201) {
-                console.log(`Command file '${blobFileName}' uploaded successfully.`);
-            } else {
-                throw new Error(`Failed to upload command file '${blobFileName}'.`);
-            }
-        } catch (error) {
-            console.error(`Error in creating container or uploading command file:`, error);
-            throw error;
-        }
-    }
-
     public async downloadAllCommandsFromContainer(filePath: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
