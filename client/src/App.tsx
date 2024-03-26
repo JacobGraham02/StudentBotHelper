@@ -1,9 +1,4 @@
-import {
-  Route,
-  Routes,
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./assets/styles.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -65,16 +60,16 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "register", 
-        element: <Register /> 
+        path: "register",
+        element: <Register />,
       },
       {
-        path: "profile", 
-        element: <ProfilePage isUserLoggedIn={true} /> 
+        path: "profile",
+        element: <ProfilePage />,
       },
-      { 
+      {
         path: "dashboard",
-        element: <DashboardPage isUserLoggedIn={true} />
+        element: <DashboardPage />,
       },
       {
         path: "login",
@@ -90,11 +85,11 @@ const router = createBrowserRouter([
       },
       {
         path: "command",
-        element: <CommandPage isUserLoggedIn={true} />
+        element: <CommandPage isUserLoggedIn={true} />,
       },
       {
-        path: 'logs',
-        element: <LogsPage />
+        path: "logs",
+        element: <LogsPage />,
       },
       {
         path: "configurations",
@@ -105,8 +100,8 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'home',
-        element: <LandingPage />
+        path: "home",
+        element: <LandingPage />,
       },
       {
         path: "support",
