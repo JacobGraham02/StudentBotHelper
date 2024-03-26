@@ -1,4 +1,3 @@
-import { UUID } from 'crypto';
 import DatabaseConnectionManager from './DatabaseConnectionManager';
 import { DiscordBotCommandType } from './types/DiscordBotCommandType';
 import { DiscordBotInformationType } from './types/DiscordBotInformationType';
@@ -14,11 +13,25 @@ export default class BotRepository {
 
     private database_connection_manager = new DatabaseConnectionManager();
 
-    public async findBotByUUID(bot_uuid: UUID): Promise<any> {
+    public async findBotByEmail(bot_email: string): Promise<any> {
         const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
-            const bot = await bot_collection.findOne({ bot_uuid: bot_uuid });
+            const bot = await bot_collection.findOne({ bot_email: bot_email });
+            return bot;
+        } catch (error) {
+            console.error(`There was an error when attempting to fetch all bot data given a UUID. Please inform the server administrator of this error: ${error}`);
+            throw error;
+        } finally {
+            await this.releaseConnectionSafely(database_connection);
+        }
+    }
+
+    public async findBotByGuildId(guild_id: string): Promise<any> {
+        const database_connection = await this.database_connection_manager.getConnection();
+        try {
+            const bot_collection = database_connection.collection('bot');
+            const bot = await bot_collection.findOne({ bot_guild_id: guild_id });
             return bot;
         } catch (error) {
             console.error(`There was an error when attempting to fetch all bot data given a UUID. Please inform the server administrator of this error: ${error}`);
@@ -38,30 +51,59 @@ export default class BotRepository {
         const database_connection = await this.database_connection_manager.getConnection();
         try {
             const bot_collection = database_connection.collection('bot');
-
-            const new_discord_bot_information_document = {
-                bot_id: discord_bot_information.bot_id,
-                bot_email: discord_bot_information.bot_email,
-                bot_username: discord_bot_information.bot_username,
-                bot_password: discord_bot_information.bot_password,
-                bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
-                bot_commands_channel: discord_bot_information.bot_commands_channel_id,
-                bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
-                bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
-            };
-
-            await bot_collection.updateOne(
-                { bot_id: discord_bot_information.bot_id },
-                { $setOnInsert: new_discord_bot_information_document },
-                { upsert: true }
-            );
+    
+            // Check if the bot already exists
+            const existing_bot = await bot_collection.findOne({ bot_id: discord_bot_information.bot_id });
+    
+            if (!existing_bot) {
+                // Insert new document since it does not exist
+                await bot_collection.insertOne({
+                    bot_id: discord_bot_information.bot_id,
+                    bot_guild_id: discord_bot_information.bot_guild_id,
+                    bot_email: discord_bot_information.bot_email,
+                    bot_username: discord_bot_information.bot_username,
+                    bot_password: discord_bot_information.bot_password
+                });
+            } 
         } catch (error: any) {
-            console.error(`There was an error when attempting to create a Discord bot document in the database. Please inform the server administrator of this error: ${error}`);
+            console.error(`There was an error when attempting to create a new bot document in the database: ${error}`);
             throw error;
         } finally {
             await this.releaseConnectionSafely(database_connection);
         }
     }
+    
+
+    public async updateBotChannelIds(discord_bot_information: DiscordBotInformationType): Promise<void> {
+        const database_connection = await this.database_connection_manager.getConnection();
+        try {
+            const bot_collection = database_connection.collection('bot');
+    
+            // Check if the bot already exists
+            const existing_bot = await bot_collection.findOne({ bot_id: discord_bot_information.bot_id });
+    
+            if (existing_bot) {
+                // Update existing document with only the bot channel IDs
+            await bot_collection.updateOne(
+                { bot_id: discord_bot_information.bot_id },
+                {
+                    $set: {
+                        bot_role_button_channel_id: discord_bot_information.bot_role_button_channel_id,
+                        bot_commands_channel: discord_bot_information.bot_commands_channel_id,
+                        bot_command_usage_information_channel: discord_bot_information.bot_command_usage_information_channel_id,
+                        bot_command_usage_error_channel: discord_bot_information.bot_command_usage_error_channel_id
+                    }
+                }
+            );
+            }
+        } catch (error: any) {
+            console.error(`There was an error when attempting to update the bot channel IDs in the database. Please inform the server administrator of this error: ${error}`);
+            throw error;
+        } finally {
+            await this.releaseConnectionSafely(database_connection);
+        }
+    }
+    
 
     public async createBotCommand(bot_command: DiscordBotCommandType): Promise<void> {
         const database_connection = await this.database_connection_manager.getConnection();
@@ -80,7 +122,7 @@ export default class BotRepository {
             await commands_collection.updateOne(
                 { bot_id: bot_command.botId },
                 { $setOnInsert: new_command_document },
-                { upsert: true}
+                { upsert: true }
             )
         } catch (error: any) {
             console.error(`There was an error when attempting to create Discord bot command in the database. Please inform the server administrator of this error: ${error}`);
@@ -165,7 +207,7 @@ export default class BotRepository {
         return formattedDate;
     }
 
-    public async writeLogToAzureContainer(logName: string, fileContents: string, containerName: string): Promise<void> {
+    public async writeLogToAzureContainer(fileContents: string, logName: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     
         if (!storageAccountConnection) {
@@ -175,13 +217,11 @@ export default class BotRepository {
         if (!containerName) {
             throw new Error(`The azure storage container name is undefined or invalid`);
         }
-
-        const logFileLineDate = new Date().toISOString();
-
-        const modifiedFileConents = fileContents
-            .split('\n')
-            .map(line => `${logFileLineDate}: ${line}`)
-            .join('\n')
+    
+        const currentDateISO = this.getCurrentDateISO();
+    
+        // Define blob file name
+        const blobFileName = `${currentDateISO}-${logName}.log`;
     
         // Create BlobServiceClient
         const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
@@ -192,17 +232,27 @@ export default class BotRepository {
         try {
             await containerClient.createIfNotExists();
     
-            // Get current date in ISO format
-            const currentDate = this.getCurrentDateISO();
-    
-            // Define blob file name
-            const blobFileName = `${currentDate}-${logName}.log`;
-    
-            // Get blob client for the file
+            // Check if the log file already exists
             const blobClient = containerClient.getBlockBlobClient(blobFileName);
+            const exists = await blobClient.exists();
+    
+            let modifiedFileContents = fileContents;
+            
+            if (exists) {
+                // If the log file exists, append new logs to it
+                const existingFileContents = await blobClient.downloadToBuffer();
+                modifiedFileContents = existingFileContents.toString() + '\n' + modifiedFileContents;
+            }
+    
+            // Prepend log entry timestamp to each line
+            const logFileLineDate = new Date().toISOString();
+            modifiedFileContents = modifiedFileContents
+                .split('\n')
+                .map(line => `${logFileLineDate}: ${line}`)
+                .join('\n');
     
             // Upload file contents to blob
-            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(modifiedFileConents, Buffer.byteLength(modifiedFileConents));
+            const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(modifiedFileContents, Buffer.byteLength(modifiedFileContents));
     
             // Check if upload was successful
             if (uploadResponse._response.status === 201) {
@@ -253,50 +303,6 @@ export default class BotRepository {
         }
     }
     
-    public async writeCommandToContainer(filePath: string, fileName: string, containerName: string): Promise<void> {
-        const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
-    
-        if (!storageAccountConnection) {
-            throw new Error(`The azure storage account connection string is undefined or invalid`);
-        }
-    
-        if (!containerName) {
-            throw new Error(`The azure storage container name is undefined or invalid`);
-        }
-    
-        // Read the file contents
-        const fileContents = await fs.readFile(filePath, { encoding: 'utf8' });
-    
-        // Create BlobServiceClient
-        const blobServiceClient = BlobServiceClient.fromConnectionString(storageAccountConnection);
-    
-        // Get container client
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-    
-        try {
-            await containerClient.createIfNotExists();
-    
-            // Define blob file name, ensuring it matches the desired extension
-            const blobFileName = `${fileName}.js`;
-    
-            // Get blob client for the file
-            const blobClient = containerClient.getBlockBlobClient(blobFileName);
-    
-            // Upload the file contents to blob
-            const uploadResponse = await blobClient.upload(fileContents, Buffer.byteLength(fileContents));
-    
-            // Check if upload was successful
-            if (uploadResponse._response.status === 201) {
-                console.log(`Command file '${blobFileName}' uploaded successfully.`);
-            } else {
-                throw new Error(`Failed to upload command file '${blobFileName}'.`);
-            }
-        } catch (error) {
-            console.error(`Error in creating container or uploading command file:`, error);
-            throw error;
-        }
-    }
-
     public async downloadAllCommandsFromContainer(filePath: string, containerName: string): Promise<void> {
         const storageAccountConnection: string | undefined = process.env.azure_storage_account_connection_string;
     

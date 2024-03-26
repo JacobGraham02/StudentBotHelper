@@ -26,7 +26,7 @@ import { ProtectedRoute } from "./utils/ProtectedRoute.js";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import CommandsPage from "./pages/bot/CommandsPage.js";
-import ConfigurationsOptionsPage from "./pages/bot/ConfigurationOptionsPage.js";
+import ConfigurationsPage from "./pages/bot/ConfigurationOptionsPage.js";
 
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
@@ -100,7 +100,7 @@ const router = createBrowserRouter([
         path: "configurations",
         element: (
           <ProtectedRoute>
-            <ConfigurationsOptionsPage />
+            <ConfigurationsPage />
           </ProtectedRoute>
         ),
       },
