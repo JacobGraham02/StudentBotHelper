@@ -7,17 +7,12 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
-  Button,
   FormCheck,
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { CommandsForm } from "../types/BotTypes";
-import { postBotConfigurations } from "../../services/bot";
+// import { CommandsForm } from "../types/BotTypes";
 
 const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
-  const navigate = useNavigate();
-
-  const [commandData, setCommandData] = useState<CommandsForm>({
+  const [commandData, setCommandData] = useState<any>({
     commandName: {
       value: "",
       error:
@@ -70,69 +65,69 @@ const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
     },
   });
 
-  const onClearHandler = () => {
-    setCommandData({
-      commandName: {
-        value: "",
-        error:
-          "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters (a-z)",
-        valid: false,
-        touched: false,
-      },
+  // const onClearHandler = () => {
+  //   setCommandData({
+  //     commandName: {
+  //       value: "",
+  //       error:
+  //         "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters (a-z)",
+  //       valid: false,
+  //       touched: false,
+  //     },
 
-      commandDescription: {
-        value: "",
-        error:
-          "Invalid command description. Please enter a command description whose length is equal to or less than 100 characters (a-z)",
-        valid: false,
-        touched: false,
-      },
+  //     commandDescription: {
+  //       value: "",
+  //       error:
+  //         "Invalid command description. Please enter a command description whose length is equal to or less than 100 characters (a-z)",
+  //       valid: false,
+  //       touched: false,
+  //     },
 
-      commandRequired: {
-        value: false,
-        error:
-          "Invalid command required option. Please enter either true or false",
-        valid: false,
-        touched: false,
-      },
+  //     commandRequired: {
+  //       value: false,
+  //       error:
+  //         "Invalid command required option. Please enter either true or false",
+  //       valid: false,
+  //       touched: false,
+  //     },
 
-      commandOptions: {
-        value: [
-          {
-            command_option_name: "",
-            command_option_description: "",
-            command_option_required: false,
-          },
-        ],
-        error:
-          "Invalid command option. Please enter valid configuration options",
-        valid: false,
-        touched: false,
-      },
+  //     commandOptions: {
+  //       value: [
+  //         {
+  //           command_option_name: "",
+  //           command_option_description: "",
+  //           command_option_required: false,
+  //         },
+  //       ],
+  //       error:
+  //         "Invalid command option. Please enter valid configuration options",
+  //       valid: false,
+  //       touched: false,
+  //     },
 
-      authorizedRoleName: {
-        value: [""],
-        error:
-          "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
-        valid: false,
-        touched: false,
-      },
-      commandExecute: {
-        value: Function,
-        error:
-          "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters",
-        valid: false,
-        touched: false,
-      },
-    });
-  };
+  //     authorizedRoleName: {
+  //       value: [""],
+  //       error:
+  //         "Invalid authorization name. Please enter valid a valid authorization name that is less than 50 characters (a-z)",
+  //       valid: false,
+  //       touched: false,
+  //     },
+  //     commandExecute: {
+  //       value: Function,
+  //       error:
+  //         "Invalid command name. Please enter a command name whose length is equal to or less than 32 characters",
+  //       valid: false,
+  //       touched: false,
+  //     },
+  //   });
+  // };
 
-  const onChangeHandler = (event) => {
+  const onChangeHandler = (event: any) => {
     const { name, value } = event.target; // Destructure name and value from the event target
 
-    const commandNameRegexPattern = /^[a-zA-Z0-9]{1,32}$/;
-    const commandDescriptionRegexPattern = /^[a-zA-Z0-9]{1,100}$/;
-    const commandRoleRegexPattern = /^[a-zA-Z0-9]{1,50}$/;
+    // const commandNameRegexPattern = /^[a-zA-Z0-9]{1,32}$/;
+    // const commandDescriptionRegexPattern = /^[a-zA-Z0-9]{1,100}$/;
+    // const commandRoleRegexPattern = /^[a-zA-Z0-9]{1,50}$/;
 
     let newValue = value;
     let isValid = false;
@@ -156,9 +151,9 @@ const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
     });
   };
 
-  const onSubmitHandler = (e: any) => {
-    e.preventDefault();
-  };
+  // const onSubmitHandler = (e: any) => {
+  //   e.preventDefault();
+  // };
   if (userLoggedIn) {
     return (
       <main id="main">

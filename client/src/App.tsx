@@ -1,9 +1,4 @@
-import {
-  Route,
-  Routes,
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./assets/styles.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -31,7 +26,6 @@ import ConfigurationsPage from "./pages/bot/ConfigurationOptionsPage.js";
 // Components
 import GitHubOAuthRedirect from "./components/Auth/GithubAuth";
 import SupportPage from "./components/LoginForm/LoginForm.js";
-import Dashboard from "./pages/Dashboard.js";
 import LogsPage from "./pages/LogsPage.js";
 import DashboardPage from "./pages/DashboardPage.js";
 import LandingPage from "./pages/LandingPage.js";
@@ -65,24 +59,24 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "register", 
-        element: <Register /> 
+        path: "register",
+        element: <Register />,
       },
       {
-        path: "profile", 
+        path: "profile",
         element: (
           <ProtectedRoute>
-            <ProfilePage isUserLoggedIn={true} /> 
+            <ProfilePage />
           </ProtectedRoute>
         ),
       },
-      { 
+      {
         path: "dashboard",
         element: (
           <ProtectedRoute>
-            <DashboardPage isUserLoggedIn={true} />
+            <DashboardPage />
           </ProtectedRoute>
-        )
+        ),
       },
       {
         path: "login",
@@ -102,15 +96,15 @@ const router = createBrowserRouter([
           <ProtectedRoute>
             <CommandPage isUserLoggedIn={true} />
           </ProtectedRoute>
-        )
+        ),
       },
       {
-        path: 'logs',
+        path: "logs",
         element: (
           <ProtectedRoute>
             <LogsPage />
           </ProtectedRoute>
-        )
+        ),
       },
       {
         path: "configurations",
@@ -121,7 +115,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'home',
+        path: "home",
         element: (
           <ProtectedRoute>
             <LandingPage />
