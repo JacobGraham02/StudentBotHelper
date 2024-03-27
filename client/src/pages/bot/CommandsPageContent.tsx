@@ -24,8 +24,8 @@ import IModalContent from "../user/interfaces/IModalContent";
 
 const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
   const navigate = useNavigate();
-  let stateBotId,
-    stateCommandName,
+  // let stateBotId,
+  let stateCommandName,
     stateCommandDescription,
     stateCommandFunction,
     stateUsers = undefined;
@@ -37,7 +37,7 @@ const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
   const { state } = useLocation();
 
   if (state) {
-    stateBotId = state.command_object.bot_id;
+    // stateBotId = state.command_object.bot_id;
     stateCommandName = state.command_object.command_name;
     stateCommandDescription = state.command_object.command_description;
     stateCommandFunction = state.command_object.command_function;
@@ -219,7 +219,7 @@ const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
 
   const onChangeHandler = (event: any) => {
     const { name, value } = event.target;
-    setCommandData((prevState) => ({
+    setCommandData((prevState: any) => ({
       ...prevState,
       [name]: {
         ...prevState[name],

@@ -20,7 +20,7 @@ const GitHubOAuthRedirect = () => {
           const userCreds = await requestUserGithub(code);
           console.log(userCreds);
 
-          const user = {
+          const user: any = {
             id: userCreds.id,
             username: userCreds.username,
             email: userCreds.email,

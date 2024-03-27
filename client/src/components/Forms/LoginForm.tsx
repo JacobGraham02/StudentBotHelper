@@ -19,7 +19,16 @@ type LoginDetails = {
   };
 };
 
-const LoginForm = ({
+interface LoginFormProps {
+  onSubmitHandler: any;
+  onChangeHandler: (field: string, value: string) => void;
+  loginDetails: LoginDetails;
+  googleOnSuccessHandler: (response: any) => any;
+  googleOnErrorHandler: () => void;
+  githubLoginHandler: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({
   onSubmitHandler,
   onChangeHandler,
   loginDetails,

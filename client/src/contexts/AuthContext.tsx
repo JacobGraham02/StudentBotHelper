@@ -12,7 +12,7 @@ type BotCredentials = {
   bot_password?: any;
   bot_role_button_channel_id?: any;
   bot_username?: any;
-}
+};
 
 type UserAuthDetails = {
   id: any;
@@ -20,7 +20,7 @@ type UserAuthDetails = {
   name: string;
   email: string;
   role: number;
-  bot: BotCredentials
+  bot: BotCredentials;
 };
 
 type AuthProviderProps = {
@@ -32,7 +32,7 @@ type AuthContextType = {
   login: (userDetails: UserAuthDetails) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
-  updateBotChannels: (channels: { [key: string]: any }) => void; 
+  updateBotChannels: (channels: { [key: string]: any }) => void;
 };
 
 const initialState: UserAuthDetails = {
@@ -51,11 +51,15 @@ const initialState: UserAuthDetails = {
     bot_id: null,
     bot_password: null,
     bot_role_button_channel_id: null,
-    bot_username: null
+    bot_username: null,
   },
 };
 
-type Action = { type: "LOGIN"; payload: UserAuthDetails } | { type: "LOGOUT" } | { type: "UPDATE_NAME"; payload: string } | { type: "UPDATE_BOT_CHANNEL"; payload: { [key: string]: any}};
+type Action =
+  | { type: "LOGIN"; payload: UserAuthDetails }
+  | { type: "LOGOUT" }
+  | { type: "UPDATE_NAME"; payload: string }
+  | { type: "UPDATE_BOT_CHANNEL"; payload: { [key: string]: any } };
 
 // Create reducer for CRUD actions
 const authReducer = (
@@ -97,10 +101,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: "LOGIN", payload: userDetails });
     setAuthCookies(userDetails);
   };
-  
-  const updateName = (name: string) => {
-    dispatch({ type: "UPDATE_NAME", payload: name });
-  };
+
+  // const updateName = (name: string) => {
+  //   dispatch({ type: "UPDATE_NAME", payload: name });
+  // };
 
   const updateBotChannels = (channels: { [key: string]: any }) => {
     dispatch({ type: "UPDATE_BOT_CHANNEL", payload: channels });
@@ -127,13 +131,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         logout,
         isLoggedIn,
-        updateBotChannels
+        updateBotChannels,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
 
 export default AuthProvider;

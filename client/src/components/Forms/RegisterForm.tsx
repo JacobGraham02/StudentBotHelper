@@ -29,7 +29,16 @@ type RegisterDetails = {
   };
 };
 
-const RegisterForm = ({
+interface RegisterFormProps {
+  onSubmitHandler: any;
+  onChangeHandler: (field: string, value: string) => void;
+  registerDetails: RegisterDetails;
+  googleOnSuccessHandler: (response: any) => void; // Ideally, replace `any` with a specific type
+  googleOnErrorHandler: () => void;
+  githubLoginHandler: () => void;
+}
+
+const RegisterForm: React.FC<RegisterFormProps> = ({
   onSubmitHandler,
   onChangeHandler,
   registerDetails,

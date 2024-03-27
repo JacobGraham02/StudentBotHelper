@@ -99,7 +99,7 @@ const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
     setShowModal(true);
   };
 
-  const showErrorSubmissionConfirmation = (error) => {
+  const showErrorSubmissionConfirmation = (error: any) => {
     setModalContent({
       title: `Command submission request unsuccessful`,
       body: `There was an error when attempting to request this command. Please try again or contact the server administrator if you believe this is an error: ${error}`,
@@ -219,7 +219,7 @@ const CommandsPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
 
   const onChangeHandler = (event: any) => {
     const { name, value } = event.target;
-    setCommandData((prevState) => ({
+    setCommandData((prevState: any) => ({
       ...prevState,
       [name]: {
         ...prevState[name],

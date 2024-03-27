@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
@@ -15,7 +15,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const [loginForm, setLoginForm] = useState({
+  const [loginForm, setLoginForm] = useState<any>({
     email: {
       valid: false,
       touched: false,
@@ -32,7 +32,7 @@ const Login = () => {
     if (authCtx?.userAuthDetails.token != "") {
       navigate("/");
     }
-  }, [authCtx?.userAuthDetails.token]);
+  }, [authCtx?.userAuthDetails.token, navigate]);
 
   const onChangeHandler = (field: string, value: string) => {
     let isValid = true; // Default to true, adjust based on validation
@@ -50,7 +50,7 @@ const Login = () => {
     }
 
     // Update state with new value and validation result
-    setLoginForm((prevState) => ({
+    setLoginForm((prevState: any) => ({
       ...prevState,
       [field]: {
         ...prevState[field],
@@ -61,7 +61,7 @@ const Login = () => {
     }));
   };
 
-  const googleOnSuccessHandler = (credentialResponse) => {
+  const googleOnSuccessHandler = (credentialResponse: any) => {
     console.log(credentialResponse);
   };
 
@@ -75,10 +75,10 @@ const Login = () => {
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&scope=user&state=tokenAuthorizationStudentHelperBot`;
   };
 
-  const onSubmitHandler = async (e) => {
+  const onSubmitHandler = async (e: any) => {
     e.preventDefault();
     let formIsValid = true;
-    const updatedFormState = {};
+    const updatedFormState: any = {};
 
     for (const field in loginForm) {
       if (!loginForm[field].valid) {
@@ -109,13 +109,13 @@ const Login = () => {
           name: response.user.name,
           email: response.user.email,
           role: response.user.role,
-          bot: bot.data
+          bot: bot.data,
         };
 
         // Log the user in
         authCtx?.login(userData);
         toast.success("Login successful!");
-      } catch (error) {
+      } catch (error: any) {
         const statusCode = error.response?.status || 500;
         if (statusCode === 401) {
           toast.error("Invalid credentials. Please try again.");

@@ -13,13 +13,21 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { updateBotLoggingChannels } from "../../services/bot/index";
-import { faArrowUpRightFromSquare, faEraser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowUpRightFromSquare,
+  faEraser,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "../user/interfaces/IModalContent";
 import { AuthContext } from "../../contexts/AuthContext";
 
-const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
+const ConfigurationPageContent = ({
+  userLoggedIn,
+}: {
+  userLoggedIn: boolean;
+}) => {
   const navigate = useNavigate();
 
   const authCtx = useContext(AuthContext);
@@ -35,19 +43,22 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
   }
   if (authCtx?.userAuthDetails.bot.bot_commands_channel) {
     command_channel_id = authCtx.userAuthDetails.bot.bot_commands_channel;
-  } 
+  }
   if (authCtx?.userAuthDetails.bot.bot_command_usage_error_channel) {
-    command_error_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_error_channel;
+    command_error_channel_id =
+      authCtx.userAuthDetails.bot.bot_command_usage_error_channel;
   }
   if (authCtx?.userAuthDetails.bot.bot_command_usage_information_channel) {
-    command_info_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_information_channel;
+    command_info_channel_id =
+      authCtx.userAuthDetails.bot.bot_command_usage_information_channel;
   }
   if (authCtx?.userAuthDetails.bot.bot_role_button_channel_id) {
-    bot_role_button_channel_id = authCtx.userAuthDetails.bot.bot_role_button_channel_id;
+    bot_role_button_channel_id =
+      authCtx.userAuthDetails.bot.bot_role_button_channel_id;
   }
 
   const [confirmClear, setConfirmClear] = useState(false);
-  
+
   const [showModal, setShowModal] = useState(false);
 
   const [modalContent, setModalContent] = useState<IModalContent>({
@@ -55,7 +66,7 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
     body: "",
     cancelButtonText: "",
     confirmButtonText: "",
-    onConfirm: () => {}  
+    onConfirm: () => {},
   });
 
   useEffect(() => {
@@ -74,10 +85,10 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       confirmButtonText: `Confirm`,
       onConfirm: () => {
         navigate(-1);
-      }
+      },
     });
     setShowModal(true);
-  }
+  };
 
   const showClearConfirmation = () => {
     setModalContent({
@@ -88,10 +99,10 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       onConfirm: () => {
         onClearHandler();
         setShowModal(false);
-      }
+      },
     });
     setShowModal(true);
-  }
+  };
 
   const submitFormConfirmation = (formSubmitEvent: any) => {
     setModalContent({
@@ -101,10 +112,10 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       confirmButtonText: `Yes`,
       onConfirm: () => {
         onSubmitHandler(formSubmitEvent);
-      }
+      },
     });
     setShowModal(true);
-  }
+  };
 
   const formHasErrorsConfirmation = (formSubmitEvent: any) => {
     setModalContent({
@@ -114,10 +125,10 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       onConfirm: () => {
         onSubmitHandler(formSubmitEvent);
         setShowModal(false);
-      }
+      },
     });
     setShowModal(true);
-  }
+  };
 
   const showSuccessSubmissionConfirmation = () => {
     setModalContent({
@@ -126,52 +137,57 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       confirmButtonText: `Ok`,
       onConfirm: () => {
         setShowModal(false);
-      }
+      },
     });
     setShowModal(true);
-  }
+  };
 
-  const showErrorSubmissionConfirmation = (error) => {
+  const showErrorSubmissionConfirmation = (error: any) => {
     setModalContent({
       title: `Channel id modifications unsuccessful`,
       body: `There was an error attempting to change the channel ids. Please try again or inform the server administrator if you believe this is an error: ${error}`,
       confirmButtonText: `Ok`,
       onConfirm: () => {
         setShowModal(false);
-      }
+      },
     });
     setShowModal(true);
-  }
-    
+  };
+
   const [configurationData, setConfigurationData] = useState<ConfigurationForm>(
     {
       guildId: {
-        value: guild_id  ?? '',
-        error: "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
+        value: guild_id ?? "",
+        error:
+          "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: guild_id ? true : false,
         touched: false,
       },
       commandChannelId: {
-        value: command_channel_id  ?? '',
-        error: "Invalid bot command channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        value: command_channel_id ?? "",
+        error:
+          "Invalid bot command channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: command_channel_id ? true : false,
         touched: false,
       },
       buttonChannelId: {
-        value: bot_role_button_channel_id  ?? '',
-        error: "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        value: bot_role_button_channel_id ?? "",
+        error:
+          "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: bot_role_button_channel_id ? true : false,
         touched: false,
       },
       botInfoChannelId: {
-        value: command_info_channel_id  ?? '',
-        error: "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        value: command_info_channel_id ?? "",
+        error:
+          "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: command_info_channel_id ? true : false,
         touched: false,
       },
       botErrorChannelId: {
-        value:  command_error_channel_id ?? '',
-        error: "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        value: command_error_channel_id ?? "",
+        error:
+          "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: command_error_channel_id ? true : false,
         touched: false,
       },
@@ -182,62 +198,86 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
     setConfigurationData({
       guildId: {
         value: "",
-        error: "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
+        error:
+          "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       commandChannelId: {
         value: "",
-        error: "Invalid command channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error:
+          "Invalid command channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       buttonChannelId: {
         value: "",
-        error: "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error:
+          "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botInfoChannelId: {
         value: "",
-        error: "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error:
+          "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botErrorChannelId: {
         value: "",
-        error: "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error:
+          "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
     });
   };
 
+  // const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target as HTMLInputElement;
+
+  //   const channelIdRegexPattern = /^[0-9]{18}$/;
+
+  //   const isTextValid = channelIdRegexPattern.test(value);
+
+  //   setConfigurationData((prevState) => ({
+  //     ...prevState,
+  //     [name]: {
+  //       ...prevState[name],
+  //       valid: isTextValid,
+  //       value: value,
+  //       touched: true,
+  //     },
+  //   }));
+  // };
+
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target as HTMLInputElement;
+    const { name, value } = e.target;
 
     const channelIdRegexPattern = /^[0-9]{18}$/;
-
     const isTextValid = channelIdRegexPattern.test(value);
 
-    setConfigurationData((prevState) => ({
+    setConfigurationData((prevState: any) => ({
       ...prevState,
-      [name]: { 
+      [name]: {
         ...prevState[name],
         valid: isTextValid,
         value: value,
-        touched: true
-      }
+        touched: true,
+      },
     }));
   };
 
   const onSubmitHandler = async (formSubmitEvent: any) => {
     formSubmitEvent.preventDefault();
 
-    const allFieldsValid = Object.values(configurationData).every(field => field.valid);
+    const allFieldsValid = Object.values(configurationData).every(
+      (field) => field.valid
+    );
 
     if (!allFieldsValid) {
-      formHasErrorsConfirmation(formSubmitEvent)
+      formHasErrorsConfirmation(formSubmitEvent);
       return;
     }
 
@@ -247,8 +287,8 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
       bot_command_channel_id: configurationData.commandChannelId.value,
       bot_button_channel_id: configurationData.buttonChannelId.value,
       bot_info_channel_id: configurationData.botInfoChannelId.value,
-      bot_error_channel_id: configurationData.botErrorChannelId.value
-    }
+      bot_error_channel_id: configurationData.botErrorChannelId.value,
+    };
 
     try {
       const patchChannelIdsResponse = await updateBotLoggingChannels(
@@ -264,28 +304,28 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
           bot_command_channel_id: configurationData.commandChannelId.value,
           bot_button_channel_id: configurationData.buttonChannelId.value,
           bot_info_channel_id: configurationData.botInfoChannelId.value,
-          bot_error_channel_id: configurationData.botErrorChannelId.value
-        }
-        
+          bot_error_channel_id: configurationData.botErrorChannelId.value,
+        };
+
         authCtx?.updateBotChannels(newChannels);
       }
     } catch (error) {
-      showErrorSubmissionConfirmation
+      showErrorSubmissionConfirmation;
     }
   };
-  
+
   if (userLoggedIn) {
     return (
       <main id="main" className="text-center">
-          <CustomModal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            title={modalContent.title}
-            body={modalContent.body}
-            cancelButtonText={modalContent.cancelButtonText}
-            confirmButtonText={modalContent.confirmButtonText!}
-            onConfirm={modalContent.onConfirm}
-          ></CustomModal>
+        <CustomModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          title={modalContent.title}
+          body={modalContent.body}
+          cancelButtonText={modalContent.cancelButtonText}
+          confirmButtonText={modalContent.confirmButtonText!}
+          onConfirm={modalContent.onConfirm}
+        ></CustomModal>
 
         <aside id="bot_configuration_options_page_content">
           <h1 id="bot_onfiguration_options_page_title">
@@ -299,15 +339,21 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
         <Container>
           <Row className="my-1 justify-content-between mt-5">
             <Col xs="auto">
-              <Button className="btn btn-danger" onClick={() => showCancelConfirmation()}>
-                <FontAwesomeIcon icon={faXmark}  className="mx-1"/>
+              <Button
+                className="btn btn-danger"
+                onClick={() => showCancelConfirmation()}
+              >
+                <FontAwesomeIcon icon={faXmark} className="mx-1" />
                 Cancel
               </Button>
             </Col>
 
             <Col xs="auto">
-              <Button className="btn btn-secondary" onClick={() => showClearConfirmation()}>
-                <FontAwesomeIcon icon={faEraser} className="mx-1"/>
+              <Button
+                className="btn btn-secondary"
+                onClick={() => showClearConfirmation()}
+              >
+                <FontAwesomeIcon icon={faEraser} className="mx-1" />
                 Reset
               </Button>
             </Col>
@@ -342,7 +388,7 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                         configurationData.guildId.value.length > 0
                       }
                     />
-                     {configurationData.guildId.error &&
+                    {configurationData.guildId.error &&
                       configurationData.guildId.valid === false && (
                         <FormControl.Feedback type="invalid">
                           {configurationData.guildId.error}
@@ -409,8 +455,8 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                         !configurationData.buttonChannelId.valid &&
                         configurationData.buttonChannelId.value.length > 0
                       }
-                      />
-                     {configurationData.buttonChannelId.error &&
+                    />
+                    {configurationData.buttonChannelId.error &&
                       configurationData.buttonChannelId.valid === false && (
                         <FormControl.Feedback type="invalid">
                           {configurationData.buttonChannelId.error}
@@ -442,8 +488,8 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                         !configurationData.botInfoChannelId.valid &&
                         configurationData.botInfoChannelId.value.length > 0
                       }
-                      />
-                     {configurationData.botInfoChannelId.error &&
+                    />
+                    {configurationData.botInfoChannelId.error &&
                       configurationData.botInfoChannelId.valid === false && (
                         <FormControl.Feedback type="invalid">
                           {configurationData.botInfoChannelId.error}
@@ -477,8 +523,8 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                         !configurationData.botErrorChannelId.valid &&
                         configurationData.botErrorChannelId.value.length > 0
                       }
-                      />
-                     {configurationData.botErrorChannelId.error &&
+                    />
+                    {configurationData.botErrorChannelId.error &&
                       configurationData.botErrorChannelId.valid === false && (
                         <FormControl.Feedback type="invalid">
                           {configurationData.botErrorChannelId.error}
@@ -489,8 +535,16 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
               </Row>
               <Row className="my-1 justify-content-center mt-5">
                 <Col xs={6} md={3}>
-                  <Button className="btn btn-info" onClick={(formSubmitEvent) => {submitFormConfirmation(formSubmitEvent)}}>
-                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="mx-1"/>
+                  <Button
+                    className="btn btn-info"
+                    onClick={(formSubmitEvent) => {
+                      submitFormConfirmation(formSubmitEvent);
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faArrowUpRightFromSquare}
+                      className="mx-1"
+                    />
                     Submit changes
                   </Button>
                 </Col>
@@ -501,8 +555,7 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
           <form
             id="bot_configuration_options_form"
             onSubmit={onSubmitHandler}
-          >
-          </form>
+          ></form>
         </section>
       </main>
     );
