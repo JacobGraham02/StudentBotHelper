@@ -3,6 +3,7 @@ import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 import { getAllBotCommands } from "../../services/bot";
 import { NavLink, useNavigate } from "react-router-dom";
+import "../../assets/css/DashboardPageStyling.css"
 
 const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
   const navigate = useNavigate();
@@ -28,7 +29,6 @@ const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
       try {
         const commands = await getAllBotCommands();
         setBotCommands(commands.data.data);
-        console.log(commands.data.data[0].data);
       } catch (error) {
         console.error(`There was an error fetching bot commands: ${error}`);
       } 
@@ -72,9 +72,9 @@ const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
           </h3>
         </aside>
       <div>
-        <ul>
+        <ul className="list-unstyled">
           {currentCommands.map((command, index) => (
-            <li key={index}>
+            <li key={index} className="list-item list-item-hover"> 
               <NavLink
                 to="/command"
                 state={{ command_object: command, command_data: command.data }}
@@ -87,11 +87,11 @@ const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
           ))}
         </ul>
       </div>
-      <div>
-        <button onClick={prevPage} disabled={currentPage === 1}>
+      <div className="mt-3">
+        <button className="btn btn-secondary me-2" onClick={prevPage} disabled={currentPage === 1}>
           Previous
         </button>
-        <button onClick={nextPage} disabled={currentPage === totalPages}>
+        <button className="btn btn-primary me-2" onClick={nextPage} disabled={currentPage === totalPages}>
           Next
         </button>
       </div>

@@ -70,11 +70,19 @@ const router = createBrowserRouter([
       },
       {
         path: "profile", 
-        element: <ProfilePage isUserLoggedIn={true} /> 
+        element: (
+          <ProtectedRoute>
+            <ProfilePage isUserLoggedIn={true} /> 
+          </ProtectedRoute>
+        ),
       },
       { 
         path: "dashboard",
-        element: <DashboardPage isUserLoggedIn={true} />
+        element: (
+          <ProtectedRoute>
+            <DashboardPage isUserLoggedIn={true} />
+          </ProtectedRoute>
+        )
       },
       {
         path: "login",
@@ -94,7 +102,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'logs',
-        element: <LogsPage />
+        element: (
+          <ProtectedRoute>
+            <LogsPage />
+          </ProtectedRoute>
+        )
       },
       {
         path: "configurations",
@@ -106,11 +118,19 @@ const router = createBrowserRouter([
       },
       {
         path: 'home',
-        element: <LandingPage />
+        element: (
+          <ProtectedRoute>
+            <LandingPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "support",
-        element: <SupportPage />,
+        element: (
+          <ProtectedRoute>
+            <SupportPage />,
+          </ProtectedRoute>
+        ),
       },
     ],
   },

@@ -19,7 +19,7 @@ export default class CommandRequestEmail {
             await emailTransporter.sendMail(mailOptions);
         } catch (error) {
             console.log(`There was an error when attempting to send the email to a gmail account: ${error}`);
-            throw error;
+            throw new Error(`There was an error when attempting to send the email to a gmail account: ${error}`);
         }
     }
 
@@ -50,7 +50,7 @@ export default class CommandRequestEmail {
             const emailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    type: "OAuth2",
+                    // type: "OAuth2",
                     user: process.env.google_admin_email,
                     accessToken,
                     clientId: process.env.google_cloud_client_id,
@@ -60,7 +60,8 @@ export default class CommandRequestEmail {
             });
             return emailTransporter;
         } catch (error) {
-            return error;
+            console.log(`There was an error when attempting to create an OAuth2 transporter object: ${error}`);
+            throw new Error(`There was an error when attempting to create an OAuth2 transporter object: ${error}`);
         }
     }
 }

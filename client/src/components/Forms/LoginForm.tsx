@@ -35,14 +35,14 @@ const LoginForm = ({
   return (
     <Container className="">
       <Row className="justify-content-md-center">
-        <Container className="text-center my-2 d-flex flex-column align-items-center">
+        {/* <Container className="text-center my-2 d-flex flex-column align-items-center">
           <div className="mb-2 d-flex justify-content-center w-100">
             <GoogleLogin
               onSuccess={googleOnSuccessHandler}
               onError={googleOnErrorHandler}
             />
           </div>
-          {/* Line Separator with "or" in the middle */}
+
           <div className="separator d-flex align-items-center my-1">
             <div className="line"></div>
             <span className="px-2">or</span>
@@ -55,14 +55,14 @@ const LoginForm = ({
               text={"Login with GitHub"}
             />
           </div>
-        </Container>
+        </Container> */}
         <Col md={6}>
           <Form onSubmit={onSubmitHandler}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter email"
+                placeholder="Enter the email given to you on Discord (e.g., jdgraha1@lakeheadu.ca)"
                 value={loginDetails.email.value}
                 onChange={(e) => handleChange("email", e.target.value)}
                 isInvalid={
@@ -70,7 +70,7 @@ const LoginForm = ({
                 }
               />
               <Form.Control.Feedback type="invalid">
-                Please provide a valid email.
+                Enter the email that given to you on Discord
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -78,7 +78,7 @@ const LoginForm = ({
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Password"
+                placeholder="Enter the password given to you on Discord (e.g., pass1)"
                 value={loginDetails.password.value}
                 onChange={(e) => handleChange("password", e.target.value)}
                 isInvalid={
@@ -86,17 +86,17 @@ const LoginForm = ({
                 }
               />
               <Form.Control.Feedback type="invalid">
-                Please provide a valid password (longer than 8 characters).
+                Enter the password that was given to you on Discord
               </Form.Control.Feedback>
             </Form.Group>
             <Container>
-              <Row className="justify-content-center my-3">
+              {/* <Row className="justify-content-center my-3">
                 <Col xs="auto">
                   <Link to="/register" className="btn btn-link">
                     Create an account instead.
                   </Link>
                 </Col>
-              </Row>
+              </Row> */}
 
               <Row className="justify-content-center">
                 <Col xs={12} md={8} lg={6}>

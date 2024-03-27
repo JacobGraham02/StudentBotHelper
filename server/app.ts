@@ -152,9 +152,9 @@ const custom_event_emitter = CustomEventEmitter.getCustomEventEmitterInstance();
 async function writeLogToAzureStorage(fileContents: string, fileName: string, containerName: string): Promise<void> {
   try {
       await bot_repository.writeLogToAzureContainer(fileContents, fileName, containerName);
-      console.log(`Command file '${fileName}' written to the container '${containerName}' successfully.`);
   } catch (error) {
-      console.error(`Error writing command file '${fileName}' to the container '${containerName}':`, error);
+      console.error(`Error writing command file '${fileName}' to the container '${containerName}': ${error}`);
+      throw new Error(`Error writing command file '${fileName}' to the container '${containerName}': ${error}`);
   }
 }
 
@@ -279,7 +279,7 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
               `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: in the wrong channel`
             );
           }
-          await interaction.reply({content:`You have used a command in the wrong channel! Use the channel titled **bot** instead to use commands`});
+          await interaction.reply({content:`You have used a command in the wrong channel! Use the channel titled **bot-commands-channel** instead to use commands`});
           return;
         }
       }
@@ -334,9 +334,8 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       `ErrorLog`, 
       `studentbothelpererror`
       );
-      await interaction.reply({
+      await interaction.editReply({
         content: `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
-        ephemeral: true,
       });
       writeLogToAzureStorage(
         `There was an error when attempting to execute the command. Please inform the server administrator of this error ${error}`,
