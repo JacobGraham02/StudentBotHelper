@@ -15,6 +15,8 @@ export type Bot = {
 }
   
 export type BotCommand = {
+    botId: string,
+    botGuildId: string,
     commandName: string,
     commandDescription: string,
     commandDescriptionForFunction: string;

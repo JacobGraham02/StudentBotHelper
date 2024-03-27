@@ -1,4 +1,9 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 import "./assets/styles.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -55,21 +60,29 @@ const router = createBrowserRouter([
         path: "/",
         element: (
           <ProtectedRoute>
-            <Dashboard />
+            <LandingPage />
           </ProtectedRoute>
         ),
       },
       {
-        path: "register",
-        element: <Register />,
+        path: "register", 
+        element: <Register /> 
       },
       {
-        path: "profile",
-        element: <ProfilePage />,
+        path: "profile", 
+        element: (
+          <ProtectedRoute>
+            <ProfilePage isUserLoggedIn={true} /> 
+          </ProtectedRoute>
+        ),
       },
-      {
+      { 
         path: "dashboard",
-        element: <DashboardPage />,
+        element: (
+          <ProtectedRoute>
+            <DashboardPage isUserLoggedIn={true} />
+          </ProtectedRoute>
+        )
       },
       {
         path: "login",
@@ -85,11 +98,19 @@ const router = createBrowserRouter([
       },
       {
         path: "command",
-        element: <CommandPage isUserLoggedIn={true} />,
+        element: (
+          <ProtectedRoute>
+            <CommandPage isUserLoggedIn={true} />
+          </ProtectedRoute>
+        )
       },
       {
-        path: "logs",
-        element: <LogsPage />,
+        path: 'logs',
+        element: (
+          <ProtectedRoute>
+            <LogsPage />
+          </ProtectedRoute>
+        )
       },
       {
         path: "configurations",
@@ -100,12 +121,20 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "home",
-        element: <LandingPage />,
+        path: 'home',
+        element: (
+          <ProtectedRoute>
+            <LandingPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "support",
-        element: <SupportPage />,
+        element: (
+          <ProtectedRoute>
+            <SupportPage />,
+          </ProtectedRoute>
+        ),
       },
     ],
   },

@@ -1,0 +1,19 @@
+/* Increases the font size and adds margin to the bottom of each list item */
+.list-item {
+    font-size: 1.2rem; /* Larger font size */
+    margin-bottom: 10px; /* Adds space between list items */
+}
+  
+.nav-link {
+    color: blue; /* Ensures nav links have a specific color, already defined */
+}
+  
+.nav-link:hover {
+    text-decoration: none; /* Example hover effect on nav links, already defined */
+}
+  
+.list-item-hover:hover {
+    font-weight: bold;
+    color: red;
+}
+  

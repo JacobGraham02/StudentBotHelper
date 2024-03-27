@@ -255,9 +255,7 @@ export default class BotRepository {
             const uploadResponse: BlobUploadCommonResponse = await blobClient.upload(modifiedFileContents, Buffer.byteLength(modifiedFileContents));
     
             // Check if upload was successful
-            if (uploadResponse._response.status === 201) {
-                console.log(`Log file '${blobFileName}' uploaded successfully.`);
-            } else {
+            if (!(uploadResponse._response.status === 201)) {
                 throw new Error(`Failed to upload log file '${blobFileName}'.`);
             }
         } catch (error) {
