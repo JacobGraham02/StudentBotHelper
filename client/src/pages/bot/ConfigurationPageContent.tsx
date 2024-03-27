@@ -149,31 +149,31 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
     {
       guildId: {
         value: guild_id  ?? '',
-        error: "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid guild id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: guild_id ? true : false,
         touched: false,
       },
       commandChannelId: {
         value: command_channel_id  ?? '',
-        error: "Invalid bot command channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid bot command channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: command_channel_id ? true : false,
         touched: false,
       },
       buttonChannelId: {
         value: bot_role_button_channel_id  ?? '',
-        error: "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid bot role button channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: bot_role_button_channel_id ? true : false,
         touched: false,
       },
       botInfoChannelId: {
         value: command_info_channel_id  ?? '',
-        error: "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid info channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: command_info_channel_id ? true : false,
         touched: false,
       },
       botErrorChannelId: {
         value:  command_error_channel_id ?? '',
-        error: "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid error channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: command_error_channel_id ? true : false,
         touched: false,
       },
@@ -184,31 +184,31 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
     setConfigurationData({
       guildId: {
         value: "",
-        error: "Invalid guild id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid guild id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       commandChannelId: {
         value: "",
-        error: "Invalid command channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid command channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       buttonChannelId: {
         value: "",
-        error: "Invalid bot role button channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid bot role button channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botInfoChannelId: {
         value: "",
-        error: "Invalid info channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid info channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
       botErrorChannelId: {
         value: "",
-        error: "Invalid error channel id. Please input a string of 18 numbers ranging from 0 to 9",
+        error: "Invalid error channel id. Please input a string of 19 numbers ranging from 0 to 9",
         valid: false,
         touched: false,
       },
@@ -218,7 +218,7 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target as HTMLInputElement;
 
-    const channelIdRegexPattern = /^[0-9]{18}$/;
+    const channelIdRegexPattern = /^[0-9]{19}$/;
 
     const isTextValid = channelIdRegexPattern.test(value);
 
@@ -334,9 +334,9 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                       onChange={onChangeHandler}
                       value={configurationData.guildId.value}
                       name="guildId"
-                      placeholder="18 digits (e.g., 123456789123456789)"
-                      pattern="[0-9]{18}"
-                      title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
+                      placeholder="19 digits (e.g., 123456789123456789)"
+                      pattern="[0-9]{19}"
+                      title="Please enter a valid 19-digit number: (e.g., 123456789123456789)"
                       required
                       isInvalid={
                         configurationData.guildId.touched &&
@@ -365,9 +365,9 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                       className="bot_configuration_options_input"
                       type="text"
                       name="commandChannelId"
-                      placeholder="18 digits (e.g., 123456789123456789)"
-                      pattern="[0-9]{18}"
-                      title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
+                      placeholder="19 digits (e.g., 123456789123456789)"
+                      pattern="[0-9]{19}"
+                      title="Please enter a valid 19-digit number: (e.g., 123456789123456789)"
                       required
                       onChange={onChangeHandler}
                       value={configurationData.commandChannelId.value}
@@ -400,9 +400,9 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                       className="bot_configuration_options_input"
                       type="text"
                       name="buttonChannelId"
-                      placeholder="18 digits (e.g., 123456789123456789)"
-                      pattern="[0-9]{18}"
-                      title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
+                      placeholder="19 digits (e.g., 123456789123456789)"
+                      pattern="[0-9]{19}"
+                      title="Please enter a valid 9-digit number: (e.g., 123456789123456789)"
                       required
                       onChange={onChangeHandler}
                       value={configurationData.buttonChannelId.value}
@@ -433,9 +433,9 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                       className="bot_configuration_options_input"
                       type="text"
                       name="botInfoChannelId"
-                      placeholder="18 digits (e.g., 123456789123456789)"
-                      pattern="[0-9]{18}"
-                      title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
+                      placeholder="19 digits (e.g., 123456789123456789)"
+                      pattern="[0-9]{19}"
+                      title="Please enter a valid 19-digit number: (e.g., 123456789123456789)"
                       required
                       onChange={onChangeHandler}
                       value={configurationData.botInfoChannelId.value}
@@ -468,9 +468,9 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
                       className="bot_configuration_options_input"
                       type="text"
                       name="botErrorChannelId"
-                      placeholder="18 digits (e.g., 123456789123456789)"
-                      pattern="[0-9]{18}"
-                      title="Please enter a valid 18-digit number: (e.g., 123456789123456789)"
+                      placeholder="19 digits (e.g., 123456789123456789)"
+                      pattern="[0-9]{19}"
+                      title="Please enter a valid 19-digit number: (e.g., 123456789123456789)"
                       required
                       onChange={onChangeHandler}
                       value={configurationData.botErrorChannelId.value}
