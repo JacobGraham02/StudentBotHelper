@@ -1,5 +1,6 @@
 export type DiscordBotCommandType = {
-    botId: number;
+    botId: string;
+    botGuildId: string;
     commandName: string;
     commandDescription: string;
     commandDescriptionForFunction: string;

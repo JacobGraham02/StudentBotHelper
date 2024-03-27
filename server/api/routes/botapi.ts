@@ -9,7 +9,6 @@ import "dotenv/config";
 import Logger from "../../utils/Logger";
 import { DiscordBotCommandType } from "../../database/MongoDB/types/DiscordBotCommandType";
 import CommandRequestEmail from "../../utils/CommandRequestEmail";
-import { UUID } from "crypto";
 import { DiscordBotInformationType } from "../../database/MongoDB/types/DiscordBotInformationType";
 dotenv.config({ path: "../../../.env" });
 
@@ -266,11 +265,15 @@ bot_commands_router.post("/commands", [ /*
     
     async function (request: Request, response: Response, next: NextFunction) {
     const {
+      botId,
+      botGuildId,
       commandName,
       commandDescription,
       commandDescriptionForFunction,
       commandAuthorizedUsers,
     }: {
+      botId: string,
+      botGuildId: string,
       commandName: string,
       commandDescription: string,
       commandDescriptionForFunction: string,
@@ -287,7 +290,8 @@ bot_commands_router.post("/commands", [ /*
     }
     
     const command_object: DiscordBotCommandType = {
-      botId: 1,
+      botId: botId,
+      botGuildId: botGuildId,
       commandName: commandName,
       commandDescription: commandDescription,
       commandDescriptionForFunction: commandDescriptionForFunction,
@@ -326,11 +330,15 @@ bot_commands_router.post('/newcommandrequest', [ /*
 
   async function (request: Request, response: Response, next: NextFunction) {
   const {
+    botId,
+    botGuildId,
     commandName,
     commandDescription,
     commandDescriptionForFunction,
     commandAuthorizedUsers,
   }: {
+    botId: string,
+    botGuildId: string,
     commandName: string,
     commandDescription: string,
     commandDescriptionForFunction: string,
@@ -347,7 +355,8 @@ bot_commands_router.post('/newcommandrequest', [ /*
   }
 
   const new_command_request: DiscordBotCommandType = {
-    botId: 1,
+    botId: botId,
+    botGuildId: botGuildId,
     commandName: commandName,
     commandDescription: commandDescription,
     commandDescriptionForFunction: commandDescriptionForFunction,

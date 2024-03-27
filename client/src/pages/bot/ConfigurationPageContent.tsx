@@ -30,20 +30,22 @@ const ConfigurationPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) =
   let command_channel_id = undefined;
   let bot_role_button_channel_id = undefined;
 
-  if (authCtx?.userAuthDetails.bot.bot_guild_id) {
-    guild_id = authCtx.userAuthDetails.bot.bot_guild_id;
-  }
-  if (authCtx?.userAuthDetails.bot.bot_commands_channel) {
-    command_channel_id = authCtx.userAuthDetails.bot.bot_commands_channel;
-  } 
-  if (authCtx?.userAuthDetails.bot.bot_command_usage_error_channel) {
-    command_error_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_error_channel;
-  }
-  if (authCtx?.userAuthDetails.bot.bot_command_usage_information_channel) {
-    command_info_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_information_channel;
-  }
-  if (authCtx?.userAuthDetails.bot.bot_role_button_channel_id) {
-    bot_role_button_channel_id = authCtx.userAuthDetails.bot.bot_role_button_channel_id;
+  if (authCtx?.userAuthDetails.bot) {
+    if (authCtx?.userAuthDetails.bot.bot_guild_id) {
+      guild_id = authCtx.userAuthDetails.bot.bot_guild_id;
+    }
+    if (authCtx?.userAuthDetails.bot.bot_commands_channel) {
+      command_channel_id = authCtx.userAuthDetails.bot.bot_commands_channel;
+    } 
+    if (authCtx?.userAuthDetails.bot.bot_command_usage_error_channel) {
+      command_error_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_error_channel;
+    }
+    if (authCtx?.userAuthDetails.bot.bot_command_usage_information_channel) {
+      command_info_channel_id = authCtx.userAuthDetails.bot.bot_command_usage_information_channel;
+    }
+    if (authCtx?.userAuthDetails.bot.bot_role_button_channel_id) {
+      bot_role_button_channel_id = authCtx.userAuthDetails.bot.bot_role_button_channel_id;
+    }
   }
 
   const [confirmClear, setConfirmClear] = useState(false);

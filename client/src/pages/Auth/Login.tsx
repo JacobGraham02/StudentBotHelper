@@ -132,7 +132,8 @@ const Login = () => {
   return (
     <>
       <Container className="text-center my-5">
-        <h4>Welcome Back!</h4>
+        <h3>Welcome back!</h3>
+        <h5>Log into your Student Bot Helper account</h5>
       </Container>
 
       <Container className="">

@@ -1,5 +1,4 @@
 import path from "path";
-import CustomDiscordClient from "../utils/CustomDiscordClient";
 import { Collection, REST, Routes } from "discord.js";
 import fs from "fs";
 import * as dotenv from "dotenv";
@@ -15,6 +14,10 @@ export default function() {
         authorization_role_name: ["Discord admin"],
         
         async execute(interaction) {
+          if (interaction.replied) {
+             console.log(`There reply for the registerCommands interaction has already taken place`);
+             return;
+          }
           const discordToken = process.env.discord_bot_token;
           const botId = process.env.discord_bot_application_id;
           const guildId = interaction.guild?.id;
@@ -51,11 +54,11 @@ export default function() {
               console.log(`The commands have been registered with your discord bot`);
             } catch (error) {
               // Added a catch block to handle errors during rest.put
-              await interaction.reply({content: `There was an error registering the commands with your bot. Please inform the bot developer.`, ephemeral: true});
+              await interaction.editReply({content: `There was an error registering the commands with your bot. Please inform the bot developer of the following error: ${error}`, ephemeral: true});
               console.error(`Error registering commands with the bot:`, error);
             }
           } else {
-            await interaction.reply({content: `The discord bot token, bot id, or token id was invalid when trying to register the commands with your bot. Please inform the bot developer of this error`, ephemeral: true});
+            await interaction.editReply({content: `The discord bot token, bot id, or token id was invalid when trying to register the commands with your bot. Please inform the bot developer of this error`, ephemeral: true});
             console.error(`The discord client id, guild id, or bot token was invalid when trying to register commands with the bot`);
           }
 

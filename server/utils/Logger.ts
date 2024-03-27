@@ -13,7 +13,7 @@ export default class Logger {
     private async sendMessageToDiscordChannel(channel: Channel, log_message: string) {
         if (!this.discord_client) {
             console.error(`The discord bot instance is undefined or null. Please inform the server administrator of this error`);
-            return;
+            throw new Error(`The discord bot instance is undefined or null. Please inform the server administrator of this error`);
         }
 
         try {
@@ -22,6 +22,7 @@ export default class Logger {
             }
         } catch (error) {
             console.error(`There was an error when attempting to send a log message to the proper Discord channel. Please contact the site administrator about this error: ${error}`);
+            throw new Error(`There was an error when attempting to send a log message to the proper Discord channel. Please contact the site administrator about this error: ${error}`);
         }
     }
 
@@ -51,47 +52,49 @@ export default class Logger {
     public async logDiscordError(channel: Channel | undefined, error: string) {
         if (!this.validateStringIsDefinedAndConformsToRegex(error)) {
             console.error(`The error message that we want to write to the Discord error messages text channel is undefined or null`);
-            return;
+            throw new Error(`The error message that we want to write to the Discord error messages text channel is undefined or null`);
         }
 
         const formatted_error_message_string = this.formatDiscordApiRelativeDate(error);
 
         if (!channel) {
             console.error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
-            return;
+            throw new Error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
         }
 
         try {
             await this.sendMessageToDiscordChannel(channel, formatted_error_message_string);
         } catch (error) {
             console.error(`There was an error when attempting to write to the errors log file: ${error}`);
+            throw new Error(`There was an error when attempting to write to the errors log file: ${error}`);
         }
     }
 
     public async logDiscordMessage(channel: Channel | undefined, message: string) {
         if (!this.validateStringIsDefinedAndConformsToRegex(message)) {
             console.error(`The information message to write to the message log Discord channel is undefined`);
-            return;
+            throw new Error(`The information message to write to the message log Discord channel is undefined`);
         }
         
         const formatted_information_message_string = this.formatDiscordApiRelativeDate(message);
 
         if (!channel) {
             console.error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
-            return;
+            throw new Error(`There was an error writing the error log message to Discord because the channel id for error log messages is undefined. Please contact your server administrator and inform them of this`);
         }
 
         try {
             await this.sendMessageToDiscordChannel(channel, formatted_information_message_string);
         } catch (error) {
             console.error(`There was an error when attempting to write to the messages log file: ${message}`);
+            throw new Error(`There was an error when attempting to write to the messages log file: ${message}`);
         }
     }
 
     public async getWebsiteLogMessage(message: string) {
         if (!this.validateStringIsDefinedAndConformsToRegex(message)) {
             console.error(`The information message to write to the bot website contains invalid characters. Please inform the server administrator if you believe this is an error`);
-            return;
+            throw new Error(`The information message to write to the bot website contains invalid characters. Please inform the server administrator if you believe this is an error`);
         }
 
         const formatted_information_message_string = this.formatLogMessageToRelativeDate(message);

@@ -1,20 +1,24 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useContext } from "react";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 import { getAllBotCommands } from "../../services/bot";
 import { NavLink, useNavigate } from "react-router-dom";
+import "../../assets/css/DashboardPageStyling.css"
+import { AuthContext } from "../../contexts/AuthContext";
 
-const DashboardPageContent = () => {
+const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
   const navigate = useNavigate();
+
+  const authCtx = useContext(AuthContext);
 
   const [showModal, setShowModal] = useState(false);
 
-  const [modalContent] = useState<IModalContent>({
+  const [modalContent, setModalContent] = useState<IModalContent>({
     title: "",
     body: "",
     cancelButtonText: "",
     confirmButtonText: "",
-    onConfirm: () => {},
+    onConfirm: () => {}
   });
 
   const [botCommands, setBotCommands] = useState<any[]>([]);
@@ -28,10 +32,9 @@ const DashboardPageContent = () => {
       try {
         const commands = await getAllBotCommands();
         setBotCommands(commands.data.data);
-        console.log(commands.data.data[0].data);
       } catch (error) {
         console.error(`There was an error fetching bot commands: ${error}`);
-      }
+      } 
     };
     fetchBotCommands();
   }, []);
@@ -58,23 +61,23 @@ const DashboardPageContent = () => {
   };
 
   const handleCommandClick = (command: any) => {
-    navigate("/command", {
-      state: { command_object: command, command_data: command.data },
-    });
+    navigate("/command", { state: { command_object: command, command_data: command.data }});
   };
 
   return (
     <main id="main" className="text-center">
-      <aside id="bot_configuration_options_page_content">
-        <h1 id="dashboard_h1_title">Your dashboard</h1>
-        <h3 id="dashboard_h3_title">
-          Below are a list of commands available to you:
-        </h3>
-      </aside>
+       <aside id="bot_configuration_options_page_content">
+          <h1 id="dashboard_h1_title">
+            {authCtx?.userAuthDetails.name}'s dashboard
+          </h1>
+          <h3 id="dashboard_h3_title">
+            Below are a list of commands available to you:
+          </h3>
+        </aside>
       <div>
-        <ul>
+        <ul className="list-unstyled">
           {currentCommands.map((command, index) => (
-            <li key={index}>
+            <li key={index} className="list-item list-item-hover"> 
               <NavLink
                 to="/command"
                 state={{ command_object: command, command_data: command.data }}
@@ -87,11 +90,11 @@ const DashboardPageContent = () => {
           ))}
         </ul>
       </div>
-      <div>
-        <button onClick={prevPage} disabled={currentPage === 1}>
+      <div className="mt-3">
+        <button className="btn btn-secondary me-2" onClick={prevPage} disabled={currentPage === 1}>
           Previous
         </button>
-        <button onClick={nextPage} disabled={currentPage === totalPages}>
+        <button className="btn btn-primary me-2" onClick={nextPage} disabled={currentPage === totalPages}>
           Next
         </button>
       </div>
