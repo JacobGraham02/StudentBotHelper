@@ -28,7 +28,9 @@ export default function() {
             try {
                 await interaction.reply({content:`**Available Commands:**\n${command_list.join('\n')}`,ephemeral:true});
             } catch (error) {
-                await interaction.reply({content:`There was an error when writing the list of available commands to Discord`,ephemeral:true});
+                if (!interaction.replied) {
+                    await interaction.followUp({content:`There was an error when writing the list of available commands to Discord`,ephemeral:true});
+                }
             }
         }
     }

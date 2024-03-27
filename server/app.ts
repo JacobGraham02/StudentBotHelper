@@ -164,6 +164,7 @@ async function writeLogToAzureStorage(fileContents: string, fileName: string, co
  */
 // async function writeLogToAzureStorage(fileContents: string, fileName: string, containerName: string): Promise<void> {
 discord_client_instance.on("ready", async () => {
+  logger = new Logger(discord_client_instance);
   if (discord_client_instance.user) {
     console.log(
       `The discord bot is logged in as ${discord_client_instance.user.tag}`
@@ -198,7 +199,6 @@ discord_client_instance.on("ready", async () => {
  *
  */
 discord_client_instance.on("interactionCreate", async (interaction) => {
-  
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
   }
@@ -240,6 +240,8 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
     if (registerCommandResult && registerCommandResult.discord_client_instance_collection) {
       discord_client_instance.discord_commands = registerCommandResult.discord_client_instance_collection;
     }
+  } else {
+    await command.execute(interaction);
   }
   
   /*
@@ -260,8 +262,6 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
 
-    logger = new Logger(discord_client_instance);
-
     try {
       const botInfo = await bot_repository.findBotByGuildId(interaction.guildId!);
 
@@ -279,12 +279,8 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
               `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: in the wrong channel`
             );
           }
-          await interaction.reply({content:`You have used a command in the wrong channel! Use the channel titled **bot-commands-channel** instead to use commands`});
-          return;
         }
       }
-
-      await command.execute(interaction);
 
       if (!botInfo) {
         return;
