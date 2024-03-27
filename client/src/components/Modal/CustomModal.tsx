@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import React from "react";
+import { Modal, Button } from "react-bootstrap";
 
 interface CustomModalProps {
   showModal: boolean; // Controls whether the modal is shown
@@ -8,42 +8,63 @@ interface CustomModalProps {
   body: React.ReactNode;
   cancelButtonText?: string;
   confirmButtonText: string;
-  size?: 'sm' | 'lg' | 'xl';
+  size?: "sm" | "lg" | "xl";
   onConfirm: () => void;
 }
 
-const CustomModal: React.FC<CustomModalProps> = ({ showModal, setShowModal, title, body, cancelButtonText, confirmButtonText, size, onConfirm }) => {
-    if (cancelButtonText) {
-        return (
-            <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" keyboard={false} size={size}>
-            <Modal.Header closeButton>
-                <Modal.Title>{title}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>{body}</Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => setShowModal(false)}>
-                    {cancelButtonText}
-                </Button>
-                <Button variant="primary" onClick={onConfirm}>
-                    {confirmButtonText}
-                </Button>
-            </Modal.Footer>
-            </Modal>
-        );
-    } else {
+const CustomModal: React.FC<CustomModalProps> = ({
+  showModal,
+  setShowModal,
+  title,
+  body,
+  cancelButtonText,
+  confirmButtonText,
+  size,
+  onConfirm,
+}) => {
+  if (cancelButtonText) {
     return (
-        <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" keyboard={false}>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        backdrop="static"
+        keyboard={false}
+        size={size}
+      >
         <Modal.Header closeButton>
-            <Modal.Title>{title}</Modal.Title>
+          <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{body}</Modal.Body>
         <Modal.Footer>
-            <Button variant="primary" onClick={onConfirm}>
-                {confirmButtonText}
-            </Button>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            {cancelButtonText}
+          </Button>
+          <Button variant="primary" onClick={onConfirm}>
+            {confirmButtonText}
+          </Button>
         </Modal.Footer>
-        </Modal>
-    )};
+      </Modal>
+    );
+  } else {
+    return (
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{body}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={onConfirm}>
+            {confirmButtonText}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
 };
 
 export default CustomModal;

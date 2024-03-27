@@ -2,7 +2,12 @@ import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 
-export function ProtectedRoute({ children }) {
+// Type for the ProtectedRoute's props
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const authCtx = useContext(AuthContext);
   const isLoggedIn = !!authCtx?.userAuthDetails.token;
 
