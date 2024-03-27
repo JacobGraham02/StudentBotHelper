@@ -13,7 +13,7 @@ export const requestUserGithub = async (code: string) => {
   }
 };
 
-export const registerUser = async (userData) => {
+export const registerUser = async (userData: any) => {
   try {
     const response = await instance.post("users/register", userData);
 
@@ -24,7 +24,7 @@ export const registerUser = async (userData) => {
   }
 };
 
-export const loginUser = async (userData) => {
+export const loginUser = async (userData: any) => {
   try {
     const response = await instance.post("users/login", userData);
 

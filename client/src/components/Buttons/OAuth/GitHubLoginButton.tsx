@@ -3,7 +3,16 @@ import { Container, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
-const GitHubLoginButton = ({ githubLoginHandler, text }) => {
+// Define the props interface
+interface GitHubLoginButtonProps {
+  githubLoginHandler: () => void;
+  text: string;
+}
+
+const GitHubLoginButton: React.FC<GitHubLoginButtonProps> = ({
+  githubLoginHandler,
+  text,
+}) => {
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
