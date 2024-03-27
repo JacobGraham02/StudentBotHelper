@@ -48,7 +48,6 @@ import { hashPassword } from "./modules/hashAndValidatePassword";
 const common_class_work_repository: CommonClassWorkRepository =
   new CommonClassWorkRepository();
 const bot_repository = new BotRepository();
-const bot_controller = new BotController(bot_repository);
 const discord_client_instance: CustomDiscordClient = new CustomDiscordClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -72,7 +71,6 @@ Variables defined in the application .env file
 const discord_bot_token: string | undefined = process.env.discord_bot_token;
 const discord_guild_id: string | undefined = process.env.discord_bot_guild_id;
 const discord_token = process.env.discord_bot_token;
-const discord_client_id = process.env.discord_bot_application_id;
 
 const registerInitialSetupCommands = async (botId: string, guildId: string) => {
   const commands_folder_path: string = path.join(__dirname, "../dist/commands");
@@ -104,11 +102,44 @@ const registerInitialSetupCommands = async (botId: string, guildId: string) => {
     rest.put(Routes.applicationGuildCommands(botId, guildId), {
       body: commands
     }).then(() => {
+      if (channelToSendLogs) {
+        logger.logDiscordMessage(
+          channelToSendLogs,
+          `The initial application setup commands were successfully registered for the guild ${guildId}`
+        )
+      }
+      writeLogToAzureStorage(
+        `The initial application setup commands were successfully registered for the guild ${guildId}`,
+        `MessageLog`,
+        `studentbothelperinfo`
+      )
       console.log('The initial application setup commands were successfully registered');
     }).catch((error) => {
       console.error(`The application encountered an error when registering the commands with the discord bot. All environment variables were valid. ${error}`);
+      if (channelToSendErrors) {
+        logger.logDiscordMessage(
+          channelToSendErrors,
+          `The initial application setup commands were successfully registered for the guild ${guildId}`
+        )
+      }
+      writeLogToAzureStorage(
+        `The initial application setup commands were successfully registered for the guild ${guildId}`,
+        `MessageLog`,
+        `studentbothelperinfo`
+      )
     });
   } else {
+    if (channelToSendErrors) {
+      logger.logDiscordMessage(
+        channelToSendErrors,
+        `The discord bot credentials was invalid when trying to register commands with the bot in guild ${guildId}`
+      )
+    }
+    writeLogToAzureStorage(
+      `The discord bot credentials was invalid when trying to register commands with the bot in guild ${guildId}`,
+      `MessageLog`,
+      `studentbothelperinfo`
+    )
     console.error(`The discord client id, guild id, or bot token was invalid when trying to register commands with the bot`);
   }
 }
@@ -137,11 +168,19 @@ discord_client_instance.on("ready", async () => {
     console.log(
       `The discord bot is logged in as ${discord_client_instance.user.tag}`
     );
-    writeLogToAzureStorage(`The Discord bot is logged in as: ${discord_client_instance.user.tag}`, `MessageLog`, `studentbothelperinfo`);
+    writeLogToAzureStorage(
+      `The Discord bot is logged in as: ${discord_client_instance.user.tag}`, 
+      `MessageLog`, 
+      `studentbothelperinfo`
+    );
   } else {
     console.log(`The discord bot has not logged in`);
   }
-  writeLogToAzureStorage(`The Discord bot is logged in as: ${discord_client_instance.user!.tag}`, `MessageLog`, `studentbothelperinfo`);
+  writeLogToAzureStorage(
+    `The Discord bot is logged in as: ${discord_client_instance.user!.tag}`, 
+    `ErrorLog`, 
+    `studentbothelpererror`
+  );
   console.log(`The bot is logged in as ${discord_client_instance.user!.tag}`);
 
   if (!discord_guild_id) {
@@ -224,10 +263,28 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
     logger = new Logger(discord_client_instance);
 
     try {
+      const botInfo = await bot_repository.findBotByGuildId(interaction.guildId!);
+
+      if (botInfo && interaction.channel && botInfo.bot_commands_channel) {
+        
+        if (interaction.channel.id !== botInfo.bot_commands_channel) {
+          writeLogToAzureStorage(
+            `The user ${interaction.user.username} attempted to use a command in the wrong channel`,
+            `ErrorLog`,
+            `studentbothelpererror`
+          )
+          if (channelToSendErrors) {
+            logger.logDiscordError(
+              channelToSendErrors,
+              `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: in the wrong channel`
+            );
+          }
+          await interaction.reply({content:`You have used a command in the wrong channel! Use the channel titled **bot** instead to use commands`});
+          return;
+        }
+      }
 
       await command.execute(interaction);
-      
-      const botInfo = await bot_repository.findBotByGuildId(interaction.guildId!);
 
       if (!botInfo) {
         return;
@@ -242,30 +299,36 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
         throw new Error(`Bot information not found for this guild`);
       }
 
-      const channelIdForCommands = botInfo.bot_commands_channel;
-      const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
-      const channelIdForErrors = botInfo.bot_command_usage_error_channel;
-      bot_id = botInfo.bit_id;
-      guild_id = botInfo.bot_guild_id;
+      if (botInfo) {
+        const channelIdForCommands = botInfo.bot_commands_channel;
+        const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
+        const channelIdForErrors = botInfo.bot_command_usage_error_channel;
+        bot_id = botInfo.bit_id;
+        guild_id = botInfo.bot_guild_id;
 
-      channelForCommands = interaction.client.channels.cache.get(channelIdForCommands);
-      channelToSendLogs = interaction.client.channels.cache.get(channdlIdForLogs);
-      channelToSendErrors = interaction.client.channels.cache.get(channelIdForErrors);
+        channelForCommands = interaction.client.channels.cache.get(channelIdForCommands);
+        channelToSendLogs = interaction.client.channels.cache.get(channdlIdForLogs);
+        channelToSendErrors = interaction.client.channels.cache.get(channelIdForErrors);
+      }
 
       if (guild_id) {
         botGuild = interaction.client.guilds.cache.get(guild_id);
       }
 
-      logger.logDiscordMessage(
-        channelToSendLogs,
-        `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
-      );
+      if (channelToSendLogs) {
+        logger.logDiscordMessage(
+          channelToSendLogs,
+          `The bot command **${interaction.commandName}** was used by the user ${interaction.user.displayName} (${interaction.user.id})\n`
+        );
+      }
       writeLogToAzureStorage(`The bot command ${interaction.commandName} was used by the user ${interaction.user.displayName} (${interaction.user.id})`, `MessageLog`, `studentbothelperinfo`);
     } catch (error) {
-      logger.logDiscordError(
-        channelToSendErrors,
-        `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
-      );
+      if (channelToSendLogs) {
+        logger.logDiscordError(
+          channelToSendErrors,
+          `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}\n`
+        );
+      }
       writeLogToAzureStorage(
       `An error occured while the user ${interaction.user.displayName} (${interaction.user.id}) attempted to execute the bot command **${interaction.commandName}**: ${error}`, 
       `ErrorLog`, 
@@ -287,10 +350,12 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       content: `You do not have permission to execute the command ${command.data.name}. Please inform the server administrator if you believe this is an error`,
       ephemeral: true,
     });
-    logger.logDiscordError(
-      channelToSendErrors,
-      `The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`
-    );
+    if (channelToSendErrors) {
+      logger.logDiscordError(
+        channelToSendErrors,
+        `The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command **${command.data.name}**`
+      );
+    }
     writeLogToAzureStorage(
       `The user ${interaction.user.displayName} (${interaction.user.id}) did not have permission to execute the command ${command.data.name}`,
       `ErrorLog`,
@@ -303,13 +368,15 @@ discord_client_instance.login(discord_bot_token);
 
 discord_client_instance.on('guildCreate', async (guild) => {
   const botInfo = await bot_repository.findBotByGuildId(guild.id);
-  const channelIdForCommands = botInfo.bot_commands_channel;
-  const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
-  const channelIdForErrors = botInfo.bot_command_usage_error_channel;
 
-  channelForCommands = guild.channels.cache.get(channelIdForCommands)
-  channelToSendLogs = guild.channels.cache.get(channdlIdForLogs);
-  channelToSendErrors = guild.channels.cache.get(channelIdForErrors);
+  if (botInfo) {
+    const channelIdForCommands = botInfo.bot_commands_channel;
+    const channdlIdForLogs = botInfo.bot_command_usage_information_channel;
+    const channelIdForErrors = botInfo.bot_command_usage_error_channel;
+    channelForCommands = guild.channels.cache.get(channelIdForCommands)
+    channelToSendLogs = guild.channels.cache.get(channdlIdForLogs);
+    channelToSendErrors = guild.channels.cache.get(channelIdForErrors);
+  }
 
   bot_id = discord_client_instance.user?.id;
   guild_id = guild.id;
