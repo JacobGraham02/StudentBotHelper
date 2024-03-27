@@ -1,12 +1,15 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useContext } from "react";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "./interfaces/IModalContent";
 import { getAllBotCommands } from "../../services/bot";
 import { NavLink, useNavigate } from "react-router-dom";
 import "../../assets/css/DashboardPageStyling.css"
+import { AuthContext } from "../../contexts/AuthContext";
 
 const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
   const navigate = useNavigate();
+
+  const authCtx = useContext(AuthContext);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -65,7 +68,7 @@ const DashboardPageContent = ({ userLoggedIn }: { userLoggedIn: boolean }) => {
     <main id="main" className="text-center">
        <aside id="bot_configuration_options_page_content">
           <h1 id="dashboard_h1_title">
-            Your dashboard
+            {authCtx?.userAuthDetails.name}'s dashboard
           </h1>
           <h3 id="dashboard_h3_title">
             Below are a list of commands available to you:
