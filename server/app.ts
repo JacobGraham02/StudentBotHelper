@@ -193,6 +193,7 @@ async function writeLogToAzureStorage(
  */
 // async function writeLogToAzureStorage(fileContents: string, fileName: string, containerName: string): Promise<void> {
 discord_client_instance.on("ready", async () => {
+  logger = new Logger(discord_client_instance);
   if (discord_client_instance.user) {
     console.log(
       `The discord bot is logged in as ${discord_client_instance.user.tag}`
@@ -272,6 +273,8 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       discord_client_instance.discord_commands =
         registerCommandResult.discord_client_instance_collection;
     }
+  } else {
+    await command.execute(interaction);
   }
 
   /*
@@ -291,8 +294,6 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
       Given the interaction that the user just had with the bot, we will call the asynchronous 'execute' function that is in the command file. This will trigger the Discord
       bot to respond to the user with a proper acknowledgement response, given that no errors occur.
       */
-
-    logger = new Logger(discord_client_instance);
 
     try {
       const botInfo = await bot_repository.findBotByGuildId(
@@ -318,8 +319,6 @@ discord_client_instance.on("interactionCreate", async (interaction) => {
           return;
         }
       }
-
-      await command.execute(interaction);
 
       if (!botInfo) {
         return;
