@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Container } from "react-bootstrap";
@@ -9,12 +9,22 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { OAuthCreds } from "../../../config";
 import { registerUser } from "../../services/users/index";
 
+// interface FormField {
+//   valid: boolean;
+//   touched: boolean;
+//   value: string;
+// }
+
+// interface RegisterForm {
+//   [key: string]: FormField;
+// }
+
 const Register = () => {
   const authCtx = useContext(AuthContext);
 
   const navigate = useNavigate();
 
-  const [registerForm, setRegisterForm] = useState({
+  const [registerForm, setRegisterForm] = useState<any>({
     fullName: {
       valid: false,
       touched: false,
@@ -41,7 +51,7 @@ const Register = () => {
     if (authCtx?.userAuthDetails.token != "") {
       navigate("/");
     }
-  }, [authCtx?.userAuthDetails.token]);
+  }, [authCtx?.userAuthDetails.token, navigate]);
 
   const onChangeHandler = (field: string, value: string) => {
     let isValid = true; // Default to true, adjust based on validation
@@ -68,7 +78,7 @@ const Register = () => {
     }
 
     // Update state with new value and validation result
-    setRegisterForm((prevState) => ({
+    setRegisterForm((prevState: any) => ({
       ...prevState,
       [field]: {
         ...prevState[field],
@@ -79,7 +89,7 @@ const Register = () => {
     }));
   };
 
-  const googleOnSuccessHandler = (credentialResponse) => {
+  const googleOnSuccessHandler = (credentialResponse: any) => {
     console.log(credentialResponse);
   };
 
@@ -93,7 +103,7 @@ const Register = () => {
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&scope=user&state=tokenAuthorizationStudentHelperBot`;
   };
 
-  const onSubmitHandler = async (e) => {
+  const onSubmitHandler = async (e: any) => {
     e.preventDefault();
     let formIsValid = true;
     // Initialize updatedFormState with the current state
@@ -126,7 +136,7 @@ const Register = () => {
 
         // redirect to login page.
         navigate("/login");
-      } catch (error) {
+      } catch (error: any) {
         // Display an error toast if registration fails
         const errorMessage =
           error.response?.data?.message ||

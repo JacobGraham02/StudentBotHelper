@@ -1,8 +1,8 @@
 import React from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
-import GitHubLoginButton from "../Buttons/OAuth/GitHubLoginButton";
+// import { Link } from "react-router-dom";
+// import { GoogleLogin } from "@react-oauth/google";
+// import GitHubLoginButton from "../Buttons/OAuth/GitHubLoginButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
@@ -19,13 +19,22 @@ type LoginDetails = {
   };
 };
 
-const LoginForm = ({
+interface LoginFormProps {
+  onSubmitHandler: any;
+  onChangeHandler: (field: string, value: string) => void;
+  loginDetails: LoginDetails;
+  googleOnSuccessHandler: (response: any) => any;
+  googleOnErrorHandler: () => void;
+  githubLoginHandler: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({
   onSubmitHandler,
   onChangeHandler,
   loginDetails,
-  googleOnSuccessHandler,
-  googleOnErrorHandler,
-  githubLoginHandler,
+  // googleOnSuccessHandler,
+  // googleOnErrorHandler,
+  // githubLoginHandler,
 }) => {
   const handleChange = (field: string, value: string) => {
     // Assuming onChangeHandler is designed to update the state based on field and value
