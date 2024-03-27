@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -11,16 +11,19 @@ import {
 } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CommandsForm, RegexPatterns } from "../types/BotTypes";
-import { postBotCommands, postBotRequestCommand } from "../../services/bot";
+import { postBotRequestCommand } from "../../services/bot";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faEraser, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import CustomModal from "../../components/Modal/CustomModal";
 import IModalContent from "../user/interfaces/IModalContent";
+import { AuthContext } from "../../contexts/AuthContext";
 
 
 const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     const navigate = useNavigate();
     let stateBotId, stateCommandName, stateCommandDescription, stateCommandFunction, stateUsers = undefined;
+
+    const authCtx = useContext(AuthContext);
 
     const [confirmClear, setConfirmClear] = useState(false);
   
@@ -269,6 +272,8 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     }
 
     const formSubmissionData = {
+      botId: authCtx?.userAuthDetails.bot.bot_id,
+      botGuildId: authCtx?.userAuthDetails.bot.bot_guild_id,
       commandName: commandData.commandName.value,
       commandDescription: commandData.commandDescription.value,
       commandDescriptionForFunction: commandData.commandDescriptionForFunction.value,
@@ -276,7 +281,7 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
     }
 
     try {
-      const postCommandResponse = await postBotCommands(
+      const postCommandResponse = await postBotRequestCommand(
         formSubmissionData
       );
       if (postCommandResponse) {
@@ -487,11 +492,11 @@ const CommandsPageContent = ({userLoggedIn}: {userLoggedIn:boolean}) => {
                                 <FormLabel 
                                   className="command_authorized_user_label"
                                 >
-                                  You can add a maximum of 8 authorized users. If you want more, please specify so in the command description
+                                  You can add a maximum of 4 authorized users. If you want more, please specify so in the command description
                                 </FormLabel>
                                 <Button className="btn btn-primary" 
                                   onClick={addAuthorizedUserField}
-                                  disabled={commandData.commandAuthorizedUsers.length >= 8}
+                                  disabled={commandData.commandAuthorizedUsers.length >= 4}
                                 >
                                 <FontAwesomeIcon icon={faUser} className="mx-1"/>
                                 Add additional authorized users

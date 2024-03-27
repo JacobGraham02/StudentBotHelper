@@ -13,10 +13,11 @@ export default class CommandRequestEmail {
                 from: process.env.google_admin_email,
                 to: process.env.google_admin_email,
                 subject: `Create command request for bot ${createEmailRequest.botId}: ${createEmailRequest.commandName}`,
-                text: `The user wants to create a command with the following properties:\n\n Command name: ${createEmailRequest.commandName}\n\n Description: ${createEmailRequest.commandDescription}\n\n Command users: ${createEmailRequest.commandAuthorizedUsers}\n\n Functionality for command: ${createEmailRequest.commandDescriptionForFunction}\n`,
+                text: `The user wants to create a command with the following properties:\n\n Command name: ${createEmailRequest.commandName}\n\n Description: ${createEmailRequest.commandDescription}\n\n Command users: ${createEmailRequest.commandAuthorizedUsers}\n\n Functionality for command: ${createEmailRequest.commandDescriptionForFunction}\n\n. The bot id is: ${createEmailRequest.botId}\n The bot guild id is: ${createEmailRequest.botGuildId}`,
             }
             let emailTransporter = await this.createOAuth2Transporter();
-            await emailTransporter.sendMail(mailOptions);
+            const response = await emailTransporter.sendMail(mailOptions);
+            return response;
         } catch (error) {
             console.log(`There was an error when attempting to send the email to a gmail account: ${error}`);
             throw new Error(`There was an error when attempting to send the email to a gmail account: ${error}`);
@@ -50,7 +51,7 @@ export default class CommandRequestEmail {
             const emailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    // type: "OAuth2",
+                    type: "OAuth2",
                     user: process.env.google_admin_email,
                     accessToken,
                     clientId: process.env.google_cloud_client_id,

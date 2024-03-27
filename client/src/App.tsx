@@ -60,7 +60,7 @@ const router = createBrowserRouter([
         path: "/",
         element: (
           <ProtectedRoute>
-            <Dashboard />
+            <LandingPage />
           </ProtectedRoute>
         ),
       },
@@ -98,7 +98,11 @@ const router = createBrowserRouter([
       },
       {
         path: "command",
-        element: <CommandPage isUserLoggedIn={true} />
+        element: (
+          <ProtectedRoute>
+            <CommandPage isUserLoggedIn={true} />
+          </ProtectedRoute>
+        )
       },
       {
         path: 'logs',
